@@ -72,7 +72,7 @@ class DAWController:
 
         return status
 
-    def _handle_status_change(self, previous: DAWStatus, current: DAWStatus) -> None:
+    def _handle_status_change(self, previous: DAWStatus, current: DAWStatus):
         """Handle changes in DAW status"""
         # DAW started
         if not previous.is_running and current.is_running:

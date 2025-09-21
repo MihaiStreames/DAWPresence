@@ -35,7 +35,7 @@ class AppSettings:
                 update_interval=data.get("UpdateInterval", 2500),
             )
 
-    def save(self, filepath: str) -> None:
+    def save(self, filepath: str):
         """Save settings to JSON file"""
         data = {
             "HideProjectName": self.hide_project_name,

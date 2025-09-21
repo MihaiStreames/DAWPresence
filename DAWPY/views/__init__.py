@@ -1,5 +1,5 @@
 from .dialogs import IntervalDialog
 from .main_window import MainWindow
-from .tray_icon import SystemTrayManager
+from .sys_tray_mann import SystemTrayManager
 
 __all__ = ["MainWindow", "SystemTrayManager", "IntervalDialog"]

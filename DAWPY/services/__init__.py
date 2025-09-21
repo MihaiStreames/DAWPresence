@@ -1,5 +1,5 @@
-from .configuration import ConfigurationService
+from .conf_service import ConfigurationService
 from .discord_service import DiscordService
-from .process_monitor import ProcessMonitorService
+from .proc_monitor_service import ProcessMonitorService
 
 __all__ = ["ProcessMonitorService", "ConfigurationService", "DiscordService"]

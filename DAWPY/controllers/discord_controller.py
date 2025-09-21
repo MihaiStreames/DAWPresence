@@ -1,8 +1,8 @@
 from typing import Callable, Optional
 
+from DAWPY.exceptions import DiscordConnectionError
 from DAWPY.models import AppSettings, DAWStatus, DiscordPresence
 from DAWPY.services import DiscordService
-from DAWPY.services.discord_service import DiscordConnectionError
 
 
 class DiscordController:
@@ -28,9 +28,7 @@ class DiscordController:
         """Check if Discord is connected"""
         return self.discord_service.is_connected
 
-    def update_from_daw_status(
-        self, daw_status: DAWStatus, settings: AppSettings
-    ) -> None:
+    def update_from_daw_status(self, daw_status: DAWStatus, settings: AppSettings):
         """Update Discord presence based on DAW status"""
         if not daw_status.is_running:
             self.disconnect()
@@ -51,7 +49,7 @@ class DiscordController:
             if self.on_error:
                 self.on_error(e)
 
-    def disconnect(self) -> None:
+    def disconnect(self):
         """Disconnect from Discord"""
         self.discord_service.disconnect()
         self._current_client_id = None
@@ -68,18 +66,18 @@ class DiscordController:
         except DiscordConnectionError:
             return False
 
-    def _on_connected(self) -> None:
+    def _on_connected(self):
         """Handle Discord connection"""
         if self.on_connected:
             self.on_connected()
 
-    def _on_disconnected(self) -> None:
+    def _on_disconnected(self):
         """Handle Discord disconnection"""
         self._current_client_id = None
         if self.on_disconnected:
             self.on_disconnected()
 
-    def _on_error(self, error: Exception) -> None:
+    def _on_error(self, error: Exception):
         """Handle Discord errors"""
         if self.on_error:
             self.on_error(error)

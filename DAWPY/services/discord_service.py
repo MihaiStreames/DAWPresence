@@ -3,13 +3,8 @@ from typing import Callable, Optional
 
 from pypresence import Presence
 
+from DAWPY.exceptions import DiscordConnectionError
 from DAWPY.models import DiscordPresence
-
-
-class DiscordConnectionError(Exception):
-    """Custom exception for Discord connection issues"""
-
-    pass
 
 
 class DiscordService:
@@ -31,7 +26,7 @@ class DiscordService:
         """Check if Discord client is connected"""
         return self._is_connected and self._client is not None
 
-    def connect(self, client_id: str) -> None:
+    def connect(self, client_id: str):
         """Connect to Discord with specified client ID"""
         if self.is_connected and self._current_client_id == client_id:
             return  # Already connected with same client ID
@@ -58,7 +53,7 @@ class DiscordService:
             else:
                 raise error
 
-    def disconnect(self) -> None:
+    def disconnect(self):
         """Disconnect from Discord"""
         if not self.is_connected:
             return
@@ -74,7 +69,7 @@ class DiscordService:
             if self.on_disconnected:
                 self.on_disconnected()
 
-    def update_presence(self, presence: DiscordPresence) -> None:
+    def update_presence(self, presence: DiscordPresence):
         """Update Discord Rich Presence"""
         if not self.is_connected:
             raise DiscordConnectionError("Not connected to Discord")
@@ -94,7 +89,7 @@ class DiscordService:
             else:
                 raise error
 
-    def _cleanup_client(self) -> None:
+    def _cleanup_client(self):
         """Clean up client state"""
         self._client = None
         self._current_client_id = None
