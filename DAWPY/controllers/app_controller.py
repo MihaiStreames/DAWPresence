@@ -1,6 +1,7 @@
 import os
 from typing import Optional
 
+from loguru import logger
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication, QMessageBox
 
@@ -9,6 +10,7 @@ from DAWPY.controllers.discord_controller import DiscordController
 from DAWPY.models import AppSettings
 from DAWPY.services import (ConfigurationService, DiscordService,
                             ProcessMonitorService)
+from DAWPY.services.logging_service import LoggingService, log_errors
 
 
 class AppController:
@@ -16,6 +18,13 @@ class AppController:
 
     def __init__(self, app_version: str):
         self.app_version = app_version
+
+        # Initialize logging first
+        self._config_dir = self._get_config_directory()
+        self.logging_service = LoggingService(self._config_dir)
+
+        logger.info(f"DAWPresence v{app_version} starting up")
+
         self.app: Optional[QApplication] = None
         self.main_window = None
 
@@ -37,8 +46,10 @@ class AppController:
         self.settings: Optional[AppSettings] = None
         self.update_timer: Optional[QTimer] = None
 
-        # Setup callbacks
+        # Callbacks
         self._setup_callbacks()
+
+        logger.success("Application controller initialized successfully")
 
     @staticmethod
     def _get_config_directory() -> str:
@@ -57,42 +68,37 @@ class AppController:
         self.discord_controller.on_disconnected = self._on_discord_disconnected
         self.discord_controller.on_error = self._on_discord_error
 
+    @log_errors
     def initialize(self) -> bool:
         """Initialize the application"""
         try:
-            # Check for multiple instances
             if self._is_already_running():
-                QMessageBox.critical(
-                    None, "Error", "Another instance of DAWPresence is already running."
-                )
+                logger.warning("Another instance is already running")
                 return False
 
-            # Ensure config directory exists
+            # Ensure configs
             os.makedirs(self._config_dir, exist_ok=True)
-
-            # Copy default daws.json if it doesn't exist
             self._ensure_daws_config()
 
             # Load settings
             self.settings = AppSettings.load(self._settings_path)
+            logger.info(
+                f"Settings loaded: Update interval={self.settings.update_interval}ms"
+            )
 
-            # Validate DAW configurations
+            # Validate configs
             try:
-                self.config_service.load_daw_configurations()
+                daw_configs = self.config_service.load_daw_configurations()
+                logger.info(f"Loaded {len(daw_configs)} DAW configurations")
             except (FileNotFoundError, ValueError) as e:
-                QMessageBox.critical(
-                    None,
-                    "Configuration Error",
-                    f"Error loading DAW configurations:\n{e}",
-                )
+                logger.error(f"DAW configuration error: {e}")
                 return False
 
+            logger.success("Application initialized successfully")
             return True
 
         except Exception as e:
-            QMessageBox.critical(
-                None, "Initialization Error", f"Failed to initialize application:\n{e}"
-            )
+            logger.exception(f"Failed to initialize application: {e}")
             return False
 
     def start(self, app: QApplication, main_window):
@@ -100,25 +106,26 @@ class AppController:
         self.app = app
         self.main_window = main_window
 
-        # Setup UI callbacks
+        # UI callbacks
         self._connect_ui_signals()
 
-        # Setup update timer
+        # Update timer
         self.update_timer = QTimer()
         self.update_timer.timeout.connect(self._update_cycle)
         self.update_timer.start(self.settings.update_interval)
 
-        # Update UI with current settings
+        # Update UI
         self._update_ui_settings()
-
-        # Show window
         self.main_window.show()
 
     def shutdown(self):
         """Shutdown the application"""
+        logger.info("Shutting down DAWPresence...")
+
         # Stop timer
         if self.update_timer:
             self.update_timer.stop()
+            logger.debug("Update timer stopped")
 
         # Disconnect Discord
         self.discord_controller.disconnect()
@@ -126,6 +133,9 @@ class AppController:
         # Save settings
         if self.settings:
             self.settings.save(self._settings_path)
+            logger.info("Settings saved")
+
+        logger.success("DAWPresence shutdown complete")
 
     def toggle_hide_project_name(self):
         """Toggle project name visibility"""
@@ -263,5 +273,5 @@ class AppController:
             shutil.copy2(package_daws_path, self._daws_config_path)
         else:
             raise FileNotFoundError(
-                "daws.json not found in package directory. Please download it from the repository."
+                "daws.json not found. Please download it from the repository."
             )

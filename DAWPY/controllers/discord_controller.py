@@ -1,8 +1,11 @@
 from typing import Callable, Optional
 
+from loguru import logger
+
 from DAWPY.exceptions import DiscordConnectionError
 from DAWPY.models import AppSettings, DAWStatus, DiscordPresence
 from DAWPY.services import DiscordService
+from DAWPY.services.logging_service import log_errors
 
 
 class DiscordController:
@@ -23,11 +26,14 @@ class DiscordController:
         self.on_disconnected: Optional[Callable] = None
         self.on_error: Optional[Callable[[Exception], None]] = None
 
+        logger.info("Discord Controller initialized")
+
     @property
     def is_connected(self) -> bool:
         """Check if Discord is connected"""
         return self.discord_service.is_connected
 
+    @log_errors
     def update_from_daw_status(self, daw_status: DAWStatus, settings: AppSettings):
         """Update Discord presence based on DAW status"""
         if not daw_status.is_running:
@@ -36,6 +42,7 @@ class DiscordController:
 
         # Ensure we're connected with correct client ID
         if not self._ensure_connection(daw_status.daw_info.client_id):
+            logger.warning("Failed to establish Discord connection")
             return
 
         # Create and update presence
@@ -45,7 +52,9 @@ class DiscordController:
 
         try:
             self.discord_service.update_presence(presence)
+            logger.debug(f"Discord presence updated: {presence.details}")
         except DiscordConnectionError as e:
+            logger.error(f"Failed to update Discord presence: {e}")
             if self.on_error:
                 self.on_error(e)
 
@@ -62,17 +71,21 @@ class DiscordController:
         try:
             self.discord_service.connect(client_id)
             self._current_client_id = client_id
+            logger.success(f"Connected to Discord (Client ID: {client_id})")
             return True
-        except DiscordConnectionError:
+        except DiscordConnectionError as e:
+            logger.warning(f"Discord connection failed: {e}")
             return False
 
     def _on_connected(self):
         """Handle Discord connection"""
+        logger.info("Discord RPC connected")
         if self.on_connected:
             self.on_connected()
 
     def _on_disconnected(self):
         """Handle Discord disconnection"""
+        logger.info("Discord RPC disconnected")
         self._current_client_id = None
         if self.on_disconnected:
             self.on_disconnected()
