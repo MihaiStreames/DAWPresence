@@ -26,7 +26,7 @@ class DiscordPresence:
             return cls(
                 details="Not using any DAW",
                 state="Idle",
-                large_text=f"DAWRPC v{version}"
+                large_text=f"DAWPresence v{version}"
             )
 
         project = daw_status.project_name
@@ -58,7 +58,7 @@ class DiscordPresence:
         return cls(
             details=details,
             state=state,
-            large_text=f"DAWRPC v{version}"
+            large_text=f"DAWPresence v{version}"
         )
 
     def to_pypresence_dict(self) -> dict:

@@ -147,7 +147,7 @@ class TestDiscordPresence:
 
         assert presence.details == "Not using any DAW"
         assert presence.state == "Idle"
-        assert "DAWRPC v2.0" in presence.large_text
+        assert "DAWPresence v2.0" in presence.large_text
 
     def test_create_for_running_daw(self, sample_daw_info):
         """Test creating presence for running DAW"""

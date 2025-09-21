@@ -14,7 +14,7 @@ def main():
     """Main application entry point"""
     # Application info
     APP_VERSION = "2.0"
-    APP_NAME = "DAWRPC"
+    APP_NAME = "DAWPresence"
 
     # Create Qt application
     app = QApplication(sys.argv)

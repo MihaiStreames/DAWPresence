@@ -21,13 +21,13 @@ def get_long_description():
 
 
 setup(
-    name="dawrpc",
+    name="dawpresence",
     version=get_version(),
     author="MihaiStreames",
     description="DAW Discord Rich Presence - Show what you're making on your DAW in Discord",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
-    url="https://github.com/MihaiStreames/DAWRPC",
+    url="https://github.com/MihaiStreames/DAWPresence",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -56,7 +56,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'dawrpc=main:main',
+            'dawpresence=main:main',
         ],
     },
     include_package_data=True,

@@ -1,5 +1,4 @@
 import os
-import sys
 from typing import Optional
 
 from PyQt5.QtCore import QTimer
@@ -11,7 +10,7 @@ from DAWPY.services import ProcessMonitorService, ConfigurationService, DiscordS
 
 
 class AppController:
-    """Main application controller - orchestrates all components"""
+    """Main application controller"""
 
     def __init__(self, app_version: str = "2.0"):
         self.app_version = app_version
@@ -42,12 +41,7 @@ class AppController:
     @staticmethod
     def _get_config_directory() -> str:
         """Get configuration directory path"""
-        if hasattr(sys, '_MEIPASS'):
-            # Running as PyInstaller executable
-            return os.path.join(os.path.dirname(sys.executable), 'config')
-        else:
-            # Running as script
-            return os.path.join(os.path.dirname(__file__), '..', 'config')
+        return os.path.join(os.path.dirname(__file__), '..', 'config')
 
     def _setup_callbacks(self) -> None:
         """Setup inter-controller communication"""
@@ -66,7 +60,7 @@ class AppController:
         try:
             # Check for multiple instances
             if self._is_already_running():
-                QMessageBox.critical(None, "Error", "Another instance of DAWRPC is already running.")
+                QMessageBox.critical(None, "Error", "Another instance of DAWPresence is already running.")
                 return False
 
             # Ensure config directory exists
@@ -220,8 +214,8 @@ class AppController:
                 if proc.info['pid'] == current_pid:
                     continue
 
-                # Check for DAWRPC executable
-                if 'DAWRPC' in proc.info['name']:
+                # Check for DAWPresence executable
+                if 'DAWPresence' in proc.info['name']:
                     return True
 
                 # Check for Python script

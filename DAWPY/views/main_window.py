@@ -211,7 +211,7 @@ class MainWindow(QMainWindow):
             event.ignore()
             self.hide()
             if self.tray_manager:
-                self.tray_manager.show_message("DAWRPC", "Application minimized to tray")
+                self.tray_manager.show_message("DAWPresence", "Application minimized to tray")
         else:
             event.accept()
 
