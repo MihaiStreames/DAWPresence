@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 
@@ -38,7 +39,7 @@ class LoggingService:
             compression="zip",   # Compress old logs
         )
 
-        logger.info(f"{self.app_name} logging initialized")
+        logger.info(f"{self.app_name} logging initialized at: {log_dir}")
 
 
 # Decorators

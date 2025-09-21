@@ -34,7 +34,7 @@ class MainWindow(QMainWindow):
 
     def _init_ui(self):
         """Initialize the user interface"""
-        self.setWindowTitle(f"DAW Discord Rich Presence v{self.app_version}")
+        self.setWindowTitle(f"DAWPresence")
         self.setFixedSize(735, 347)
 
         # Create central widget and layout

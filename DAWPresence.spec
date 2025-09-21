@@ -3,12 +3,13 @@
 block_cipher = None
 
 a = Analysis(
-    ['main.py'],
-    pathex=[],
+    ['DAWPY/main.py'],
+    pathex=['.'],
     binaries=[],
     datas=[
-        ('daws.json', '.'),
-        ('settings.json', '.'),
+        ('DAWPY/daws.json', '.'),
+        ('DAWPY/assets/red.ico', 'assets'),
+        ('DAWPY/assets/green.ico', 'assets'),
     ],
     hiddenimports=[
         'PyQt5.QtCore',
@@ -40,13 +41,13 @@ exe = EXE(
     a.datas,
     [],
     name='DAWPresence',
-    debug=False,
+    debug=True,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    upx=False,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,
+    console=True,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,

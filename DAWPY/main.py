@@ -1,19 +1,20 @@
 import os
 import sys
+import traceback
 
 from PyQt5.QtWidgets import QApplication
 
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from controllers.app_controller import AppController
-from views.main_window import MainWindow
+from DAWPY.controllers.app_controller import AppController
+from DAWPY.views.main_window import MainWindow
 
 
 def main():
     """Main application entry point"""
     # Application info
-    APP_VERSION = "2.0"
+    APP_VERSION = "1.0"
     APP_NAME = "DAWPresence"
 
     # Create Qt application
@@ -44,6 +45,7 @@ def main():
 
     except Exception as e:
         print(f"Fatal error: {e}")
+        traceback.print_exc()
         return 1
 
 
