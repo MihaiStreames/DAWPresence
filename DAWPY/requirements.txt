@@ -3,3 +3,4 @@ pypresence>=4.3.0
 psutil>=7.1.0
 pywin32>=311
 setuptools>=80.9.0
+loguru>=0.7.3

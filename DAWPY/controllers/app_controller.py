@@ -19,7 +19,7 @@ class AppController:
     def __init__(self, app_version: str):
         self.app_version = app_version
 
-        # Initialize logging first
+        # Logging first
         self._config_dir = self._get_config_directory()
         self.logging_service = LoggingService(self._config_dir)
 

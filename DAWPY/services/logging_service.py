@@ -31,17 +31,17 @@ class LoggingService:
         # File handler with rotation
         logger.add(
             log_dir / f"{self.app_name.lower()}_{{time:YYYY-MM-DD}}.log",
-            level="INFO",
+            level="TRACE",
             format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} - {message}",
             rotation="1 day",
             retention="7 days",  # Keep logs for 1 week
-            compression="zip",  # Compress old logs
+            compression="zip",   # Compress old logs
         )
 
         logger.info(f"{self.app_name} logging initialized")
 
 
-# Decorator for timing functions
+# Decorators
 from functools import wraps
 from time import time
 

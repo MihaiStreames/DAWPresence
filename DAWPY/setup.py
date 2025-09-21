@@ -30,6 +30,7 @@ setup(
         "PyQt5>=5.15.11",
         "pypresence>=4.3.0",
         "psutil>=7.1.0",
+        "loguru>=0.7.3",
     ],
     extras_require={
         "windows": ["pywin32>=311"],
