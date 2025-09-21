@@ -41,7 +41,7 @@ class AppSettings:
             settings.save(filepath)
             return settings
 
-    def save(self, filepath: str) -> None:
+    def save(self, filepath: str):
         """Save settings to JSON file"""
         data = {
             "HideProjectName": self.hide_project_name,

@@ -45,7 +45,7 @@ class AppController:
         """Get configuration directory path"""
         return os.path.join(os.path.dirname(__file__), "..", "config")
 
-    def _setup_callbacks(self) -> None:
+    def _setup_callbacks(self):
         """Setup inter-controller communication"""
         # DAW Controller callbacks
         self.daw_controller.on_daw_started = self._on_daw_started
@@ -95,7 +95,7 @@ class AppController:
             )
             return False
 
-    def start(self, app: QApplication, main_window) -> None:
+    def start(self, app: QApplication, main_window):
         """Start the application"""
         self.app = app
         self.main_window = main_window
@@ -114,7 +114,7 @@ class AppController:
         # Show window
         self.main_window.show()
 
-    def shutdown(self) -> None:
+    def shutdown(self):
         """Shutdown the application"""
         # Stop timer
         if self.update_timer:
@@ -127,7 +127,7 @@ class AppController:
         if self.settings:
             self.settings.save(self._settings_path)
 
-    def toggle_hide_project_name(self) -> None:
+    def toggle_hide_project_name(self):
         """Toggle project name visibility"""
         self.settings = self.settings.update(
             hide_project_name=not self.settings.hide_project_name
@@ -135,7 +135,7 @@ class AppController:
         self.settings.save(self._settings_path)
         self._update_ui_settings()
 
-    def toggle_hide_system_usage(self) -> None:
+    def toggle_hide_system_usage(self):
         """Toggle system usage visibility"""
         self.settings = self.settings.update(
             hide_system_usage=not self.settings.hide_system_usage
@@ -143,7 +143,7 @@ class AppController:
         self.settings.save(self._settings_path)
         self._update_ui_settings()
 
-    def set_update_interval(self, interval: int) -> None:
+    def set_update_interval(self, interval: int):
         """Set presence update interval"""
         try:
             self.settings = self.settings.update(update_interval=interval)
@@ -158,7 +158,7 @@ class AppController:
         except ValueError as e:
             QMessageBox.warning(None, "Invalid Interval", str(e))
 
-    def _update_cycle(self) -> None:
+    def _update_cycle(self):
         """Main update cycle"""
         try:
             # Scan for DAWs and update status
@@ -170,7 +170,7 @@ class AppController:
         except Exception as e:
             print(f"Error in update cycle: {e}")
 
-    def _connect_ui_signals(self) -> None:
+    def _connect_ui_signals(self):
         """Connect UI signals to controller methods"""
         if hasattr(self.main_window, "toggle_project_name_signal"):
             self.main_window.toggle_project_name_signal.connect(
@@ -188,37 +188,37 @@ class AppController:
         if hasattr(self.main_window, "exit_signal"):
             self.main_window.exit_signal.connect(self.shutdown)
 
-    def _update_ui_settings(self) -> None:
+    def _update_ui_settings(self):
         """Update UI to reflect current settings"""
         if hasattr(self.main_window, "update_settings_display"):
             self.main_window.update_settings_display(self.settings)
 
-    def _on_daw_started(self, daw_status) -> None:
+    def _on_daw_started(self, daw_status):
         """Handle DAW started event"""
         if hasattr(self.main_window, "on_daw_started"):
             self.main_window.on_daw_started(daw_status)
 
-    def _on_daw_stopped(self, daw_status) -> None:
+    def _on_daw_stopped(self, daw_status):
         """Handle DAW stopped event"""
         if hasattr(self.main_window, "on_daw_stopped"):
             self.main_window.on_daw_stopped(daw_status)
 
-    def _on_daw_status_updated(self, daw_status) -> None:
+    def _on_daw_status_updated(self, daw_status):
         """Handle DAW status update"""
         if hasattr(self.main_window, "update_daw_display"):
             self.main_window.update_daw_display(daw_status)
 
-    def _on_discord_connected(self) -> None:
+    def _on_discord_connected(self):
         """Handle Discord connected event"""
         if hasattr(self.main_window, "on_discord_connected"):
             self.main_window.on_discord_connected()
 
-    def _on_discord_disconnected(self) -> None:
+    def _on_discord_disconnected(self):
         """Handle Discord disconnected event"""
         if hasattr(self.main_window, "on_discord_disconnected"):
             self.main_window.on_discord_disconnected()
 
-    def _on_discord_error(self, error: Exception) -> None:
+    def _on_discord_error(self, error: Exception):
         """Handle Discord error"""
         if hasattr(self.main_window, "on_discord_error"):
             self.main_window.on_discord_error(error)
@@ -249,7 +249,7 @@ class AppController:
 
         return False
 
-    def _ensure_daws_config(self) -> None:
+    def _ensure_daws_config(self):
         """Ensure daws.json exists in config directory"""
         if os.path.exists(self._daws_config_path):
             return

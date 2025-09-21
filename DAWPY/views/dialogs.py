@@ -11,7 +11,7 @@ class IntervalDialog(QObject):
         super().__init__()
         self.parent = parent
 
-    def show_dialog(self, current_interval: int = 2500) -> None:
+    def show_dialog(self, current_interval: int = 2500):
         """Show interval input dialog"""
         interval, ok = QInputDialog.getInt(
             self.parent,
