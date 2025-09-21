@@ -28,17 +28,11 @@ class DiscordController:
         """Check if Discord is connected"""
         return self.discord_service.is_connected
 
-    @property
-    def current_client_id(self) -> Optional[str]:
-        """Get current Discord client ID"""
-        return self._current_client_id
-
     def update_from_daw_status(
         self, daw_status: DAWStatus, settings: AppSettings
     ) -> None:
         """Update Discord presence based on DAW status"""
         if not daw_status.is_running:
-            # No DAW running - disconnect
             self.disconnect()
             return
 

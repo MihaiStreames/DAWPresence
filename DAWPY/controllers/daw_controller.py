@@ -21,17 +21,12 @@ class DAWController:
         self.on_daw_stopped: Optional[Callable[[DAWStatus], None]] = None
         self.on_status_updated: Optional[Callable[[DAWStatus], None]] = None
 
-    @property
-    def current_status(self) -> DAWStatus:
-        """Get current DAW status"""
-        return self._current_status
-
     def scan_for_daws(self, settings: AppSettings) -> DAWStatus:
         """Scan for running DAWs and update status"""
         previous_status = self._current_status
         new_status = DAWStatus()
 
-        # Get all supported DAW configurations
+        # Load configs
         daw_configs = self.config_service.load_daw_configurations()
 
         # Check each DAW
@@ -45,7 +40,7 @@ class DAWController:
                 new_status = self._build_daw_status(daw_info, process_info, settings)
                 break
 
-        # Update current status
+        # Update status
         self._current_status = new_status
 
         # Fire callbacks
@@ -69,7 +64,7 @@ class DAWController:
             version=self.process_monitor.get_process_version(process_info.exe_path),
         )
 
-        # Extract project name if not hidden
+        # Extract project name
         if not settings.hide_project_name:
             status.project_name = status.extract_project_name()
         else:
@@ -88,7 +83,3 @@ class DAWController:
         elif previous.is_running and not current.is_running:
             if self.on_daw_stopped:
                 self.on_daw_stopped(current)
-
-    def get_supported_daws(self) -> List[DAWInfo]:
-        """Get list of all supported DAWs"""
-        return self.config_service.load_daw_configurations()

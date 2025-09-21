@@ -9,13 +9,8 @@ class ConfigurationService:
     """Service for loading and managing DAW configurations"""
 
     def __init__(self, config_path: str = None):
-        self.config_path = config_path or self._get_default_config_path()
+        self.config_path = config_path
         self._daws_cache = None
-
-    @staticmethod
-    def _get_default_config_path() -> str:
-        """Get default configuration file path"""
-        return os.path.join(os.path.dirname(__file__), "..", "config", "daws.json")
 
     def load_daw_configurations(self) -> List[DAWInfo]:
         """Load DAW configurations from JSON file"""
@@ -62,13 +57,3 @@ class ConfigurationService:
                 return daw
 
         return None
-
-    def get_supported_process_names(self) -> List[str]:
-        """Get list of all supported process names"""
-        daws = self.load_daw_configurations()
-        return [daw.process_name for daw in daws]
-
-    def reload_configurations(self) -> None:
-        """Reload configurations from file"""
-        self._daws_cache = None
-        self.load_daw_configurations()

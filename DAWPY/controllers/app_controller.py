@@ -37,7 +37,7 @@ class AppController:
         self.settings: Optional[AppSettings] = None
         self.update_timer: Optional[QTimer] = None
 
-        # Setup callbacks
+        # Callbacks
         self._setup_callbacks()
 
     @staticmethod
@@ -60,23 +60,20 @@ class AppController:
     def initialize(self) -> bool:
         """Initialize the application"""
         try:
-            # Check for multiple instances
-            if self._is_already_running():
+            if self._is_already_running():  # We don't want multiple instances
                 QMessageBox.critical(
                     None, "Error", "Another instance of DAWPresence is already running."
                 )
                 return False
 
-            # Ensure config directory exists
+            # Ensure configs
             os.makedirs(self._config_dir, exist_ok=True)
-
-            # Copy default daws.json if it doesn't exist
             self._ensure_daws_config()
 
-            # Load settings
+            # Load
             self.settings = AppSettings.load(self._settings_path)
 
-            # Validate DAW configurations
+            # Validate configs
             try:
                 self.config_service.load_daw_configurations()
             except (FileNotFoundError, ValueError) as e:
@@ -100,18 +97,16 @@ class AppController:
         self.app = app
         self.main_window = main_window
 
-        # Setup UI callbacks
+        # UI callbacks
         self._connect_ui_signals()
 
-        # Setup update timer
+        # Update timer
         self.update_timer = QTimer()
         self.update_timer.timeout.connect(self._update_cycle)
         self.update_timer.start(self.settings.update_interval)
 
-        # Update UI with current settings
+        # Update UI
         self._update_ui_settings()
-
-        # Show window
         self.main_window.show()
 
     def shutdown(self) -> None:
@@ -263,5 +258,5 @@ class AppController:
             shutil.copy2(package_daws_path, self._daws_config_path)
         else:
             raise FileNotFoundError(
-                "daws.json not found in package directory. Please download it from the repository."
+                "daws.json not found. Please download it from the repository."
             )

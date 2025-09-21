@@ -37,13 +37,10 @@ class SystemTrayManager(QObject):
 
     def _setup_tray(self) -> None:
         """Setup tray icon and menu"""
-        # Set initial icon (red = disconnected)
         self._set_icon_color("red")
 
-        # Create menu
         self._create_menu()
 
-        # Set menu and show
         self.tray_icon.setContextMenu(self.tray_menu)
         self.tray_icon.activated.connect(self._on_tray_activated)
         self.tray_icon.show()

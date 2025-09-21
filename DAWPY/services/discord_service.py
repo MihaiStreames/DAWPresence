@@ -31,11 +31,6 @@ class DiscordService:
         """Check if Discord client is connected"""
         return self._is_connected and self._client is not None
 
-    @property
-    def current_client_id(self) -> Optional[str]:
-        """Get current Discord client ID"""
-        return self._current_client_id
-
     def connect(self, client_id: str) -> None:
         """Connect to Discord with specified client ID"""
         if self.is_connected and self._current_client_id == client_id:
@@ -98,17 +93,6 @@ class DiscordService:
                 self.on_error(error)
             else:
                 raise error
-
-    def clear_presence(self) -> None:
-        """Clear Discord Rich Presence"""
-        if not self.is_connected:
-            return
-
-        try:
-            self._client.clear()
-        except Exception as e:
-            if self.on_error:
-                self.on_error(DiscordConnectionError(f"Failed to clear presence: {e}"))
 
     def _cleanup_client(self) -> None:
         """Clean up client state"""

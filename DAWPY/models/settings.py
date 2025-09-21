@@ -27,19 +27,13 @@ class AppSettings:
             settings.save(filepath)
             return settings
 
-        try:
-            with open(filepath, "r") as f:
-                data = json.load(f)
-                return cls(
-                    hide_project_name=data.get("HideProjectName", False),
-                    hide_system_usage=data.get("HideSystemUsage", False),
-                    update_interval=data.get("UpdateInterval", 2500),
-                )
-        except (json.JSONDecodeError, KeyError, ValueError) as e:
-            # If file is corrupted, create new one with defaults
-            settings = cls()
-            settings.save(filepath)
-            return settings
+        with open(filepath, "r") as f:
+            data = json.load(f)
+            return cls(
+                hide_project_name=data.get("HideProjectName", False),
+                hide_system_usage=data.get("HideSystemUsage", False),
+                update_interval=data.get("UpdateInterval", 2500),
+            )
 
     def save(self, filepath: str) -> None:
         """Save settings to JSON file"""

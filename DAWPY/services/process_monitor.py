@@ -1,6 +1,7 @@
 import ctypes
+import os
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
 
 import psutil
 import win32gui
@@ -39,19 +40,6 @@ class ProcessMonitorService:
 
         return None
 
-    def get_all_processes(self) -> List[ProcessInfo]:
-        """Get information for all running processes"""
-        processes = []
-        for proc in psutil.process_iter(["pid", "name"]):
-            try:
-                process_info = self._create_process_info(proc)
-                if process_info:
-                    processes.append(process_info)
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
-                continue
-
-        return processes
-
     def _create_process_info(self, proc: psutil.Process) -> Optional[ProcessInfo]:
         """Create ProcessInfo from psutil.Process"""
         try:
@@ -64,8 +52,6 @@ class ProcessMonitorService:
             memory_mb = memory_info.rss / (1024 * 1024)
 
             # Normalize CPU usage by core count
-            import os
-
             cpu_count = os.cpu_count() or 1
             normalized_cpu = cpu_percent / cpu_count
 
@@ -109,7 +95,7 @@ class ProcessMonitorService:
 
     @staticmethod
     def get_process_version(exe_path: str) -> str:
-        """Get version information from executable"""
+        """Get version information from executable (Windows only)"""
         if not exe_path:
             return "0.0.0"
 
