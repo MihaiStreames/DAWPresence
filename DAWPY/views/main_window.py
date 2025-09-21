@@ -18,7 +18,7 @@ class MainWindow(QMainWindow):
     update_interval_signal = pyqtSignal(int)
     exit_signal = pyqtSignal()
 
-    def __init__(self, app_version: str = "2.0"):
+    def __init__(self, app_version: str = "1.0"):
         super().__init__()
         self.app_version = app_version
         self.exiting = False

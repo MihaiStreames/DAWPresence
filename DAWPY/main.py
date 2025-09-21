@@ -13,7 +13,7 @@ from views.main_window import MainWindow
 def main():
     """Main application entry point"""
     # Application info
-    APP_VERSION = "2.0"
+    APP_VERSION = "1.0"
     APP_NAME = "DAWPresence"
 
     # Create Qt application
@@ -44,6 +44,8 @@ def main():
 
     except Exception as e:
         print(f"Fatal error: {e}")
+        import traceback
+        traceback.print_exc()
         return 1
 
 

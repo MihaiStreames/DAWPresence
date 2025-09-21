@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="dawpresence",
-    version="2.0.0",
+    version="1.0.0",
     author="MihaiStreames",
     description="DAW Discord Rich Presence - Show what you're making on your DAW in Discord",
     url="https://github.com/MihaiStreames/DAWPresence",
