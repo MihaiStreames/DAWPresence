@@ -1,13 +1,17 @@
-from typing import Optional, List, Callable
+from typing import Callable, List, Optional
 
-from DAWPY.models import DAWStatus, AppSettings, DAWInfo
-from DAWPY.services import ProcessMonitorService, ConfigurationService
+from DAWPY.models import AppSettings, DAWInfo, DAWStatus
+from DAWPY.services import ConfigurationService, ProcessMonitorService
 
 
 class DAWController:
     """Controller for DAW monitoring and status management"""
 
-    def __init__(self, process_monitor: ProcessMonitorService, config_service: ConfigurationService):
+    def __init__(
+        self,
+        process_monitor: ProcessMonitorService,
+        config_service: ConfigurationService,
+    ):
         self.process_monitor = process_monitor
         self.config_service = config_service
         self._current_status = DAWStatus()
@@ -32,7 +36,9 @@ class DAWController:
 
         # Check each DAW
         for daw_info in daw_configs:
-            process_info = self.process_monitor.get_process_by_name(daw_info.process_name)
+            process_info = self.process_monitor.get_process_by_name(
+                daw_info.process_name
+            )
 
             if process_info:
                 # DAW is running - build status
@@ -50,7 +56,9 @@ class DAWController:
 
         return new_status
 
-    def _build_daw_status(self, daw_info: DAWInfo, process_info, settings: AppSettings) -> DAWStatus:
+    def _build_daw_status(
+        self, daw_info: DAWInfo, process_info, settings: AppSettings
+    ) -> DAWStatus:
         """Build DAWStatus from process information"""
         status = DAWStatus(
             daw_info=daw_info,
@@ -58,7 +66,7 @@ class DAWController:
             cpu_usage=process_info.cpu_percent,
             ram_usage_mb=process_info.memory_mb,
             window_title=process_info.window_title,
-            version=self.process_monitor.get_process_version(process_info.exe_path)
+            version=self.process_monitor.get_process_version(process_info.exe_path),
         )
 
         # Extract project name if not hidden

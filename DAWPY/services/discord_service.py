@@ -1,5 +1,5 @@
 import time
-from typing import Optional, Callable
+from typing import Callable, Optional
 
 from pypresence import Presence
 
@@ -8,6 +8,7 @@ from DAWPY.models import DiscordPresence
 
 class DiscordConnectionError(Exception):
     """Custom exception for Discord connection issues"""
+
     pass
 
 
@@ -86,8 +87,8 @@ class DiscordService:
         try:
             # Use service start time if presence doesn't have one
             presence_data = presence.to_pypresence_dict()
-            if not presence_data.get('start'):
-                presence_data['start'] = self._start_time
+            if not presence_data.get("start"):
+                presence_data["start"] = self._start_time
 
             self._client.update(**presence_data)
 

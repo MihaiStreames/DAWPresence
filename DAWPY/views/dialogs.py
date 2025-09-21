@@ -19,7 +19,7 @@ class IntervalDialog(QObject):
             "Type the presence update interval (in milliseconds):",
             value=current_interval,
             min=1000,
-            max=100_000_000
+            max=100_000_000,
         )
 
         if ok:

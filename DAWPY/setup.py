@@ -1,32 +1,12 @@
 import os
 
-from setuptools import setup, find_packages
-
-
-def get_version():
-    """Extract version from main.py"""
-    with open("main.py", "r") as f:
-        for line in f:
-            if "APP_VERSION" in line:
-                return line.split('"')[1]
-    return "2.0.0"
-
-
-def get_long_description():
-    """Get long description from README"""
-    if os.path.exists("README.md"):
-        with open("README.md", "r", encoding="utf-8") as f:
-            return f.read()
-    return "DAW Discord Rich Presence - Show your DAW activity in Discord"
-
+from setuptools import find_packages, setup
 
 setup(
     name="dawpresence",
-    version=get_version(),
+    version="2.0.0",
     author="MihaiStreames",
     description="DAW Discord Rich Presence - Show what you're making on your DAW in Discord",
-    long_description=get_long_description(),
-    long_description_content_type="text/markdown",
     url="https://github.com/MihaiStreames/DAWPresence",
     packages=find_packages(),
     classifiers=[
@@ -52,21 +32,24 @@ setup(
         "psutil>=7.1.0",
     ],
     extras_require={
-        'windows': ['pywin32>=311'],
+        "windows": ["pywin32>=311"],
     },
     entry_points={
-        'console_scripts': [
-            'dawpresence=main:main',
+        "console_scripts": [
+            "dawpresence=main:main",
         ],
     },
     include_package_data=True,
     package_data={
-        '': ['*.json', '*.ico', '*.png', '*.md', '*.txt'],
-        'config': ['*.json'],
-        'assets': ['*.ico', '*.png'],
+        "": ["*.json", "*.ico", "*.png", "*.md", "*.txt"],
+        "config": ["*.json"],
+        "assets": ["*.ico", "*.png"],
     },
     data_files=[
-        ('config', ['config/daws.json']),
-        ('assets', ['assets/red.ico', 'assets/green.ico'] if os.path.exists('assets') else []),
+        ("config", ["config/daws.json"]),
+        (
+            "assets",
+            ["assets/red.ico", "assets/green.ico"] if os.path.exists("assets") else [],
+        ),
     ],
 )

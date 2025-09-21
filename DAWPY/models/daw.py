@@ -6,6 +6,7 @@ from typing import Optional
 @dataclass(frozen=True)
 class DAWInfo:
     """Immutable DAW configuration data"""
+
     process_name: str
     display_text: str
     title_regex: str
@@ -31,6 +32,7 @@ class DAWInfo:
 @dataclass
 class DAWStatus:
     """Current runtime state of a DAW"""
+
     daw_info: Optional[DAWInfo] = None
     is_running: bool = False
     cpu_usage: float = 0.0

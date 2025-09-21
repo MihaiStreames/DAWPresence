@@ -7,13 +7,14 @@ from PyQt5.QtWidgets import QApplication, QMessageBox
 from DAWPY.controllers.daw_controller import DAWController
 from DAWPY.controllers.discord_controller import DiscordController
 from DAWPY.models import AppSettings
-from DAWPY.services import ProcessMonitorService, ConfigurationService, DiscordService
+from DAWPY.services import (ConfigurationService, DiscordService,
+                            ProcessMonitorService)
 
 
 class AppController:
     """Main application controller"""
 
-    def __init__(self, app_version: str = "2.0"):
+    def __init__(self, app_version: str):
         self.app_version = app_version
         self.app: Optional[QApplication] = None
         self.main_window = None
@@ -42,7 +43,7 @@ class AppController:
     @staticmethod
     def _get_config_directory() -> str:
         """Get configuration directory path"""
-        return os.path.join(os.path.dirname(__file__), '..', 'config')
+        return os.path.join(os.path.dirname(__file__), "..", "config")
 
     def _setup_callbacks(self) -> None:
         """Setup inter-controller communication"""
@@ -61,7 +62,9 @@ class AppController:
         try:
             # Check for multiple instances
             if self._is_already_running():
-                QMessageBox.critical(None, "Error", "Another instance of DAWPresence is already running.")
+                QMessageBox.critical(
+                    None, "Error", "Another instance of DAWPresence is already running."
+                )
                 return False
 
             # Ensure config directory exists
@@ -77,13 +80,19 @@ class AppController:
             try:
                 self.config_service.load_daw_configurations()
             except (FileNotFoundError, ValueError) as e:
-                QMessageBox.critical(None, "Configuration Error", f"Error loading DAW configurations:\n{e}")
+                QMessageBox.critical(
+                    None,
+                    "Configuration Error",
+                    f"Error loading DAW configurations:\n{e}",
+                )
                 return False
 
             return True
 
         except Exception as e:
-            QMessageBox.critical(None, "Initialization Error", f"Failed to initialize application:\n{e}")
+            QMessageBox.critical(
+                None, "Initialization Error", f"Failed to initialize application:\n{e}"
+            )
             return False
 
     def start(self, app: QApplication, main_window) -> None:
@@ -120,13 +129,17 @@ class AppController:
 
     def toggle_hide_project_name(self) -> None:
         """Toggle project name visibility"""
-        self.settings = self.settings.update(hide_project_name=not self.settings.hide_project_name)
+        self.settings = self.settings.update(
+            hide_project_name=not self.settings.hide_project_name
+        )
         self.settings.save(self._settings_path)
         self._update_ui_settings()
 
     def toggle_hide_system_usage(self) -> None:
         """Toggle system usage visibility"""
-        self.settings = self.settings.update(hide_system_usage=not self.settings.hide_system_usage)
+        self.settings = self.settings.update(
+            hide_system_usage=not self.settings.hide_system_usage
+        )
         self.settings.save(self._settings_path)
         self._update_ui_settings()
 
@@ -139,7 +152,9 @@ class AppController:
             if self.update_timer:
                 self.update_timer.setInterval(interval)
 
-            QMessageBox.information(None, "Success", "Update interval changed successfully.")
+            QMessageBox.information(
+                None, "Success", "Update interval changed successfully."
+            )
         except ValueError as e:
             QMessageBox.warning(None, "Invalid Interval", str(e))
 
@@ -157,71 +172,76 @@ class AppController:
 
     def _connect_ui_signals(self) -> None:
         """Connect UI signals to controller methods"""
-        if hasattr(self.main_window, 'toggle_project_name_signal'):
-            self.main_window.toggle_project_name_signal.connect(self.toggle_hide_project_name)
+        if hasattr(self.main_window, "toggle_project_name_signal"):
+            self.main_window.toggle_project_name_signal.connect(
+                self.toggle_hide_project_name
+            )
 
-        if hasattr(self.main_window, 'toggle_system_usage_signal'):
-            self.main_window.toggle_system_usage_signal.connect(self.toggle_hide_system_usage)
+        if hasattr(self.main_window, "toggle_system_usage_signal"):
+            self.main_window.toggle_system_usage_signal.connect(
+                self.toggle_hide_system_usage
+            )
 
-        if hasattr(self.main_window, 'update_interval_signal'):
+        if hasattr(self.main_window, "update_interval_signal"):
             self.main_window.update_interval_signal.connect(self.set_update_interval)
 
-        if hasattr(self.main_window, 'exit_signal'):
+        if hasattr(self.main_window, "exit_signal"):
             self.main_window.exit_signal.connect(self.shutdown)
 
     def _update_ui_settings(self) -> None:
         """Update UI to reflect current settings"""
-        if hasattr(self.main_window, 'update_settings_display'):
+        if hasattr(self.main_window, "update_settings_display"):
             self.main_window.update_settings_display(self.settings)
 
     def _on_daw_started(self, daw_status) -> None:
         """Handle DAW started event"""
-        if hasattr(self.main_window, 'on_daw_started'):
+        if hasattr(self.main_window, "on_daw_started"):
             self.main_window.on_daw_started(daw_status)
 
     def _on_daw_stopped(self, daw_status) -> None:
         """Handle DAW stopped event"""
-        if hasattr(self.main_window, 'on_daw_stopped'):
+        if hasattr(self.main_window, "on_daw_stopped"):
             self.main_window.on_daw_stopped(daw_status)
 
     def _on_daw_status_updated(self, daw_status) -> None:
         """Handle DAW status update"""
-        if hasattr(self.main_window, 'update_daw_display'):
+        if hasattr(self.main_window, "update_daw_display"):
             self.main_window.update_daw_display(daw_status)
 
     def _on_discord_connected(self) -> None:
         """Handle Discord connected event"""
-        if hasattr(self.main_window, 'on_discord_connected'):
+        if hasattr(self.main_window, "on_discord_connected"):
             self.main_window.on_discord_connected()
 
     def _on_discord_disconnected(self) -> None:
         """Handle Discord disconnected event"""
-        if hasattr(self.main_window, 'on_discord_disconnected'):
+        if hasattr(self.main_window, "on_discord_disconnected"):
             self.main_window.on_discord_disconnected()
 
     def _on_discord_error(self, error: Exception) -> None:
         """Handle Discord error"""
-        if hasattr(self.main_window, 'on_discord_error'):
+        if hasattr(self.main_window, "on_discord_error"):
             self.main_window.on_discord_error(error)
 
     @staticmethod
     def _is_already_running() -> bool:
         """Check if another instance is already running"""
         import psutil
+
         current_pid = os.getpid()
 
-        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+        for proc in psutil.process_iter(["pid", "name", "cmdline"]):
             try:
-                if proc.info['pid'] == current_pid:
+                if proc.info["pid"] == current_pid:
                     continue
 
                 # Check for DAWPresence executable
-                if 'DAWPresence' in proc.info['name']:
+                if "DAWPresence" in proc.info["name"]:
                     return True
 
                 # Check for Python script
-                cmdline = proc.info.get('cmdline', [])
-                if cmdline and any('main.py' in arg for arg in cmdline):
+                cmdline = proc.info.get("cmdline", [])
+                if cmdline and any("main.py" in arg for arg in cmdline):
                     return True
 
             except (psutil.NoSuchProcess, psutil.AccessDenied):
@@ -235,10 +255,13 @@ class AppController:
             return
 
         # Copy from package directory
-        package_daws_path = os.path.join(os.path.dirname(__file__), '..', 'daws.json')
+        package_daws_path = os.path.join(os.path.dirname(__file__), "..", "daws.json")
 
         if os.path.exists(package_daws_path):
             import shutil
+
             shutil.copy2(package_daws_path, self._daws_config_path)
         else:
-            raise FileNotFoundError("daws.json not found in package directory. Please download it from the repository.")
+            raise FileNotFoundError(
+                "daws.json not found in package directory. Please download it from the repository."
+            )

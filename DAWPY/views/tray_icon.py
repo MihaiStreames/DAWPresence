@@ -1,10 +1,9 @@
 import os
 from typing import Optional
 
-from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QPixmap, QPainter, QBrush
-from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction
+from PyQt5.QtCore import QObject, Qt, pyqtSignal
+from PyQt5.QtGui import QBrush, QIcon, QPainter, QPixmap
+from PyQt5.QtWidgets import QAction, QMenu, QSystemTrayIcon
 
 from DAWPY.models import AppSettings
 
@@ -52,7 +51,9 @@ class SystemTrayManager(QObject):
     def _create_menu(self) -> None:
         """Create tray context menu"""
         # Version info (disabled)
-        self.version_action = QAction(f"DAW Discord Rich Presence v{self.app_version}", self)
+        self.version_action = QAction(
+            f"DAW Discord Rich Presence v{self.app_version}", self
+        )
         self.version_action.setEnabled(False)
         self.tray_menu.addAction(self.version_action)
 
@@ -72,11 +73,15 @@ class SystemTrayManager(QObject):
         settings_menu = self.tray_menu.addMenu("Settings")
 
         self.hide_project_action = QAction("[OFF] Hide Project Name", self)
-        self.hide_project_action.triggered.connect(self.toggle_project_name_requested.emit)
+        self.hide_project_action.triggered.connect(
+            self.toggle_project_name_requested.emit
+        )
         settings_menu.addAction(self.hide_project_action)
 
         self.hide_system_action = QAction("[OFF] Hide System Usage", self)
-        self.hide_system_action.triggered.connect(self.toggle_system_usage_requested.emit)
+        self.hide_system_action.triggered.connect(
+            self.toggle_system_usage_requested.emit
+        )
         settings_menu.addAction(self.hide_system_action)
 
         interval_action = QAction("Set Update Interval", self)
@@ -129,13 +134,19 @@ class SystemTrayManager(QObject):
     def update_settings_display(self, settings: AppSettings) -> None:
         """Update settings menu items"""
         if self.hide_project_action:
-            project_text = f"[{'ON' if settings.hide_project_name else 'OFF'}] Hide Project Name"
+            project_text = (
+                f"[{'ON' if settings.hide_project_name else 'OFF'}] Hide Project Name"
+            )
             self.hide_project_action.setText(project_text)
 
         if self.hide_system_action:
-            system_text = f"[{'ON' if settings.hide_system_usage else 'OFF'}] Hide System Usage"
+            system_text = (
+                f"[{'ON' if settings.hide_system_usage else 'OFF'}] Hide System Usage"
+            )
             self.hide_system_action.setText(system_text)
 
     def show_message(self, title: str, message: str, duration: int = 3000) -> None:
         """Show tray notification"""
-        self.tray_icon.showMessage(title, message, QSystemTrayIcon.Information, duration)
+        self.tray_icon.showMessage(
+            title, message, QSystemTrayIcon.Information, duration
+        )

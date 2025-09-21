@@ -1,6 +1,6 @@
-from typing import Optional, Callable
+from typing import Callable, Optional
 
-from DAWPY.models import DAWStatus, AppSettings, DiscordPresence
+from DAWPY.models import AppSettings, DAWStatus, DiscordPresence
 from DAWPY.services import DiscordService
 from DAWPY.services.discord_service import DiscordConnectionError
 
@@ -8,7 +8,7 @@ from DAWPY.services.discord_service import DiscordConnectionError
 class DiscordController:
     """Controller for Discord Rich Presence management"""
 
-    def __init__(self, discord_service: DiscordService, app_version: str = "1.0"):
+    def __init__(self, discord_service: DiscordService, app_version: str):
         self.discord_service = discord_service
         self.app_version = app_version
         self._current_client_id: Optional[str] = None
@@ -33,7 +33,9 @@ class DiscordController:
         """Get current Discord client ID"""
         return self._current_client_id
 
-    def update_from_daw_status(self, daw_status: DAWStatus, settings: AppSettings) -> None:
+    def update_from_daw_status(
+        self, daw_status: DAWStatus, settings: AppSettings
+    ) -> None:
         """Update Discord presence based on DAW status"""
         if not daw_status.is_running:
             # No DAW running - disconnect
@@ -45,7 +47,9 @@ class DiscordController:
             return
 
         # Create and update presence
-        presence = DiscordPresence.create_for_daw(daw_status, settings, self.app_version)
+        presence = DiscordPresence.create_for_daw(
+            daw_status, settings, self.app_version
+        )
 
         try:
             self.discord_service.update_presence(presence)

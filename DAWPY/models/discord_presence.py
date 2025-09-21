@@ -9,6 +9,7 @@ from DAWPY.models.settings import AppSettings
 @dataclass
 class DiscordPresence:
     """Discord Rich Presence data structure"""
+
     details: str = ""
     state: str = ""
     large_image: str = "icon"
@@ -21,13 +22,15 @@ class DiscordPresence:
             self.start_time = int(time.time())
 
     @classmethod
-    def create_for_daw(cls, daw_status: DAWStatus, settings: AppSettings, version: str) -> 'DiscordPresence':
+    def create_for_daw(
+        cls, daw_status: DAWStatus, settings: AppSettings, version: str
+    ) -> "DiscordPresence":
         """Create Discord presence from DAW status"""
         if not daw_status.is_running:
             return cls(
                 details="Not using any DAW",
                 state="Idle",
-                large_text=f"DAWPresence v{version}"
+                large_text=f"DAWPresence v{version}",
             )
 
         project = daw_status.project_name
@@ -47,7 +50,11 @@ class DiscordPresence:
             state_parts = []
 
             # Add version if not hidden
-            if daw_status.daw_info and not daw_status.daw_info.hide_version and daw_status.version != "0.0.0":
+            if (
+                daw_status.daw_info
+                and not daw_status.daw_info.hide_version
+                and daw_status.version != "0.0.0"
+            ):
                 state_parts.append(f"v{daw_status.version}")
 
             # Add system usage
@@ -56,18 +63,14 @@ class DiscordPresence:
 
             state = ", ".join(state_parts)
 
-        return cls(
-            details=details,
-            state=state,
-            large_text=f"DAWPresence v{version}"
-        )
+        return cls(details=details, state=state, large_text=f"DAWPresence v{version}")
 
     def to_pypresence_dict(self) -> dict:
         """Convert to pypresence format"""
         return {
-            'details': self.details,
-            'state': self.state,
-            'large_image': self.large_image,
-            'large_text': self.large_text,
-            'start': self.start_time
+            "details": self.details,
+            "state": self.state,
+            "large_image": self.large_image,
+            "large_text": self.large_text,
+            "start": self.start_time,
         }

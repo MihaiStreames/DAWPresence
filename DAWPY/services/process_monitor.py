@@ -1,6 +1,6 @@
 import ctypes
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import List, Optional
 
 import psutil
 import win32gui
@@ -10,6 +10,7 @@ import win32process
 @dataclass
 class ProcessInfo:
     """Process information data"""
+
     pid: int
     name: str
     exe_path: str
@@ -26,11 +27,11 @@ class ProcessMonitorService:
 
     def get_process_by_name(self, process_name: str) -> Optional[ProcessInfo]:
         """Find process by name (case-insensitive)"""
-        target_name = process_name.lower().replace('.exe', '')
+        target_name = process_name.lower().replace(".exe", "")
 
-        for proc in psutil.process_iter(['pid', 'name']):
+        for proc in psutil.process_iter(["pid", "name"]):
             try:
-                proc_name = proc.info['name'].lower().replace('.exe', '')
+                proc_name = proc.info["name"].lower().replace(".exe", "")
                 if proc_name == target_name:
                     return self._create_process_info(proc)
             except (psutil.NoSuchProcess, psutil.AccessDenied):
@@ -41,7 +42,7 @@ class ProcessMonitorService:
     def get_all_processes(self) -> List[ProcessInfo]:
         """Get information for all running processes"""
         processes = []
-        for proc in psutil.process_iter(['pid', 'name']):
+        for proc in psutil.process_iter(["pid", "name"]):
             try:
                 process_info = self._create_process_info(proc)
                 if process_info:
@@ -55,7 +56,7 @@ class ProcessMonitorService:
         """Create ProcessInfo from psutil.Process"""
         try:
             # Get basic info
-            proc_info = proc.as_dict(['pid', 'name', 'exe'])
+            proc_info = proc.as_dict(["pid", "name", "exe"])
 
             # Get CPU and memory usage
             cpu_percent = proc.cpu_percent(interval=0.1)
@@ -64,6 +65,7 @@ class ProcessMonitorService:
 
             # Normalize CPU usage by core count
             import os
+
             cpu_count = os.cpu_count() or 1
             normalized_cpu = cpu_percent / cpu_count
 
@@ -71,12 +73,12 @@ class ProcessMonitorService:
             window_title = self._get_window_title(proc.pid)
 
             return ProcessInfo(
-                pid=proc_info['pid'],
-                name=proc_info['name'],
-                exe_path=proc_info['exe'] or "",
+                pid=proc_info["pid"],
+                name=proc_info["name"],
+                exe_path=proc_info["exe"] or "",
                 cpu_percent=normalized_cpu,
                 memory_mb=int(memory_mb),
-                window_title=window_title
+                window_title=window_title,
             )
 
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
@@ -122,14 +124,18 @@ class ProcessMonitorService:
             lptr = ctypes.c_void_p()
             lsize = ctypes.c_uint()
             ctypes.windll.version.VerQueryValueW(
-                res, r"\VarFileInfo\Translation",
-                ctypes.byref(lptr), ctypes.byref(lsize)
+                res,
+                r"\VarFileInfo\Translation",
+                ctypes.byref(lptr),
+                ctypes.byref(lsize),
             )
 
             if lsize.value == 0:
                 return "0.0.0"
 
-            lang, codepage = ctypes.cast(lptr, ctypes.POINTER(ctypes.c_ushort * 2)).contents
+            lang, codepage = ctypes.cast(
+                lptr, ctypes.POINTER(ctypes.c_ushort * 2)
+            ).contents
             str_path = f"\\StringFileInfo\\{lang:04X}{codepage:04X}\\ProductVersion"
 
             ctypes.windll.version.VerQueryValueW(
@@ -139,7 +145,7 @@ class ProcessMonitorService:
             if lsize.value == 0:
                 return "0.0.0"
 
-            version = ctypes.wstring_at(lptr, lsize.value).rstrip('\x00')
+            version = ctypes.wstring_at(lptr, lsize.value).rstrip("\x00")
             return version or "0.0.0"
 
         except Exception:
