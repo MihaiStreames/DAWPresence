@@ -4,7 +4,8 @@ from typing import Optional
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication, QMessageBox
 
-from DAWPY.controllers import DAWController, DiscordController
+from DAWPY.controllers.daw_controller import DAWController
+from DAWPY.controllers.discord_controller import DiscordController
 from DAWPY.models import AppSettings
 from DAWPY.services import ProcessMonitorService, ConfigurationService, DiscordService
 

@@ -2,7 +2,8 @@ import time
 from dataclasses import dataclass
 from typing import Optional
 
-from DAWPY.models import AppSettings, DAWStatus
+from DAWPY.models.daw import DAWStatus
+from DAWPY.models.settings import AppSettings
 
 
 @dataclass

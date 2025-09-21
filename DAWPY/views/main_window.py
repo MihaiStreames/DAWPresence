@@ -13,7 +13,8 @@ from PyQt5.QtWidgets import (
 )
 
 from DAWPY.models import DAWStatus, AppSettings
-from DAWPY.views import SystemTrayManager, IntervalDialog
+from DAWPY.views.dialogs import IntervalDialog
+from DAWPY.views.tray_icon import SystemTrayManager
 
 
 class MainWindow(QMainWindow):

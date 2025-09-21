@@ -1,2 +1,8 @@
+# Config
+config
 
+# IDE
 /.idea
+
+# Python
+__pycache__
