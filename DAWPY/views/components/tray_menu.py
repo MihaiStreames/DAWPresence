@@ -32,9 +32,7 @@ class TrayContextMenu(QObject):
     def _create_menu(self):
         """Create tray context menu"""
         # Version info (disabled)
-        self.version_action = QAction(
-            f"DAWPresence v{self.app_version}", self
-        )
+        self.version_action = QAction(f"DAWPresence v{self.app_version}", self)
         self.version_action.setEnabled(False)
         self.menu.addAction(self.version_action)
 

@@ -1,7 +1,7 @@
-import os
-
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon
+
+from DAWPY.utils import IconUtils
 
 
 class TrayIconManager:
@@ -13,7 +13,7 @@ class TrayIconManager:
 
     def _set_icon_color(self, color: str):
         """Set tray icon color"""
-        icon_path = os.path.join(os.path.dirname(__file__), f"../../assets/{color}.ico")
+        icon_path = IconUtils.get_icon_path(color)
         self.tray_icon.setIcon(QIcon(icon_path))
 
     def set_connected_status(self, connected: bool):

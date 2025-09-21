@@ -1,5 +1,4 @@
 import os
-import sys
 from typing import Optional
 
 from loguru import logger
@@ -12,6 +11,7 @@ from DAWPY.models import AppSettings
 from DAWPY.services import (ConfigurationService, DiscordService,
                             ProcessMonitorService)
 from DAWPY.services.logging_service import LoggingService, log_errors
+from DAWPY.utils import PathUtils, ProcessUtils
 
 
 class AppController:
@@ -20,33 +20,19 @@ class AppController:
     def __init__(self, app_version: str):
         self.app_version = app_version
 
-        # Since it's for Windows only, we use APPDATA
-        app_data = os.environ.get('APPDATA', os.path.expanduser("~"))
-        self._user_data_dir = os.path.join(app_data, "DAWPresence")
-        os.makedirs(self._user_data_dir, exist_ok=True)
+        # Ensure data directory exists before logging
+        self._data_dir = PathUtils.get_data_directory()
+        os.makedirs(self._data_dir, exist_ok=True)
+        self.logging_service = LoggingService(self._data_dir)
 
-        # Bundled files path (read-only configs)
-        if getattr(sys, 'frozen', False):
-            # PyInstaller bundle
-            self._bundled_dir = sys._MEIPASS
-        else:
-            # Development mode
-            self._bundled_dir = os.path.join(os.path.dirname(__file__), "..")
-
-        # Logging
-        self.logging_service = LoggingService(self._user_data_dir)
         logger.info(f"DAWPresence v{app_version} starting up")
 
         self.app: Optional[QApplication] = None
         self.main_window = None
 
-        # File paths
-        self._settings_path = os.path.join(self._user_data_dir, "settings.json")
-        self._daws_config_path = os.path.join(self._bundled_dir, "daws.json")
-
         # Services
         self.process_monitor = ProcessMonitorService()
-        self.config_service = ConfigurationService(self._daws_config_path)
+        self.config_service = ConfigurationService(PathUtils.get_daws_config_path())
         self.discord_service = DiscordService()
 
         # Controllers
@@ -78,13 +64,12 @@ class AppController:
     def initialize(self) -> bool:
         """Initialize the application"""
         try:
-            if self._is_already_running():
+            if ProcessUtils.is_app_already_running():
                 logger.warning("Another instance is already running")
                 return False
 
             # Load settings
-            self.settings = AppSettings.load(self._settings_path)
-            logger.info(f"Settings loaded from: {self._settings_path}")
+            self.settings = AppSettings.load(PathUtils.get_settings_path())
             logger.info(
                 f"Settings loaded: Update interval={self.settings.update_interval}ms"
             )
@@ -92,7 +77,7 @@ class AppController:
             # Validate configs
             try:
                 daw_configs = self.config_service.load_daw_configurations()
-                logger.info(f"Loaded {len(daw_configs)} DAW configurations from {self._daws_config_path}")
+                logger.info(f"Loaded {len(daw_configs)} DAW configurations")
             except (FileNotFoundError, ValueError) as e:
                 logger.error(f"DAW configuration error: {e}")
                 return False
@@ -135,7 +120,7 @@ class AppController:
 
         # Save settings
         if self.settings:
-            self.settings.save(self._settings_path)
+            self.settings.save(PathUtils.get_settings_path())
             logger.info("Settings saved")
 
         logger.success("DAWPresence shutdown complete")
@@ -145,7 +130,7 @@ class AppController:
         self.settings = self.settings.update(
             hide_project_name=not self.settings.hide_project_name
         )
-        self.settings.save(self._settings_path)
+        self.settings.save(PathUtils.get_settings_path())
         self._update_ui_settings()
 
     def toggle_hide_system_usage(self):
@@ -153,14 +138,14 @@ class AppController:
         self.settings = self.settings.update(
             hide_system_usage=not self.settings.hide_system_usage
         )
-        self.settings.save(self._settings_path)
+        self.settings.save(PathUtils.get_settings_path())
         self._update_ui_settings()
 
     def set_update_interval(self, interval: int):
         """Set presence update interval"""
         try:
             self.settings = self.settings.update(update_interval=interval)
-            self.settings.save(self._settings_path)
+            self.settings.save(PathUtils.get_settings_path())
 
             if self.update_timer:
                 self.update_timer.setInterval(interval)
@@ -235,29 +220,3 @@ class AppController:
         """Handle Discord error"""
         if hasattr(self.main_window, "on_discord_error"):
             self.main_window.on_discord_error(error)
-
-    @staticmethod
-    def _is_already_running() -> bool:
-        """Check if another instance is already running"""
-        # Disable instance check for PyInstaller builds to avoid parent process confusion
-        if getattr(sys, 'frozen', False):
-            return False
-
-        import psutil
-
-        current_pid = os.getpid()
-
-        for proc in psutil.process_iter(["pid", "name", "cmdline"]):
-            try:
-                if proc.info["pid"] == current_pid:
-                    continue
-
-                # Check for Python script (development mode only)
-                cmdline = proc.info.get("cmdline", [])
-                if cmdline and any("main.py" in arg for arg in cmdline):
-                    return True
-
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
-                continue
-
-        return False

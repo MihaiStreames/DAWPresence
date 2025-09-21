@@ -2,6 +2,8 @@ import re
 from dataclasses import dataclass
 from typing import Optional
 
+from DAWPY.utils import SystemUtils, ValidationUtils
+
 
 @dataclass(frozen=True)
 class DAWInfo:
@@ -15,12 +17,9 @@ class DAWInfo:
 
     def __post_init__(self):
         """Validate DAW configuration"""
-        if not self.process_name:
-            raise ValueError("Process name cannot be empty")
-        if not self.display_text:
-            raise ValueError("Display text cannot be empty")
-        if not self.client_id:
-            raise ValueError("Client ID cannot be empty")
+        ValidationUtils.validate_required_string(self.process_name, "Process name")
+        ValidationUtils.validate_required_string(self.display_text, "Display text")
+        ValidationUtils.validate_required_string(self.client_id, "Client ID")
 
         # Validate regex
         try:
@@ -45,14 +44,14 @@ class DAWStatus:
     def cpu_usage_str(self) -> str:
         """Format CPU usage as string"""
         if self.is_running:
-            return f"{self.cpu_usage:.2f}%"
+            return SystemUtils.format_cpu_usage(self.cpu_usage)
         return "Undefined"
 
     @property
     def ram_usage_str(self) -> str:
         """Format RAM usage as string"""
         if self.is_running:
-            return f"{self.ram_usage_mb}MB"
+            return SystemUtils.format_memory_usage(self.ram_usage_mb)
         return "Undefined"
 
     @property
