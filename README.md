@@ -54,6 +54,11 @@ foundation for this enhanced version!**
    python main.py
    ```
 
+## How It Works
+
+DAWPresence monitors running processes to detect supported DAWs, extracts project information from window titles using
+regex patterns, and updates your Discord Rich Presence accordingly.
+
 ## Contributing
 
 ### Adding New DAW Support
