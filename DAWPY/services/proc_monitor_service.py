@@ -6,6 +6,9 @@ from typing import Optional
 import psutil
 import win32gui
 import win32process
+from loguru import logger
+
+from DAWPY.services.logging_service import log_errors, log_performance
 
 
 @dataclass
@@ -25,21 +28,32 @@ class ProcessMonitorService:
 
     def __init__(self):
         self._processes_cache = {}
+        logger.info("Process Monitor Service initialized")
 
+    @log_performance
     def get_process_by_name(self, process_name: str) -> Optional[ProcessInfo]:
         """Find process by name (case-insensitive)"""
         target_name = process_name.lower().replace(".exe", "")
 
-        for proc in psutil.process_iter(["pid", "name"]):
-            try:
-                proc_name = proc.info["name"].lower().replace(".exe", "")
-                if proc_name == target_name:
-                    return self._create_process_info(proc)
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
-                continue
+        try:
+            for proc in psutil.process_iter(["pid", "name"]):
+                try:
+                    proc_name = proc.info["name"].lower().replace(".exe", "")
+                    if proc_name == target_name:
+                        process_info = self._create_process_info(proc)
+                        if process_info:
+                            logger.trace(
+                                f"Found process: {process_name} (PID: {process_info.pid})"
+                            )
+                            return process_info
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    continue
+        except Exception as e:
+            logger.error(f"Error scanning for process {process_name}: {e}")
 
         return None
 
+    @log_errors
     def _create_process_info(self, proc: psutil.Process) -> Optional[ProcessInfo]:
         """Create ProcessInfo from psutil.Process"""
         try:
@@ -56,7 +70,11 @@ class ProcessMonitorService:
             normalized_cpu = cpu_percent / cpu_count
 
             # Get window title
-            window_title = self._get_window_title(proc.pid)
+            window_title = self._get_window_title(proc.info["pid"])
+
+            logger.trace(
+                f"Process info created for {proc_info['name']}: {memory_mb:.1f}MB RAM, {normalized_cpu:.1f}% CPU"
+            )
 
             return ProcessInfo(
                 pid=proc_info["pid"],
@@ -67,7 +85,8 @@ class ProcessMonitorService:
                 window_title=window_title,
             )
 
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess) as e:
+            logger.debug(f"Cannot access process info: {e}")
             return None
 
     @staticmethod

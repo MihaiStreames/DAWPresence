@@ -33,7 +33,7 @@ class TrayContextMenu(QObject):
         """Create tray context menu"""
         # Version info (disabled)
         self.version_action = QAction(
-            f"DAW Discord Rich Presence v{self.app_version}", self
+            f"DAWPresence v{self.app_version}", self
         )
         self.version_action.setEnabled(False)
         self.menu.addAction(self.version_action)

@@ -18,6 +18,7 @@ a = Analysis(
         'psutil',
         'win32gui',
         'win32process',
+        'loguru',
     ],
     hookspath=[],
     hooksconfig={},

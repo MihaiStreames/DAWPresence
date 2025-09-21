@@ -1,7 +1,10 @@
-from typing import Callable, List, Optional
+from typing import Callable, Optional
+
+from loguru import logger
 
 from DAWPY.models import AppSettings, DAWInfo, DAWStatus
 from DAWPY.services import ConfigurationService, ProcessMonitorService
+from DAWPY.services.logging_service import log_performance
 
 
 class DAWController:
@@ -21,13 +24,21 @@ class DAWController:
         self.on_daw_stopped: Optional[Callable[[DAWStatus], None]] = None
         self.on_status_updated: Optional[Callable[[DAWStatus], None]] = None
 
+        logger.info("DAW Controller initialized")
+
+    @log_performance
     def scan_for_daws(self, settings: AppSettings) -> DAWStatus:
         """Scan for running DAWs and update status"""
         previous_status = self._current_status
         new_status = DAWStatus()
 
         # Load configs
-        daw_configs = self.config_service.load_daw_configurations()
+        try:
+            daw_configs = self.config_service.load_daw_configurations()
+            logger.debug(f"Loaded {len(daw_configs)} DAW configurations")
+        except Exception as e:
+            logger.error(f"Failed to load DAW configurations: {e}")
+            return new_status
 
         # Check each DAW
         for daw_info in daw_configs:
@@ -36,14 +47,14 @@ class DAWController:
             )
 
             if process_info:
-                # DAW is running - build status
                 new_status = self._build_daw_status(daw_info, process_info, settings)
+                logger.info(
+                    f"DAW detected: {daw_info.display_text} | Project: {new_status.project_name} | PID: {process_info.pid}"
+                )
                 break
 
-        # Update status
+        # Update status and handle changes
         self._current_status = new_status
-
-        # Fire callbacks
         self._handle_status_change(previous_status, new_status)
 
         if self.on_status_updated:
@@ -76,10 +87,12 @@ class DAWController:
         """Handle changes in DAW status"""
         # DAW started
         if not previous.is_running and current.is_running:
+            logger.success(f"DAW Started: {current.display_name}")
             if self.on_daw_started:
                 self.on_daw_started(current)
 
         # DAW stopped
         elif previous.is_running and not current.is_running:
+            logger.info("No DAW detected")
             if self.on_daw_stopped:
                 self.on_daw_stopped(current)
