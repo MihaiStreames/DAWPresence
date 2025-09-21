@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 from typing import Optional
 
@@ -33,6 +34,24 @@ class PathUtils:
     def get_icon_path(icon_name: str) -> str:
         """Get icon file path"""
         return os.path.join(PathUtils.get_project_root(), "assets", f"{icon_name}.ico")
+
+    @staticmethod
+    def ensure_daws_config():
+        """Ensure daws.json exists in .data directory"""
+        data_config_path = PathUtils.get_daws_config_path()
+
+        if os.path.exists(data_config_path):
+            return
+
+        # Copy from DAWPY/daws.json to .data/daws.json
+        source_path = os.path.join(Path(__file__).parent, "daws.json")
+
+        if os.path.exists(source_path):
+            shutil.copy2(source_path, data_config_path)
+        else:
+            raise FileNotFoundError(
+                f"daws.json not found at {source_path}. Please ensure the file exists in the DAWPY directory or download it from the repository."
+            )
 
 
 class ProcessUtils:

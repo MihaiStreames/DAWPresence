@@ -68,6 +68,10 @@ class AppController:
                 logger.warning("Another instance is already running")
                 return False
 
+            # Ensure configs exist
+            PathUtils.ensure_daws_config()
+            logger.info("DAW configurations setup complete")
+
             # Load settings
             self.settings = AppSettings.load(PathUtils.get_settings_path())
             logger.info(
