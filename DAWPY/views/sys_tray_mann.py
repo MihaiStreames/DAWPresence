@@ -1,5 +1,7 @@
+from typing import Any
+
 from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtWidgets import QSystemTrayIcon
+from PyQt5.QtWidgets import QSystemTrayIcon, QWidget
 
 from DAWPY.models import AppSettings
 from DAWPY.views.components.tray_icon_mann import TrayIconManager
@@ -16,7 +18,7 @@ class SystemTrayManager(QObject):
     update_interval_requested = pyqtSignal()
     show_window_requested = pyqtSignal()
 
-    def __init__(self, parent_window, app_version: str) -> None:
+    def __init__(self, parent_window: QWidget, app_version: str) -> None:
         super().__init__()
         self.parent_window = parent_window
         self.app_version = app_version
@@ -46,7 +48,7 @@ class SystemTrayManager(QObject):
         self.tray_icon.activated.connect(self._on_tray_activated)
         self.tray_icon.show()
 
-    def _on_tray_activated(self, reason) -> None:
+    def _on_tray_activated(self, reason: Any) -> None:
         """Handle tray icon activation"""
         if reason == QSystemTrayIcon.DoubleClick:
             self.show_window_requested.emit()

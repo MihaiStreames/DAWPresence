@@ -1,3 +1,5 @@
+from typing import Any
+
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QInputDialog
 
@@ -7,7 +9,7 @@ class IntervalDialog(QObject):
 
     interval_changed = pyqtSignal(int)
 
-    def __init__(self, parent=None) -> None:
+    def __init__(self, parent: Any = None) -> None:
         super().__init__()
         self.parent = parent
 

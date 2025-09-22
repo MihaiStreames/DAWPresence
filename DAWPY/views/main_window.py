@@ -1,4 +1,5 @@
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget
 
 from DAWPY.models import AppSettings, DAWStatus
@@ -132,7 +133,7 @@ class MainWindow(QMainWindow):
             f"Cannot connect to Discord RPC server.\n{error!s}",
         )
 
-    def closeEvent(self, event) -> None:
+    def closeEvent(self, event: QCloseEvent) -> None:
         """Handle window close event"""
         if not self.exiting:
             event.ignore()
