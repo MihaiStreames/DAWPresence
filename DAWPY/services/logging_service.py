@@ -1,19 +1,26 @@
 import sys
+from collections.abc import Callable
+from functools import wraps
 from pathlib import Path
+from time import time
+from typing import Any, TypeVar
 
 from loguru import logger
+
+# Type variable for decorators
+F = TypeVar("F", bound=Callable[..., Any])
 
 
 class LoggingService:
     """Service for application logging using Loguru"""
 
-    def __init__(self, data_dir: str, app_name: str = "DAWPresence"):
+    def __init__(self, data_dir: str, app_name: str = "DAWPresence") -> None:
         self.data_dir = data_dir
         self.app_name = app_name
         self._setup_logging()
 
-    def _setup_logging(self):
-        """Setup Loguru logging configuration"""
+    def _setup_logging(self) -> None:
+        """Set up Loguru logging configuration"""
         # Remove default handler
         logger.remove()
 
@@ -41,16 +48,11 @@ class LoggingService:
         logger.info(f"{self.app_name} logging initialized")
 
 
-# Decorators
-from functools import wraps
-from time import time
-
-
-def log_performance(func):
-    """Decorator to log function execution time"""
+def log_performance[F: Callable[..., Any]](func: F) -> F:
+    """Log function execution time"""
 
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         start_time = time()
         try:
             result = func(*args, **kwargs)
@@ -65,11 +67,11 @@ def log_performance(func):
     return wrapper
 
 
-def log_errors(func):
-    """Decorator to automatically log exceptions"""
+def log_errors[F: Callable[..., Any]](func: F) -> F:
+    """Log exceptions automatically"""
 
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         try:
             return func(*args, **kwargs)
         except Exception as e:

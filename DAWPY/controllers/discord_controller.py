@@ -11,7 +11,7 @@ from DAWPY.services.logging_service import log_errors
 class DiscordController:
     """Controller for Discord Rich Presence management"""
 
-    def __init__(self, discord_service: DiscordService, app_version: str):
+    def __init__(self, discord_service: DiscordService, app_version: str) -> None:
         self.discord_service = discord_service
         self.app_version = app_version
         self._current_client_id: str | None = None
@@ -22,8 +22,8 @@ class DiscordController:
         self.discord_service.on_error = self._on_error
 
         # Controller callbacks
-        self.on_connected: Callable | None = None
-        self.on_disconnected: Callable | None = None
+        self.on_connected: Callable[[], None] | None = None
+        self.on_disconnected: Callable[[], None] | None = None
         self.on_error: Callable[[Exception], None] | None = None
 
         logger.info("Discord Controller initialized")
@@ -34,7 +34,7 @@ class DiscordController:
         return self.discord_service.is_connected
 
     @log_errors
-    def update_from_daw_status(self, daw_status: DAWStatus, settings: AppSettings):
+    def update_from_daw_status(self, daw_status: DAWStatus, settings: AppSettings) -> None:
         """Update Discord presence based on DAW status"""
         if not daw_status.is_running:
             self.disconnect()
@@ -56,7 +56,7 @@ class DiscordController:
             if self.on_error:
                 self.on_error(e)
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         """Disconnect from Discord"""
         self.discord_service.disconnect()
         self._current_client_id = None
@@ -75,20 +75,20 @@ class DiscordController:
             logger.warning(f"Discord connection failed: {e}")
             return False
 
-    def _on_connected(self):
+    def _on_connected(self) -> None:
         """Handle Discord connection"""
         logger.info("Discord RPC connected")
         if self.on_connected:
             self.on_connected()
 
-    def _on_disconnected(self):
+    def _on_disconnected(self) -> None:
         """Handle Discord disconnection"""
         logger.info("Discord RPC disconnected")
         self._current_client_id = None
         if self.on_disconnected:
             self.on_disconnected()
 
-    def _on_error(self, error: Exception):
+    def _on_error(self, error: Exception) -> None:
         """Handle Discord errors"""
         if self.on_error:
             self.on_error(error)

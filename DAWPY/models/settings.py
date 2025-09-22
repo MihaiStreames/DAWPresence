@@ -13,7 +13,7 @@ class AppSettings:
     hide_system_usage: bool = False
     update_interval: int = 2500
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate settings"""
         if not ValidationUtils.validate_update_interval(self.update_interval):
             raise ValueError("Update interval must be between 1000ms and 100,000,000ms")
@@ -35,7 +35,7 @@ class AppSettings:
                 update_interval=data.get("UpdateInterval", 2500),
             )
 
-    def save(self, filepath: str):
+    def save(self, filepath: str) -> None:
         """Save settings to JSON file"""
         data = {
             "HideProjectName": self.hide_project_name,

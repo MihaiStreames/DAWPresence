@@ -14,7 +14,7 @@ class TrayContextMenu(QObject):
     update_interval_requested = pyqtSignal()
     show_window_requested = pyqtSignal()
 
-    def __init__(self, app_version: str):
+    def __init__(self, app_version: str) -> None:
         super().__init__()
         self.app_version = app_version
         self.menu = QMenu()
@@ -27,7 +27,7 @@ class TrayContextMenu(QObject):
 
         self._create_menu()
 
-    def _create_menu(self):
+    def _create_menu(self) -> None:
         """Create tray context menu"""
         # Version info (disabled)
         self.version_action = QAction(f"DAWPresence v{self.app_version}", self)
@@ -68,12 +68,12 @@ class TrayContextMenu(QObject):
         exit_action.triggered.connect(self.exit_requested.emit)
         self.menu.addAction(exit_action)
 
-    def update_discord_status(self, message: str):
+    def update_discord_status(self, message: str) -> None:
         """Update Discord status message in menu"""
         if self.discord_status_action:
             self.discord_status_action.setText(message)
 
-    def update_settings_display(self, settings: AppSettings):
+    def update_settings_display(self, settings: AppSettings) -> None:
         """Update settings menu items"""
         if self.hide_project_action:
             project_text = f"[{'ON' if settings.hide_project_name else 'OFF'}] Hide Project Name"

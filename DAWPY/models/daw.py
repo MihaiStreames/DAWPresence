@@ -14,7 +14,7 @@ class DAWInfo:
     client_id: str
     hide_version: bool = False
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate DAW configuration"""
         ValidationUtils.validate_required_string(self.process_name, "Process name")
         ValidationUtils.validate_required_string(self.display_text, "Display text")
@@ -24,7 +24,7 @@ class DAWInfo:
         try:
             re.compile(self.title_regex)
         except re.error as e:
-            raise ValueError(f"Invalid title regex: {e}")
+            raise ValueError(f"Invalid title regex: {e}") from e
 
 
 @dataclass

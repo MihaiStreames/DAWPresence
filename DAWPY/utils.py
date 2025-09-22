@@ -35,7 +35,7 @@ class PathUtils:
         return os.path.join(PathUtils.get_project_root(), "assets", f"{icon_name}.ico")
 
     @staticmethod
-    def ensure_daws_config():
+    def ensure_daws_config() -> None:
         """Ensure daws.json exists in .data directory"""
         data_config_path = PathUtils.get_daws_config_path()
 

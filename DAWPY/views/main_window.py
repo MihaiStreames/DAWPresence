@@ -16,7 +16,7 @@ class MainWindow(QMainWindow):
     update_interval_signal = pyqtSignal(int)
     exit_signal = pyqtSignal()
 
-    def __init__(self, app_version: str = "1.0"):
+    def __init__(self, app_version: str = "1.0") -> None:
         super().__init__()
         self.app_version = app_version
         self.exiting = False
@@ -30,7 +30,7 @@ class MainWindow(QMainWindow):
         self._init_ui()
         self._setup_tray()
 
-    def _init_ui(self):
+    def _init_ui(self) -> None:
         """Initialize the user interface"""
         self.setWindowTitle("DAWPresence")
         self.setFixedSize(735, 347)
@@ -49,7 +49,7 @@ class MainWindow(QMainWindow):
         self.status_groups = StatusGroupsWidget()
         main_layout.addWidget(self.status_groups)
 
-    def _connect_menu_signals(self):
+    def _connect_menu_signals(self) -> None:
         """Connect menu bar signals"""
         if self.menu_bar_manager:
             self.menu_bar_manager.toggle_project_name_requested.connect(
@@ -60,8 +60,8 @@ class MainWindow(QMainWindow):
             )
             self.menu_bar_manager.update_interval_requested.connect(self._show_interval_dialog)
 
-    def _setup_tray(self):
-        """Setup system tray"""
+    def _setup_tray(self) -> None:
+        """Set up system tray"""
         self.tray_manager = SystemTrayManager(self, self.app_version)
         self.tray_manager.exit_requested.connect(self.exit_signal.emit)
         self.tray_manager.toggle_project_name_requested.connect(
@@ -73,7 +73,7 @@ class MainWindow(QMainWindow):
         self.tray_manager.update_interval_requested.connect(self._show_interval_dialog)
         self.tray_manager.show_window_requested.connect(self.show)
 
-    def _show_interval_dialog(self):
+    def _show_interval_dialog(self) -> None:
         """Show interval setting dialog"""
         if not self.interval_dialog:
             self.interval_dialog = IntervalDialog(self)
@@ -83,12 +83,12 @@ class MainWindow(QMainWindow):
 
     # Public methods for controller interaction
 
-    def update_daw_display(self, daw_status: DAWStatus):
+    def update_daw_display(self, daw_status: DAWStatus) -> None:
         """Update DAW status display"""
         if self.status_groups:
             self.status_groups.update_daw_display(daw_status)
 
-    def update_settings_display(self, settings: AppSettings):
+    def update_settings_display(self, settings: AppSettings) -> None:
         """Update menu items to reflect current settings"""
         if self.menu_bar_manager:
             self.menu_bar_manager.update_settings_display(settings)
@@ -96,29 +96,29 @@ class MainWindow(QMainWindow):
         if self.tray_manager:
             self.tray_manager.update_settings_display(settings)
 
-    def on_daw_started(self, daw_status: DAWStatus):
+    def on_daw_started(self, daw_status: DAWStatus) -> None:
         """Handle DAW started event"""
         if self.tray_manager:
             self.tray_manager.show_message("DAW Started", f"{daw_status.display_name} detected!")
 
-    def on_daw_stopped(self):
+    def on_daw_stopped(self) -> None:
         """Handle DAW stopped event"""
         if self.tray_manager:
             self.tray_manager.show_message("DAW Stopped", "No DAW detected")
 
-    def on_discord_connected(self):
+    def on_discord_connected(self) -> None:
         """Handle Discord connected event"""
         if self.tray_manager:
             self.tray_manager.set_connected_status(True)
             self.tray_manager.update_discord_status("Connected to Discord")
 
-    def on_discord_disconnected(self):
+    def on_discord_disconnected(self) -> None:
         """Handle Discord disconnected event"""
         if self.tray_manager:
             self.tray_manager.set_connected_status(False)
             self.tray_manager.update_discord_status("Open a DAW to begin displaying RPC")
 
-    def on_discord_error(self, error: Exception):
+    def on_discord_error(self, error: Exception) -> None:
         """Handle Discord error"""
         if self.tray_manager:
             self.tray_manager.set_connected_status(False)
@@ -132,7 +132,7 @@ class MainWindow(QMainWindow):
             f"Cannot connect to Discord RPC server.\n{error!s}",
         )
 
-    def closeEvent(self, event):
+    def closeEvent(self, event) -> None:
         """Handle window close event"""
         if not self.exiting:
             event.ignore()
@@ -142,7 +142,7 @@ class MainWindow(QMainWindow):
         else:
             event.accept()
 
-    def exit_application(self):
+    def exit_application(self) -> None:
         """Prepare for application exit"""
         self.exiting = True
         self.close()

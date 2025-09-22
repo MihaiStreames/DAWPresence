@@ -16,7 +16,7 @@ class SystemTrayManager(QObject):
     update_interval_requested = pyqtSignal()
     show_window_requested = pyqtSignal()
 
-    def __init__(self, parent_window, app_version: str):
+    def __init__(self, parent_window, app_version: str) -> None:
         super().__init__()
         self.parent_window = parent_window
         self.app_version = app_version
@@ -28,8 +28,8 @@ class SystemTrayManager(QObject):
 
         self._setup_tray()
 
-    def _setup_tray(self):
-        """Setup tray icon and menu"""
+    def _setup_tray(self) -> None:
+        """Set up tray icon and menu"""
         # Connect context menu signals
         self.context_menu.exit_requested.connect(self.exit_requested.emit)
         self.context_menu.toggle_project_name_requested.connect(
@@ -46,23 +46,23 @@ class SystemTrayManager(QObject):
         self.tray_icon.activated.connect(self._on_tray_activated)
         self.tray_icon.show()
 
-    def _on_tray_activated(self, reason):
+    def _on_tray_activated(self, reason) -> None:
         """Handle tray icon activation"""
         if reason == QSystemTrayIcon.DoubleClick:
             self.show_window_requested.emit()
 
-    def set_connected_status(self, connected: bool):
+    def set_connected_status(self, connected: bool) -> None:
         """Update tray icon based on connection status"""
         self.icon_manager.set_connected_status(connected)
 
-    def update_discord_status(self, message: str):
+    def update_discord_status(self, message: str) -> None:
         """Update Discord status message in menu"""
         self.context_menu.update_discord_status(message)
 
-    def update_settings_display(self, settings: AppSettings):
+    def update_settings_display(self, settings: AppSettings) -> None:
         """Update settings menu items"""
         self.context_menu.update_settings_display(settings)
 
-    def show_message(self, title: str, message: str, duration: int = 3000):
+    def show_message(self, title: str, message: str, duration: int = 3000) -> None:
         """Show tray notification"""
         self.tray_icon.showMessage(title, message, QSystemTrayIcon.Information, duration)

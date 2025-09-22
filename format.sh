@@ -4,8 +4,10 @@ set -e
 # Format with black
 black DAWPY/
 
-# Lint & sort imports with ruff (auto-fix)
-ruff check DAWPY/ --fix
+# Lint & sort imports with ruff
+ruff check DAWPY/ --fix --unsafe-fixes
 
 # Type-check with mypy
-mypy DAWPY/
+cd DAWPY
+mypy .
+cd ..

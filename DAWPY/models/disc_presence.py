@@ -1,5 +1,6 @@
 import time
 from dataclasses import dataclass
+from typing import Any
 
 from DAWPY.models.daw import DAWStatus
 from DAWPY.models.settings import AppSettings
@@ -15,7 +16,7 @@ class DiscordPresence:
     large_text: str = ""
     start_time: int | None = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Set start time if not provided"""
         if self.start_time is None:
             self.start_time = int(time.time())
@@ -67,7 +68,7 @@ class DiscordPresence:
 
         return cls(details=details, state=state, large_text=f"DAWPresence v{version}")
 
-    def to_pypresence_dict(self) -> dict:
+    def to_pypresence_dict(self) -> dict[str, Any]:
         """Convert to pypresence format"""
         return {
             "details": self.details,

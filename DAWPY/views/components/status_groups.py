@@ -8,7 +8,7 @@ from DAWPY.models import DAWStatus
 class StatusGroupWidget(QGroupBox):
     """Base class for status display groups"""
 
-    def __init__(self, title: str, font_name: str = "Tahoma", font_size: int = 12):
+    def __init__(self, title: str, font_name: str = "Tahoma", font_size: int = 12) -> None:
         super().__init__(title)
         self.layout = QVBoxLayout(self)
         self.label = QLabel("None")
@@ -16,7 +16,7 @@ class StatusGroupWidget(QGroupBox):
         self.label.setFont(QFont(font_name, font_size))
         self.layout.addWidget(self.label)
 
-    def update_text(self, text: str):
+    def update_text(self, text: str) -> None:
         """Update the display text"""
         self.label.setText(text)
 
@@ -24,10 +24,10 @@ class StatusGroupWidget(QGroupBox):
 class DAWNameGroup(StatusGroupWidget):
     """Digital Audio Workstation name display group"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Current Digital Audio Workstation")
 
-    def update_daw(self, daw_status: DAWStatus):
+    def update_daw(self, daw_status: DAWStatus) -> None:
         """Update DAW name display"""
         self.update_text(daw_status.display_name)
 
@@ -35,10 +35,10 @@ class DAWNameGroup(StatusGroupWidget):
 class ProjectNameGroup(StatusGroupWidget):
     """Project name display group"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Opening Project")
 
-    def update_project(self, daw_status: DAWStatus):
+    def update_project(self, daw_status: DAWStatus) -> None:
         """Update project name display"""
         self.update_text(daw_status.project_name)
 
@@ -46,17 +46,17 @@ class ProjectNameGroup(StatusGroupWidget):
 class SystemUsageGroup(StatusGroupWidget):
     """Base class for system usage groups"""
 
-    def __init__(self, title: str):
+    def __init__(self, title: str) -> None:
         super().__init__(title, font_name="Consolas", font_size=20)
 
 
 class CPUUsageGroup(SystemUsageGroup):
     """CPU usage display group"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("CPU Usage")
 
-    def update_cpu(self, daw_status: DAWStatus):
+    def update_cpu(self, daw_status: DAWStatus) -> None:
         """Update CPU usage display"""
         self.update_text(daw_status.cpu_usage_str)
 
@@ -64,10 +64,10 @@ class CPUUsageGroup(SystemUsageGroup):
 class RAMUsageGroup(SystemUsageGroup):
     """RAM usage display group"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("RAM Usage")
 
-    def update_ram(self, daw_status: DAWStatus):
+    def update_ram(self, daw_status: DAWStatus) -> None:
         """Update RAM usage display"""
         self.update_text(daw_status.ram_usage_str)
 
@@ -75,11 +75,11 @@ class RAMUsageGroup(SystemUsageGroup):
 class StatusGroupsWidget(QWidget):
     """Container widget for all status display groups"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._init_ui()
 
-    def _init_ui(self):
+    def _init_ui(self) -> None:
         """Initialize the status groups layout"""
         self.grid_layout = QGridLayout(self)
         self.grid_layout.setContentsMargins(10, 10, 10, 10)
@@ -103,7 +103,7 @@ class StatusGroupsWidget(QWidget):
         self.grid_layout.setRowStretch(0, 1)
         self.grid_layout.setRowStretch(1, 1)
 
-    def update_daw_display(self, daw_status: DAWStatus):
+    def update_daw_display(self, daw_status: DAWStatus) -> None:
         """Update all status displays"""
         self.daw_group.update_daw(daw_status)
         self.project_group.update_project(daw_status)

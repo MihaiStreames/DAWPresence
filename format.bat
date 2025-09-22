@@ -2,8 +2,10 @@
 REM Format with black
 black DAWPY/
 
-REM Lint & sort imports with ruff (auto-fix)
-ruff check DAWPY/ --fix
+REM Lint & sort imports with ruff
+ruff check DAWPY/ --fix --unsafe-fixes
 
 REM Type-check with mypy
-mypy DAWPY/
+cd DAWPY
+mypy .
+cd ..

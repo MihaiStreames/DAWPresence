@@ -14,7 +14,7 @@ class DAWController:
         self,
         process_monitor: ProcessMonitorService,
         config_service: ConfigurationService,
-    ):
+    ) -> None:
         self.process_monitor = process_monitor
         self.config_service = config_service
         self._current_status = DAWStatus()
@@ -84,7 +84,7 @@ class DAWController:
 
         return status
 
-    def _handle_status_change(self, previous: DAWStatus, current: DAWStatus):
+    def _handle_status_change(self, previous: DAWStatus, current: DAWStatus) -> None:
         """Handle changes in DAW status"""
         # DAW started
         if not previous.is_running and current.is_running:

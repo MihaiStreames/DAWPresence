@@ -7,7 +7,7 @@ from DAWPY.models import DAWInfo
 class ConfigurationService:
     """Service for loading and managing DAW configurations"""
 
-    def __init__(self, config_path: str = None):
+    def __init__(self, config_path: str | None = None) -> None:
         self.config_path = config_path
         self._daws_cache = None
 
@@ -42,7 +42,7 @@ class ConfigurationService:
             return daws
 
         except json.JSONDecodeError as e:
-            raise ValueError(f"Invalid JSON in DAW configuration file: {e}")
+            raise ValueError(f"Invalid JSON in DAW configuration file: {e}") from e
 
     def get_daw_by_process_name(self, process_name: str) -> DAWInfo | None:
         """Get DAW configuration by process name"""

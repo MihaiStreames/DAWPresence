@@ -15,7 +15,7 @@ from DAWPY.utils import PathUtils, ProcessUtils
 class AppController:
     """Main application controller"""
 
-    def __init__(self, app_version: str):
+    def __init__(self, app_version: str) -> None:
         self.app_version = app_version
 
         # Ensure data directory exists before logging
@@ -46,8 +46,8 @@ class AppController:
 
         logger.success("Application controller initialized successfully")
 
-    def _setup_callbacks(self):
-        """Setup inter-controller communication"""
+    def _setup_callbacks(self) -> None:
+        """Set up inter-controller communication"""
         # DAW Controller callbacks
         self.daw_controller.on_daw_started = self._on_daw_started
         self.daw_controller.on_daw_stopped = self._on_daw_stopped
@@ -89,7 +89,7 @@ class AppController:
             logger.exception(f"Failed to initialize application: {e}")
             return False
 
-    def start(self, app: QApplication, main_window):
+    def start(self, app: QApplication, main_window) -> None:
         """Start the application"""
         self.app = app
         self.main_window = main_window
@@ -106,7 +106,7 @@ class AppController:
         self._update_ui_settings()
         self.main_window.show()
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         """Shutdown the application"""
         logger.info("Shutting down DAWPresence...")
 
@@ -125,19 +125,19 @@ class AppController:
 
         logger.success("DAWPresence shutdown complete")
 
-    def toggle_hide_project_name(self):
+    def toggle_hide_project_name(self) -> None:
         """Toggle project name visibility"""
         self.settings = self.settings.update(hide_project_name=not self.settings.hide_project_name)
         self.settings.save(PathUtils.get_settings_path())
         self._update_ui_settings()
 
-    def toggle_hide_system_usage(self):
+    def toggle_hide_system_usage(self) -> None:
         """Toggle system usage visibility"""
         self.settings = self.settings.update(hide_system_usage=not self.settings.hide_system_usage)
         self.settings.save(PathUtils.get_settings_path())
         self._update_ui_settings()
 
-    def set_update_interval(self, interval: int):
+    def set_update_interval(self, interval: int) -> None:
         """Set presence update interval"""
         try:
             self.settings = self.settings.update(update_interval=interval)
@@ -150,8 +150,8 @@ class AppController:
         except ValueError as e:
             QMessageBox.warning(None, "Invalid Interval", str(e))
 
-    def _update_cycle(self):
-        """Main update cycle"""
+    def _update_cycle(self) -> None:
+        """Execute main update cycle"""
         try:
             # Scan for DAWs and update status
             daw_status = self.daw_controller.scan_for_daws(self.settings)
@@ -162,7 +162,7 @@ class AppController:
         except Exception as e:
             print(f"Error in update cycle: {e}")
 
-    def _connect_ui_signals(self):
+    def _connect_ui_signals(self) -> None:
         """Connect UI signals to controller methods"""
         if hasattr(self.main_window, "toggle_project_name_signal"):
             self.main_window.toggle_project_name_signal.connect(self.toggle_hide_project_name)
@@ -176,37 +176,37 @@ class AppController:
         if hasattr(self.main_window, "exit_signal"):
             self.main_window.exit_signal.connect(self.shutdown)
 
-    def _update_ui_settings(self):
+    def _update_ui_settings(self) -> None:
         """Update UI to reflect current settings"""
         if hasattr(self.main_window, "update_settings_display"):
             self.main_window.update_settings_display(self.settings)
 
-    def _on_daw_started(self, daw_status):
+    def _on_daw_started(self, daw_status) -> None:
         """Handle DAW started event"""
         if hasattr(self.main_window, "on_daw_started"):
             self.main_window.on_daw_started(daw_status)
 
-    def _on_daw_stopped(self, daw_status):
+    def _on_daw_stopped(self, daw_status) -> None:
         """Handle DAW stopped event"""
         if hasattr(self.main_window, "on_daw_stopped"):
             self.main_window.on_daw_stopped(daw_status)
 
-    def _on_daw_status_updated(self, daw_status):
+    def _on_daw_status_updated(self, daw_status) -> None:
         """Handle DAW status update"""
         if hasattr(self.main_window, "update_daw_display"):
             self.main_window.update_daw_display(daw_status)
 
-    def _on_discord_connected(self):
+    def _on_discord_connected(self) -> None:
         """Handle Discord connected event"""
         if hasattr(self.main_window, "on_discord_connected"):
             self.main_window.on_discord_connected()
 
-    def _on_discord_disconnected(self):
+    def _on_discord_disconnected(self) -> None:
         """Handle Discord disconnected event"""
         if hasattr(self.main_window, "on_discord_disconnected"):
             self.main_window.on_discord_disconnected()
 
-    def _on_discord_error(self, error: Exception):
+    def _on_discord_error(self, error: Exception) -> None:
         """Handle Discord error"""
         if hasattr(self.main_window, "on_discord_error"):
             self.main_window.on_discord_error(error)

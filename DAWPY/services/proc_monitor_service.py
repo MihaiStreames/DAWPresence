@@ -25,7 +25,7 @@ class ProcessInfo:
 class ProcessMonitorService:
     """Service for monitoring system processes"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._processes_cache = {}
         logger.info("Process Monitor Service initialized")
 
@@ -91,21 +91,19 @@ class ProcessMonitorService:
 
         def enum_window_callback(hwnd, windows):
             if win32gui.IsWindowVisible(hwnd) and win32gui.IsWindowEnabled(hwnd):
-                try:
-                    _, found_pid = win32process.GetWindowThreadProcessId(hwnd)
-                    if found_pid == pid:
-                        title = win32gui.GetWindowText(hwnd)
-                        if title.strip():
-                            windows.append(title)
-                except:
-                    pass
+                _, found_pid = win32process.GetWindowThreadProcessId(hwnd)
+                if found_pid == pid:
+                    title = win32gui.GetWindowText(hwnd)
+                    if title.strip():
+                        windows.append(title)
             return True
 
         windows = []
         try:
             win32gui.EnumWindows(enum_window_callback, windows)
             return windows[0] if windows else ""
-        except:
+        except (OSError, AttributeError) as e:
+            logger.debug(f"Failed to enumerate windows: {e}")
             return ""
 
     @staticmethod

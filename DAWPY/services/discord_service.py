@@ -1,6 +1,7 @@
 import time
 from collections.abc import Callable
 
+from loguru import logger
 from pypresence import Presence
 
 from DAWPY.exceptions import DiscordConnectionError
@@ -10,15 +11,15 @@ from DAWPY.models import DiscordPresence
 class DiscordService:
     """Service for managing Discord Rich Presence"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._client: Presence | None = None
         self._current_client_id: str | None = None
         self._is_connected = False
         self._start_time = int(time.time())
 
         # Callbacks
-        self.on_connected: Callable | None = None
-        self.on_disconnected: Callable | None = None
+        self.on_connected: Callable[[], None] | None = None
+        self.on_disconnected: Callable[[], None] | None = None
         self.on_error: Callable[[Exception], None] | None = None
 
     @property
@@ -26,7 +27,7 @@ class DiscordService:
         """Check if Discord client is connected"""
         return self._is_connected and self._client is not None
 
-    def connect(self, client_id: str):
+    def connect(self, client_id: str) -> None:
         """Connect to Discord with specified client ID"""
         if self.is_connected and self._current_client_id == client_id:
             return  # Already connected with same client ID
@@ -51,9 +52,9 @@ class DiscordService:
             if self.on_error:
                 self.on_error(error)
             else:
-                raise error
+                raise error from e
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         """Disconnect from Discord"""
         if not self.is_connected:
             return
@@ -62,14 +63,15 @@ class DiscordService:
             if self._client:
                 self._client.clear()
                 self._client.close()
-        except Exception:
-            pass  # Ignore errors during cleanup
+        except Exception as e:
+            logger.debug(f"Error during Discord cleanup: {e}")
+            # Ignore errors during cleanup
         finally:
             self._cleanup_client()
             if self.on_disconnected:
                 self.on_disconnected()
 
-    def update_presence(self, presence: DiscordPresence):
+    def update_presence(self, presence: DiscordPresence) -> None:
         """Update Discord Rich Presence"""
         if not self.is_connected:
             raise DiscordConnectionError("Not connected to Discord")
@@ -87,14 +89,14 @@ class DiscordService:
             if self.on_error:
                 self.on_error(error)
             else:
-                raise error
+                raise error from e
 
-    def _cleanup_client(self):
+    def _cleanup_client(self) -> None:
         """Clean up client state"""
         self._client = None
         self._current_client_id = None
         self._is_connected = False
 
-    def __del__(self):
+    def __del__(self) -> None:
         """Ensure cleanup on object destruction"""
         self.disconnect()

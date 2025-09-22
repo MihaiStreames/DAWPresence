@@ -11,8 +11,8 @@ from DAWPY.controllers.app_controller import AppController
 from DAWPY.views.main_window import MainWindow
 
 
-def main():
-    """Main application entry point"""
+def main() -> int:
+    """Run the main application"""
     # Application info
     APP_VERSION = "1.0"
     APP_NAME = "DAWPresence"

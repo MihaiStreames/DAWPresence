@@ -7,11 +7,11 @@ class IntervalDialog(QObject):
 
     interval_changed = pyqtSignal(int)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None) -> None:
         super().__init__()
         self.parent = parent
 
-    def show_dialog(self, current_interval: int = 2500):
+    def show_dialog(self, current_interval: int = 2500) -> None:
         """Show interval input dialog"""
         interval, ok = QInputDialog.getInt(
             self.parent,
