@@ -1,8 +1,9 @@
-# Config
-config
+# Data directory
+.data/
 
 # IDE
 /.idea
 
 # Python
 __pycache__
+*.pyc

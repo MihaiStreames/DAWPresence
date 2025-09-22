@@ -1,5 +1,4 @@
 import ctypes
-import os
 from dataclasses import dataclass
 from typing import Optional
 
@@ -9,6 +8,7 @@ import win32process
 from loguru import logger
 
 from DAWPY.services.logging_service import log_errors, log_performance
+from DAWPY.utils import ProcessUtils, SystemUtils
 
 
 @dataclass
@@ -33,12 +33,12 @@ class ProcessMonitorService:
     @log_performance
     def get_process_by_name(self, process_name: str) -> Optional[ProcessInfo]:
         """Find process by name (case-insensitive)"""
-        target_name = process_name.lower().replace(".exe", "")
+        target_name = ProcessUtils.normalize_process_name(process_name)
 
         try:
             for proc in psutil.process_iter(["pid", "name"]):
                 try:
-                    proc_name = proc.info["name"].lower().replace(".exe", "")
+                    proc_name = ProcessUtils.normalize_process_name(proc.info["name"])
                     if proc_name == target_name:
                         process_info = self._create_process_info(proc)
                         if process_info:
@@ -63,17 +63,16 @@ class ProcessMonitorService:
             # Get CPU and memory usage
             cpu_percent = proc.cpu_percent(interval=0.1)
             memory_info = proc.memory_info()
-            memory_mb = memory_info.rss / (1024 * 1024)
 
-            # Normalize CPU usage by core count
-            cpu_count = os.cpu_count() or 1
-            normalized_cpu = cpu_percent / cpu_count
+            # Normalize CPU usage by core count and convert memory to MB
+            normalized_cpu = cpu_percent / SystemUtils.get_cpu_count()
+            memory_mb = SystemUtils.bytes_to_mb(memory_info.rss)
 
             # Get window title
             window_title = self._get_window_title(proc.info["pid"])
 
             logger.trace(
-                f"Process info created for {proc_info['name']}: {memory_mb:.1f}MB RAM, {normalized_cpu:.1f}% CPU"
+                f"Process info created for {proc_info['name']}: {memory_mb}MB RAM, {normalized_cpu:.1f}% CPU"
             )
 
             return ProcessInfo(
@@ -81,7 +80,7 @@ class ProcessMonitorService:
                 name=proc_info["name"],
                 exe_path=proc_info["exe"] or "",
                 cpu_percent=normalized_cpu,
-                memory_mb=int(memory_mb),
+                memory_mb=memory_mb,
                 window_title=window_title,
             )
 

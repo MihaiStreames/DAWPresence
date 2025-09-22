@@ -2,6 +2,8 @@ import json
 import os
 from dataclasses import asdict, dataclass
 
+from DAWPY.utils import ValidationUtils
+
 
 @dataclass
 class AppSettings:
@@ -13,10 +15,8 @@ class AppSettings:
 
     def __post_init__(self):
         """Validate settings"""
-        if self.update_interval < 1000:
-            raise ValueError("Update interval must be at least 1000ms")
-        if self.update_interval > 100_000_000:
-            raise ValueError("Update interval too large")
+        if not ValidationUtils.validate_update_interval(self.update_interval):
+            raise ValueError("Update interval must be between 1000ms and 100,000,000ms")
 
     @classmethod
     def load(cls, filepath: str) -> "AppSettings":

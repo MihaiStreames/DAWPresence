@@ -7,8 +7,8 @@ from loguru import logger
 class LoggingService:
     """Service for application logging using Loguru"""
 
-    def __init__(self, config_dir: str, app_name: str = "DAWPresence"):
-        self.config_dir = config_dir
+    def __init__(self, data_dir: str, app_name: str = "DAWPresence"):
+        self.data_dir = data_dir
         self.app_name = app_name
         self._setup_logging()
 
@@ -18,8 +18,8 @@ class LoggingService:
         logger.remove()
 
         # Create logs directory
-        log_dir = Path(self.config_dir) / "logs"
-        log_dir.mkdir(exist_ok=True)
+        log_dir = Path(self.data_dir) / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
 
         # Console handler (warnings and errors only)
         logger.add(
@@ -35,7 +35,7 @@ class LoggingService:
             format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} - {message}",
             rotation="1 day",
             retention="7 days",  # Keep logs for 1 week
-            compression="zip",   # Compress old logs
+            compression="zip",  # Compress old logs
         )
 
         logger.info(f"{self.app_name} logging initialized")

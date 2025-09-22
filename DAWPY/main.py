@@ -1,13 +1,14 @@
 import os
 import sys
+import traceback
 
 from PyQt5.QtWidgets import QApplication
 
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from controllers.app_controller import AppController
-from views.main_window import MainWindow
+from DAWPY.controllers.app_controller import AppController
+from DAWPY.views.main_window import MainWindow
 
 
 def main():
@@ -44,7 +45,6 @@ def main():
 
     except Exception as e:
         print(f"Fatal error: {e}")
-        import traceback
         traceback.print_exc()
         return 1
 

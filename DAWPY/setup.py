@@ -50,7 +50,7 @@ setup(
         ("config", ["config/daws.json"]),
         (
             "assets",
-            ["assets/red.ico", "assets/green.ico"] if os.path.exists("assets") else [],
+            ["assets/red.ico", "assets/green.ico"] if os.path.exists("../assets") else [],
         ),
     ],
 )
