@@ -27,7 +27,7 @@ class AppSettings:
             settings.save(filepath)
             return settings
 
-        with open(filepath, "r") as f:
+        with open(filepath) as f:
             data = json.load(f)
             return cls(
                 hide_project_name=data.get("HideProjectName", False),

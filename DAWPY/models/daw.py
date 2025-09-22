@@ -1,6 +1,5 @@
 import re
 from dataclasses import dataclass
-from typing import Optional
 
 from DAWPY.utils import SystemUtils, ValidationUtils
 
@@ -32,7 +31,7 @@ class DAWInfo:
 class DAWStatus:
     """Current runtime state of a DAW"""
 
-    daw_info: Optional[DAWInfo] = None
+    daw_info: DAWInfo | None = None
     is_running: bool = False
     cpu_usage: float = 0.0
     ram_usage_mb: int = 0

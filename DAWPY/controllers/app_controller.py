@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 
 from loguru import logger
 from PyQt5.QtCore import QTimer
@@ -8,8 +7,7 @@ from PyQt5.QtWidgets import QApplication, QMessageBox
 from DAWPY.controllers.daw_controller import DAWController
 from DAWPY.controllers.discord_controller import DiscordController
 from DAWPY.models import AppSettings
-from DAWPY.services import (ConfigurationService, DiscordService,
-                            ProcessMonitorService)
+from DAWPY.services import ConfigurationService, DiscordService, ProcessMonitorService
 from DAWPY.services.logging_service import LoggingService, log_errors
 from DAWPY.utils import PathUtils, ProcessUtils
 
@@ -27,7 +25,7 @@ class AppController:
 
         logger.info(f"DAWPresence v{app_version} starting up")
 
-        self.app: Optional[QApplication] = None
+        self.app: QApplication | None = None
         self.main_window = None
 
         # Services
@@ -40,8 +38,8 @@ class AppController:
         self.discord_controller = DiscordController(self.discord_service, app_version)
 
         # Settings and state
-        self.settings: Optional[AppSettings] = None
-        self.update_timer: Optional[QTimer] = None
+        self.settings: AppSettings | None = None
+        self.update_timer: QTimer | None = None
 
         # Callbacks
         self._setup_callbacks()
@@ -74,9 +72,7 @@ class AppController:
 
             # Load settings
             self.settings = AppSettings.load(PathUtils.get_settings_path())
-            logger.info(
-                f"Settings loaded: Update interval={self.settings.update_interval}ms"
-            )
+            logger.info(f"Settings loaded: Update interval={self.settings.update_interval}ms")
 
             # Validate configs
             try:
@@ -131,17 +127,13 @@ class AppController:
 
     def toggle_hide_project_name(self):
         """Toggle project name visibility"""
-        self.settings = self.settings.update(
-            hide_project_name=not self.settings.hide_project_name
-        )
+        self.settings = self.settings.update(hide_project_name=not self.settings.hide_project_name)
         self.settings.save(PathUtils.get_settings_path())
         self._update_ui_settings()
 
     def toggle_hide_system_usage(self):
         """Toggle system usage visibility"""
-        self.settings = self.settings.update(
-            hide_system_usage=not self.settings.hide_system_usage
-        )
+        self.settings = self.settings.update(hide_system_usage=not self.settings.hide_system_usage)
         self.settings.save(PathUtils.get_settings_path())
         self._update_ui_settings()
 
@@ -154,9 +146,7 @@ class AppController:
             if self.update_timer:
                 self.update_timer.setInterval(interval)
 
-            QMessageBox.information(
-                None, "Success", "Update interval changed successfully."
-            )
+            QMessageBox.information(None, "Success", "Update interval changed successfully.")
         except ValueError as e:
             QMessageBox.warning(None, "Invalid Interval", str(e))
 
@@ -175,14 +165,10 @@ class AppController:
     def _connect_ui_signals(self):
         """Connect UI signals to controller methods"""
         if hasattr(self.main_window, "toggle_project_name_signal"):
-            self.main_window.toggle_project_name_signal.connect(
-                self.toggle_hide_project_name
-            )
+            self.main_window.toggle_project_name_signal.connect(self.toggle_hide_project_name)
 
         if hasattr(self.main_window, "toggle_system_usage_signal"):
-            self.main_window.toggle_system_usage_signal.connect(
-                self.toggle_hide_system_usage
-            )
+            self.main_window.toggle_system_usage_signal.connect(self.toggle_hide_system_usage)
 
         if hasattr(self.main_window, "update_interval_signal"):
             self.main_window.update_interval_signal.connect(self.set_update_interval)

@@ -1,0 +1,99 @@
+# ========== BLACK (Formatter) ==========
+[tool.black]
+line-length = 100
+target-version = ["py313"]
+skip-string-normalization = false
+
+# ========== RUFF (Linter & Formatter) ==========
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "W",    # pycodestyle warnings
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C",    # complexity
+    "Q",    # flake8-quotes
+    "N",    # pep8-naming
+    "D",    # pydocstyle
+    "UP",   # pyupgrade
+    "S",    # bandit (security)
+    "T20",  # flake8-print
+    "PT",   # flake8-pytest-style
+    "RET",  # flake8-return
+    "SIM",  # flake8-simplify
+    "ARG",  # flake8-unused-arguments
+    "DTZ",  # flake8-datetimez
+    "ERA",  # eradicate (commented code)
+    "PD",   # pandas-vet
+    "PGH",  # pygrep-hooks
+    "FLY",  # flynt (f-string conversion)
+    "PIE",  # flake8-pie
+    "COM",  # flake8-commas
+    "ISC",  # flake8-implicit-str-concat
+    "ICN",  # flake8-import-conventions
+    "G",    # flake8-logging-format
+    "INP",  # flake8-no-pep420
+    "RSE",  # flake8-raise
+    "RUF",  # ruff-specific rules
+]
+
+ignore = [
+    "D100",   # Missing docstring in public module
+    "D104",   # Missing docstring in public package
+    "D203",   # 1 blank line required before class docstring (conflicts with D211)
+    "D213",   # Multi-line docstring summary should start at the second line (conflicts with D212)
+    "E501",   # Line too long (handled by black)
+    "COM812", # Trailing comma missing (conflicts with black)
+    "ISC001", # Implicitly concatenated string literals (conflicts with black)
+    "D415",   # First line should end with a period, question mark, or exclamation point (conflicts with D211)
+    "N802",   # Function name should be lowercase
+    "N806",   # Variable in function should be lowercase
+    "D107",   # Missing docstring in __init__
+    "T201",   # print found (using this in main)
+]
+
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.isort]
+known-first-party = ["DAWPY"]
+combine-as-imports = true
+force-wrap-aliases = true
+split-on-trailing-comma = true
+
+# ========== MYPY (Type Checker) ==========
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+check_untyped_defs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+disallow_any_generics = true
+disallow_any_unimported = true
+disallow_subclassing_any = true
+no_implicit_optional = true
+strict_optional = true
+strict_equality = true
+show_error_codes = true
+show_column_numbers = true
+pretty = true
+color_output = true
+error_summary = true
+ignore_missing_imports = true
+follow_imports = "silent"
+allow_redefinition = false

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget
 
@@ -24,17 +22,17 @@ class MainWindow(QMainWindow):
         self.exiting = False
 
         # UI Components
-        self.tray_manager: Optional[SystemTrayManager] = None
-        self.interval_dialog: Optional[IntervalDialog] = None
-        self.menu_bar_manager: Optional[AppMenuBar] = None
-        self.status_groups: Optional[StatusGroupsWidget] = None
+        self.tray_manager: SystemTrayManager | None = None
+        self.interval_dialog: IntervalDialog | None = None
+        self.menu_bar_manager: AppMenuBar | None = None
+        self.status_groups: StatusGroupsWidget | None = None
 
         self._init_ui()
         self._setup_tray()
 
     def _init_ui(self):
         """Initialize the user interface"""
-        self.setWindowTitle(f"DAWPresence")
+        self.setWindowTitle("DAWPresence")
         self.setFixedSize(735, 347)
 
         # Create central widget and layout
@@ -55,24 +53,22 @@ class MainWindow(QMainWindow):
         """Connect menu bar signals"""
         if self.menu_bar_manager:
             self.menu_bar_manager.toggle_project_name_requested.connect(
-                self.toggle_project_name_signal.emit
+                self.toggle_project_name_signal.emit,
             )
             self.menu_bar_manager.toggle_system_usage_requested.connect(
-                self.toggle_system_usage_signal.emit
+                self.toggle_system_usage_signal.emit,
             )
-            self.menu_bar_manager.update_interval_requested.connect(
-                self._show_interval_dialog
-            )
+            self.menu_bar_manager.update_interval_requested.connect(self._show_interval_dialog)
 
     def _setup_tray(self):
         """Setup system tray"""
         self.tray_manager = SystemTrayManager(self, self.app_version)
         self.tray_manager.exit_requested.connect(self.exit_signal.emit)
         self.tray_manager.toggle_project_name_requested.connect(
-            self.toggle_project_name_signal.emit
+            self.toggle_project_name_signal.emit,
         )
         self.tray_manager.toggle_system_usage_requested.connect(
-            self.toggle_system_usage_signal.emit
+            self.toggle_system_usage_signal.emit,
         )
         self.tray_manager.update_interval_requested.connect(self._show_interval_dialog)
         self.tray_manager.show_window_requested.connect(self.show)
@@ -81,9 +77,7 @@ class MainWindow(QMainWindow):
         """Show interval setting dialog"""
         if not self.interval_dialog:
             self.interval_dialog = IntervalDialog(self)
-            self.interval_dialog.interval_changed.connect(
-                self.update_interval_signal.emit
-            )
+            self.interval_dialog.interval_changed.connect(self.update_interval_signal.emit)
 
         self.interval_dialog.show_dialog()
 
@@ -105,11 +99,9 @@ class MainWindow(QMainWindow):
     def on_daw_started(self, daw_status: DAWStatus):
         """Handle DAW started event"""
         if self.tray_manager:
-            self.tray_manager.show_message(
-                "DAW Started", f"{daw_status.display_name} detected!"
-            )
+            self.tray_manager.show_message("DAW Started", f"{daw_status.display_name} detected!")
 
-    def on_daw_stopped(self, daw_status: DAWStatus):
+    def on_daw_stopped(self):
         """Handle DAW stopped event"""
         if self.tray_manager:
             self.tray_manager.show_message("DAW Stopped", "No DAW detected")
@@ -124,9 +116,7 @@ class MainWindow(QMainWindow):
         """Handle Discord disconnected event"""
         if self.tray_manager:
             self.tray_manager.set_connected_status(False)
-            self.tray_manager.update_discord_status(
-                "Open a DAW to begin displaying RPC"
-            )
+            self.tray_manager.update_discord_status("Open a DAW to begin displaying RPC")
 
     def on_discord_error(self, error: Exception):
         """Handle Discord error"""
@@ -139,7 +129,7 @@ class MainWindow(QMainWindow):
         QMessageBox.warning(
             self,
             "Discord Connection Error",
-            f"Cannot connect to Discord RPC server.\n{str(error)}",
+            f"Cannot connect to Discord RPC server.\n{error!s}",
         )
 
     def closeEvent(self, event):
@@ -148,9 +138,7 @@ class MainWindow(QMainWindow):
             event.ignore()
             self.hide()
             if self.tray_manager:
-                self.tray_manager.show_message(
-                    "DAWPresence", "Application minimized to tray"
-                )
+                self.tray_manager.show_message("DAWPresence", "Application minimized to tray")
         else:
             event.accept()
 

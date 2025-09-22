@@ -1,5 +1,3 @@
-from typing import Optional
-
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QAction, QMenuBar
 
@@ -17,24 +15,20 @@ class AppMenuBar(QObject):
     def __init__(self, menubar: QMenuBar):
         super().__init__()
         self.menubar = menubar
-        self.hide_project_action: Optional[QAction] = None
-        self.hide_system_action: Optional[QAction] = None
+        self.hide_project_action: QAction | None = None
+        self.hide_system_action: QAction | None = None
         self._create_menu()
 
     def _create_menu(self):
         """Create menu actions"""
         # Hide Project Name action
         self.hide_project_action = QAction("[OFF] Hide Project Name", self)
-        self.hide_project_action.triggered.connect(
-            self.toggle_project_name_requested.emit
-        )
+        self.hide_project_action.triggered.connect(self.toggle_project_name_requested.emit)
         self.menubar.addAction(self.hide_project_action)
 
         # Hide System Usage action
         self.hide_system_action = QAction("[OFF] Hide System Usage", self)
-        self.hide_system_action.triggered.connect(
-            self.toggle_system_usage_requested.emit
-        )
+        self.hide_system_action.triggered.connect(self.toggle_system_usage_requested.emit)
         self.menubar.addAction(self.hide_system_action)
 
         # Set Update Interval action
@@ -44,12 +38,8 @@ class AppMenuBar(QObject):
 
     def update_settings_display(self, settings: AppSettings):
         """Update menu items to reflect current settings"""
-        project_text = (
-            f"[{'ON' if settings.hide_project_name else 'OFF'}] Hide Project Name"
-        )
-        system_text = (
-            f"[{'ON' if settings.hide_system_usage else 'OFF'}] Hide System Usage"
-        )
+        project_text = f"[{'ON' if settings.hide_project_name else 'OFF'}] Hide Project Name"
+        system_text = f"[{'ON' if settings.hide_system_usage else 'OFF'}] Hide System Usage"
 
         if self.hide_project_action:
             self.hide_project_action.setText(project_text)

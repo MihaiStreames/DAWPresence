@@ -1,7 +1,6 @@
 import os
 import shutil
 from pathlib import Path
-from typing import Optional
 
 import psutil
 
@@ -50,7 +49,7 @@ class PathUtils:
             shutil.copy2(source_path, data_config_path)
         else:
             raise FileNotFoundError(
-                f"daws.json not found at {source_path}. Please ensure the file exists in the DAWPY directory or download it from the repository."
+                f"daws.json not found at {source_path}. Please ensure the file exists in the DAWPY directory or download it from the repository.",
             )
 
 
@@ -132,7 +131,7 @@ class IconUtils:
     """Icon and UI utilities"""
 
     @staticmethod
-    def get_icon_path(icon_name: str) -> Optional[str]:
+    def get_icon_path(icon_name: str) -> str | None:
         """Get path to icon file with fallback handling"""
         icon_path = PathUtils.get_icon_path(icon_name)
 

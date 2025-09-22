@@ -1,6 +1,5 @@
 import json
 import os
-from typing import List
 
 from DAWPY.models import DAWInfo
 
@@ -12,18 +11,16 @@ class ConfigurationService:
         self.config_path = config_path
         self._daws_cache = None
 
-    def load_daw_configurations(self) -> List[DAWInfo]:
+    def load_daw_configurations(self) -> list[DAWInfo]:
         """Load DAW configurations from JSON file"""
         if self._daws_cache is not None:
             return self._daws_cache
 
         if not os.path.exists(self.config_path):
-            raise FileNotFoundError(
-                f"DAW configuration file not found: {self.config_path}"
-            )
+            raise FileNotFoundError(f"DAW configuration file not found: {self.config_path}")
 
         try:
-            with open(self.config_path, "r", encoding="utf-8") as f:
+            with open(self.config_path, encoding="utf-8") as f:
                 data = json.load(f)
 
             daws = []

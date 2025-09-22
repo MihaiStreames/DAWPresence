@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from loguru import logger
 
@@ -20,9 +20,9 @@ class DAWController:
         self._current_status = DAWStatus()
 
         # Callbacks
-        self.on_daw_started: Optional[Callable[[DAWStatus], None]] = None
-        self.on_daw_stopped: Optional[Callable[[DAWStatus], None]] = None
-        self.on_status_updated: Optional[Callable[[DAWStatus], None]] = None
+        self.on_daw_started: Callable[[DAWStatus], None] | None = None
+        self.on_daw_stopped: Callable[[DAWStatus], None] | None = None
+        self.on_status_updated: Callable[[DAWStatus], None] | None = None
 
         logger.info("DAW Controller initialized")
 
@@ -42,14 +42,12 @@ class DAWController:
 
         # Check each DAW
         for daw_info in daw_configs:
-            process_info = self.process_monitor.get_process_by_name(
-                daw_info.process_name
-            )
+            process_info = self.process_monitor.get_process_by_name(daw_info.process_name)
 
             if process_info:
                 new_status = self._build_daw_status(daw_info, process_info, settings)
                 logger.info(
-                    f"DAW detected: {daw_info.display_text} | Project: {new_status.project_name} | PID: {process_info.pid}"
+                    f"DAW detected: {daw_info.display_text} | Project: {new_status.project_name} | PID: {process_info.pid}",
                 )
                 break
 
@@ -63,7 +61,10 @@ class DAWController:
         return new_status
 
     def _build_daw_status(
-        self, daw_info: DAWInfo, process_info, settings: AppSettings
+        self,
+        daw_info: DAWInfo,
+        process_info,
+        settings: AppSettings,
     ) -> DAWStatus:
         """Build DAWStatus from process information"""
         status = DAWStatus(

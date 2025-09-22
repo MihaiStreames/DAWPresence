@@ -1,6 +1,5 @@
 import ctypes
 from dataclasses import dataclass
-from typing import Optional
 
 import psutil
 import win32gui
@@ -31,7 +30,7 @@ class ProcessMonitorService:
         logger.info("Process Monitor Service initialized")
 
     @log_performance
-    def get_process_by_name(self, process_name: str) -> Optional[ProcessInfo]:
+    def get_process_by_name(self, process_name: str) -> ProcessInfo | None:
         """Find process by name (case-insensitive)"""
         target_name = ProcessUtils.normalize_process_name(process_name)
 
@@ -42,9 +41,7 @@ class ProcessMonitorService:
                     if proc_name == target_name:
                         process_info = self._create_process_info(proc)
                         if process_info:
-                            logger.trace(
-                                f"Found process: {process_name} (PID: {process_info.pid})"
-                            )
+                            logger.trace(f"Found process: {process_name} (PID: {process_info.pid})")
                             return process_info
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     continue
@@ -54,7 +51,7 @@ class ProcessMonitorService:
         return None
 
     @log_errors
-    def _create_process_info(self, proc: psutil.Process) -> Optional[ProcessInfo]:
+    def _create_process_info(self, proc: psutil.Process) -> ProcessInfo | None:
         """Create ProcessInfo from psutil.Process"""
         try:
             # Get basic info
@@ -72,7 +69,7 @@ class ProcessMonitorService:
             window_title = self._get_window_title(proc.info["pid"])
 
             logger.trace(
-                f"Process info created for {proc_info['name']}: {memory_mb}MB RAM, {normalized_cpu:.1f}% CPU"
+                f"Process info created for {proc_info['name']}: {memory_mb}MB RAM, {normalized_cpu:.1f}% CPU",
             )
 
             return ProcessInfo(
@@ -137,13 +134,14 @@ class ProcessMonitorService:
             if lsize.value == 0:
                 return "0.0.0"
 
-            lang, codepage = ctypes.cast(
-                lptr, ctypes.POINTER(ctypes.c_ushort * 2)
-            ).contents
+            lang, codepage = ctypes.cast(lptr, ctypes.POINTER(ctypes.c_ushort * 2)).contents
             str_path = f"\\StringFileInfo\\{lang:04X}{codepage:04X}\\ProductVersion"
 
             ctypes.windll.version.VerQueryValueW(
-                res, str_path, ctypes.byref(lptr), ctypes.byref(lsize)
+                res,
+                str_path,
+                ctypes.byref(lptr),
+                ctypes.byref(lsize),
             )
 
             if lsize.value == 0:

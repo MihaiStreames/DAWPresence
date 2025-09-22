@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from loguru import logger
 
@@ -14,7 +14,7 @@ class DiscordController:
     def __init__(self, discord_service: DiscordService, app_version: str):
         self.discord_service = discord_service
         self.app_version = app_version
-        self._current_client_id: Optional[str] = None
+        self._current_client_id: str | None = None
 
         # Setup service callbacks
         self.discord_service.on_connected = self._on_connected
@@ -22,9 +22,9 @@ class DiscordController:
         self.discord_service.on_error = self._on_error
 
         # Controller callbacks
-        self.on_connected: Optional[Callable] = None
-        self.on_disconnected: Optional[Callable] = None
-        self.on_error: Optional[Callable[[Exception], None]] = None
+        self.on_connected: Callable | None = None
+        self.on_disconnected: Callable | None = None
+        self.on_error: Callable[[Exception], None] | None = None
 
         logger.info("Discord Controller initialized")
 
@@ -46,9 +46,7 @@ class DiscordController:
             return
 
         # Create and update presence
-        presence = DiscordPresence.create_for_daw(
-            daw_status, settings, self.app_version
-        )
+        presence = DiscordPresence.create_for_daw(daw_status, settings, self.app_version)
 
         try:
             self.discord_service.update_presence(presence)

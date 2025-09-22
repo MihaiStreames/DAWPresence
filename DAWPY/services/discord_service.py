@@ -1,5 +1,5 @@
 import time
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from pypresence import Presence
 
@@ -11,15 +11,15 @@ class DiscordService:
     """Service for managing Discord Rich Presence"""
 
     def __init__(self):
-        self._client: Optional[Presence] = None
-        self._current_client_id: Optional[str] = None
+        self._client: Presence | None = None
+        self._current_client_id: str | None = None
         self._is_connected = False
         self._start_time = int(time.time())
 
         # Callbacks
-        self.on_connected: Optional[Callable] = None
-        self.on_disconnected: Optional[Callable] = None
-        self.on_error: Optional[Callable[[Exception], None]] = None
+        self.on_connected: Callable | None = None
+        self.on_disconnected: Callable | None = None
+        self.on_error: Callable[[Exception], None] | None = None
 
     @property
     def is_connected(self) -> bool:

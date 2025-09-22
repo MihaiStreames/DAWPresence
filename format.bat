@@ -1,3 +1,9 @@
-pipx install black isort mypy
+@echo off
+REM Format with black
 black DAWPY/
-isort DAWPY/
+
+REM Lint & sort imports with ruff (auto-fix)
+ruff check DAWPY/ --fix
+
+REM Type-check with mypy
+mypy DAWPY/

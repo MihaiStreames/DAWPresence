@@ -33,14 +33,12 @@ class SystemTrayManager(QObject):
         # Connect context menu signals
         self.context_menu.exit_requested.connect(self.exit_requested.emit)
         self.context_menu.toggle_project_name_requested.connect(
-            self.toggle_project_name_requested.emit
+            self.toggle_project_name_requested.emit,
         )
         self.context_menu.toggle_system_usage_requested.connect(
-            self.toggle_system_usage_requested.emit
+            self.toggle_system_usage_requested.emit,
         )
-        self.context_menu.update_interval_requested.connect(
-            self.update_interval_requested.emit
-        )
+        self.context_menu.update_interval_requested.connect(self.update_interval_requested.emit)
         self.context_menu.show_window_requested.connect(self.show_window_requested.emit)
 
         # Setup tray icon
@@ -67,6 +65,4 @@ class SystemTrayManager(QObject):
 
     def show_message(self, title: str, message: str, duration: int = 3000):
         """Show tray notification"""
-        self.tray_icon.showMessage(
-            title, message, QSystemTrayIcon.Information, duration
-        )
+        self.tray_icon.showMessage(title, message, QSystemTrayIcon.Information, duration)
