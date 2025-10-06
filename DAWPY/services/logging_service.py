@@ -59,6 +59,7 @@ def log_performance[F: Callable[..., Any]](func: F) -> F:
             execution_time = (time() - start_time) * 1000  # Convert to ms
             logger.debug(f"{func.__name__} executed in {execution_time:.2f}ms")
             return result
+
         except Exception as e:
             execution_time = (time() - start_time) * 1000
             logger.error(f"{func.__name__} failed after {execution_time:.2f}ms: {e}")
@@ -74,6 +75,7 @@ def log_errors[F: Callable[..., Any]](func: F) -> F:
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         try:
             return func(*args, **kwargs)
+
         except Exception as e:
             logger.exception(f"Error in {func.__name__}: {e}")
             raise

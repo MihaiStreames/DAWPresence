@@ -16,7 +16,7 @@ class DiscordController:
         self.app_version = app_version
         self._current_client_id: str | None = None
 
-        # Setup service callbacks
+        # Service callbacks
         self.discord_service.on_connected = self._on_connected
         self.discord_service.on_disconnected = self._on_disconnected
         self.discord_service.on_error = self._on_error
@@ -40,17 +40,16 @@ class DiscordController:
             self.disconnect()
             return
 
-        # Ensure we're connected with correct client ID
         if not self._ensure_connection(daw_status.daw_info.client_id):
             logger.warning("Failed to establish Discord connection")
             return
 
-        # Create and update presence
         presence = DiscordPresence.create_for_daw(daw_status, settings, self.app_version)
 
         try:
             self.discord_service.update_presence(presence)
             logger.debug(f"Discord presence updated: {presence.details}")
+
         except DiscordConnectionError as e:
             logger.error(f"Failed to update Discord presence: {e}")
             if self.on_error:
@@ -71,6 +70,7 @@ class DiscordController:
             self._current_client_id = client_id
             logger.success(f"Connected to Discord (Client ID: {client_id})")
             return True
+
         except DiscordConnectionError as e:
             logger.warning(f"Discord connection failed: {e}")
             return False

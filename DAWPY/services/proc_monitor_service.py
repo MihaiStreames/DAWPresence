@@ -43,8 +43,10 @@ class ProcessMonitorService:
                         if process_info:
                             logger.trace(f"Found process: {process_name} (PID: {process_info.pid})")
                             return process_info
+
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     continue
+
         except Exception as e:
             logger.error(f"Error scanning for process {process_name}: {e}")
 
@@ -99,9 +101,11 @@ class ProcessMonitorService:
             return True
 
         windows = []
+
         try:
             win32gui.EnumWindows(enum_window_callback, windows)
             return windows[0] if windows else ""
+
         except (OSError, AttributeError) as e:
             logger.debug(f"Failed to enumerate windows: {e}")
             return ""

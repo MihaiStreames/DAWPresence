@@ -7,7 +7,7 @@ from DAWPY.utils import ValidationUtils
 
 @dataclass
 class AppSettings:
-    """Application settings with validation"""
+    """Application settings"""
 
     hide_project_name: bool = False
     hide_system_usage: bool = False
@@ -20,9 +20,8 @@ class AppSettings:
 
     @classmethod
     def load(cls, filepath: str) -> "AppSettings":
-        """Load settings from JSON file"""
+        """Load settings from JSON"""
         if not os.path.exists(filepath):
-            # Create default settings file
             settings = cls()
             settings.save(filepath)
             return settings
@@ -36,7 +35,7 @@ class AppSettings:
             )
 
     def save(self, filepath: str) -> None:
-        """Save settings to JSON file"""
+        """Save settings to JSON"""
         data = {
             "HideProjectName": self.hide_project_name,
             "HideSystemUsage": self.hide_system_usage,

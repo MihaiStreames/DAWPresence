@@ -5,7 +5,7 @@ from DAWPY.models import DAWInfo
 
 
 class ConfigurationService:
-    """Service for loading and managing DAW configurations"""
+    """Service for loading DAW configurations"""
 
     def __init__(self, config_path: str | None = None) -> None:
         self.config_path = config_path
@@ -34,6 +34,7 @@ class ConfigurationService:
                         hide_version=item.get("HideVersion", False),
                     )
                     daws.append(daw_info)
+
                 except (KeyError, ValueError) as e:
                     print(f"Warning: Invalid DAW configuration: {e}")
                     continue

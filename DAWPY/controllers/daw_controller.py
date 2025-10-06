@@ -11,9 +11,7 @@ class DAWController:
     """Controller for DAW monitoring and status management"""
 
     def __init__(
-        self,
-        process_monitor: ProcessMonitorService,
-        config_service: ConfigurationService,
+        self, process_monitor: ProcessMonitorService, config_service: ConfigurationService
     ) -> None:
         self.process_monitor = process_monitor
         self.config_service = config_service
@@ -32,15 +30,14 @@ class DAWController:
         previous_status = self._current_status
         new_status = DAWStatus()
 
-        # Load configs
         try:
             daw_configs = self.config_service.load_daw_configurations()
             logger.debug(f"Loaded {len(daw_configs)} DAW configurations")
+
         except Exception as e:
             logger.error(f"Failed to load DAW configurations: {e}")
             return new_status
 
-        # Check each DAW
         for daw_info in daw_configs:
             process_info = self.process_monitor.get_process_by_name(daw_info.process_name)
 
@@ -51,20 +48,14 @@ class DAWController:
                 )
                 break
 
-        # Update status and handle changes
         self._current_status = new_status
         self._handle_status_change(previous_status, new_status)
-
         if self.on_status_updated:
             self.on_status_updated(new_status)
-
         return new_status
 
     def _build_daw_status(
-        self,
-        daw_info: DAWInfo,
-        process_info,
-        settings: AppSettings,
+        self, daw_info: DAWInfo, process_info, settings: AppSettings
     ) -> DAWStatus:
         """Build DAWStatus from process information"""
         status = DAWStatus(
@@ -76,7 +67,6 @@ class DAWController:
             version=self.process_monitor.get_process_version(process_info.exe_path),
         )
 
-        # Extract project name
         if not settings.hide_project_name:
             status.project_name = status.extract_project_name()
         else:
@@ -91,7 +81,6 @@ class DAWController:
             logger.success(f"DAW Started: {current.display_name}")
             if self.on_daw_started:
                 self.on_daw_started(current)
-
         # DAW stopped
         elif previous.is_running and not current.is_running:
             logger.info("No DAW detected")

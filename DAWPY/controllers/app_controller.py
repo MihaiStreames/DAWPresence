@@ -17,8 +17,6 @@ class AppController:
 
     def __init__(self, app_version: str) -> None:
         self.app_version = app_version
-
-        # Ensure data directory exists before logging
         self._data_dir = PathUtils.get_data_directory()
         os.makedirs(self._data_dir, exist_ok=True)
         self.logging_service = LoggingService(self._data_dir)
@@ -66,18 +64,16 @@ class AppController:
                 logger.warning("Another instance is already running")
                 return False
 
-            # Ensure configs exist
             PathUtils.ensure_daws_config()
             logger.info("DAW configurations setup complete")
 
-            # Load settings
             self.settings = AppSettings.load(PathUtils.get_settings_path())
             logger.info(f"Settings loaded: Update interval={self.settings.update_interval}ms")
 
-            # Validate configs
             try:
                 daw_configs = self.config_service.load_daw_configurations()
                 logger.info(f"Loaded {len(daw_configs)} DAW configurations")
+
             except (FileNotFoundError, ValueError) as e:
                 logger.error(f"DAW configuration error: {e}")
                 return False
@@ -93,16 +89,12 @@ class AppController:
         """Start the application"""
         self.app = app
         self.main_window = main_window
-
-        # UI callbacks
         self._connect_ui_signals()
 
-        # Update timer
         self.update_timer = QTimer()
         self.update_timer.timeout.connect(self._update_cycle)
         self.update_timer.start(self.settings.update_interval)
 
-        # Update UI
         self._update_ui_settings()
         self.main_window.show()
 
@@ -110,15 +102,12 @@ class AppController:
         """Shutdown the application"""
         logger.info("Shutting down DAWPresence...")
 
-        # Stop timer
         if self.update_timer:
             self.update_timer.stop()
             logger.debug("Update timer stopped")
 
-        # Disconnect Discord
         self.discord_controller.disconnect()
 
-        # Save settings
         if self.settings:
             self.settings.save(PathUtils.get_settings_path())
             logger.info("Settings saved")
@@ -142,21 +131,17 @@ class AppController:
         try:
             self.settings = self.settings.update(update_interval=interval)
             self.settings.save(PathUtils.get_settings_path())
-
             if self.update_timer:
                 self.update_timer.setInterval(interval)
-
             QMessageBox.information(None, "Success", "Update interval changed successfully.")
+
         except ValueError as e:
             QMessageBox.warning(None, "Invalid Interval", str(e))
 
     def _update_cycle(self) -> None:
         """Execute main update cycle"""
         try:
-            # Scan for DAWs and update status
             daw_status = self.daw_controller.scan_for_daws(self.settings)
-
-            # Update Discord presence
             self.discord_controller.update_from_daw_status(daw_status, self.settings)
 
         except Exception as e:

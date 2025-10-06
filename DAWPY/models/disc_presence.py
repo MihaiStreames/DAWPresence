@@ -1,6 +1,5 @@
 import time
 from dataclasses import dataclass
-from typing import Any
 
 from DAWPY.models.daw import DAWStatus
 from DAWPY.models.settings import AppSettings
@@ -23,36 +22,27 @@ class DiscordPresence:
 
     @classmethod
     def create_for_daw(
-        cls,
-        daw_status: DAWStatus,
-        settings: AppSettings,
-        version: str,
+        cls, daw_status: DAWStatus, settings: AppSettings, version: str
     ) -> "DiscordPresence":
         """Create Discord presence from DAW status"""
         if not daw_status.is_running:
             return cls(
-                details="Not using any DAW",
-                state="Idle",
-                large_text=f"DAWPresence v{version}",
+                details="Not using any DAW", state="Idle", large_text=f"DAWPresence v{version}"
             )
 
         project = daw_status.project_name
         if settings.hide_project_name:
             project = "(hidden)"
 
-        # Build details
         if project in ["None", "Untitled"]:
             details = "Opening an untitled project"
         else:
             details = f"Opening project: {project}"
 
-        # Build state
         if settings.hide_system_usage:
             state = f"Using {daw_status.display_name}"
         else:
             state_parts = []
-
-            # Add version if not hidden
             if (
                 daw_status.daw_info
                 and not daw_status.daw_info.hide_version
@@ -68,7 +58,7 @@ class DiscordPresence:
 
         return cls(details=details, state=state, large_text=f"DAWPresence v{version}")
 
-    def to_pypresence_dict(self) -> dict[str, Any]:
+    def to_pypresence_dict(self) -> dict:
         """Convert to pypresence format"""
         return {
             "details": self.details,

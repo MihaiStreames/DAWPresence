@@ -30,9 +30,7 @@ class DiscordService:
     def connect(self, client_id: str) -> None:
         """Connect to Discord with specified client ID"""
         if self.is_connected and self._current_client_id == client_id:
-            return  # Already connected with same client ID
-
-        # Disconnect existing client if different ID
+            return
         if self.is_connected and self._current_client_id != client_id:
             self.disconnect()
 
@@ -42,7 +40,6 @@ class DiscordService:
             self._current_client_id = client_id
             self._is_connected = True
             self._start_time = int(time.time())
-
             if self.on_connected:
                 self.on_connected()
 
@@ -63,9 +60,11 @@ class DiscordService:
             if self._client:
                 self._client.clear()
                 self._client.close()
+
         except Exception as e:
             logger.debug(f"Error during Discord cleanup: {e}")
             # Ignore errors during cleanup
+
         finally:
             self._cleanup_client()
             if self.on_disconnected:
@@ -77,7 +76,6 @@ class DiscordService:
             raise DiscordConnectionError("Not connected to Discord")
 
         try:
-            # Use service start time if presence doesn't have one
             presence_data = presence.to_pypresence_dict()
             if not presence_data.get("start"):
                 presence_data["start"] = self._start_time

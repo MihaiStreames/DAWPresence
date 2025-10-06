@@ -6,7 +6,7 @@ from DAWPY.utils import SystemUtils, ValidationUtils
 
 @dataclass(frozen=True)
 class DAWInfo:
-    """Immutable DAW configuration data"""
+    """DAW configuration data"""
 
     process_name: str
     display_text: str
@@ -20,9 +20,9 @@ class DAWInfo:
         ValidationUtils.validate_required_string(self.display_text, "Display text")
         ValidationUtils.validate_required_string(self.client_id, "Client ID")
 
-        # Validate regex
         try:
             re.compile(self.title_regex)
+
         except re.error as e:
             raise ValueError(f"Invalid title regex: {e}") from e
 
