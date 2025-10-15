@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: DAWPresence
+Version: 0.1.0
+License-File: LICENSE
+Requires-Dist: PyQt5>=5.15.11
+Requires-Dist: pypresence>=4.3.0
+Requires-Dist: psutil>=7.1.0
+Requires-Dist: pywin32>=311; sys_platform == "win32"
+Requires-Dist: setuptools>=80.9.0
+Requires-Dist: loguru>=0.7.3
+Dynamic: license-file
