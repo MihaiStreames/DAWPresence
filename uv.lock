@@ -23,7 +23,7 @@ dependencies = [
     { name = "pywin32", marker = "sys_platform == 'win32'" },
     { name = "setuptools" },
     { name = "types-psutil" },
-    { name = "types-pywin32" },
+    { name = "types-pywin32", marker = "sys_platform == 'win32'" },
     { name = "types-setuptools" },
 ]
 
@@ -36,7 +36,7 @@ requires-dist = [
     { name = "pywin32", marker = "sys_platform == 'win32'", specifier = ">=311" },
     { name = "setuptools", specifier = ">=80.9.0" },
     { name = "types-psutil", specifier = ">=7.0.0.20251001" },
-    { name = "types-pywin32", specifier = ">=311.0.0.20251008" },
+    { name = "types-pywin32", marker = "sys_platform == 'win32'", specifier = ">=311.0.0.20251008" },
     { name = "types-setuptools", specifier = ">=80.9.0.20250822" },
 ]
 
