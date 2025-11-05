@@ -1,6 +1,6 @@
+from dataclasses import asdict, dataclass
 import json
 import os
-from dataclasses import asdict, dataclass
 
 from DAWPY.utils import ValidationUtils
 

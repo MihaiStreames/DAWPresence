@@ -2,8 +2,9 @@
 .data/
 
 # IDE
-/.idea
+.idea/
 
 # Python
 __pycache__
 *.pyc
+.egg-info/

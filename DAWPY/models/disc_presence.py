@@ -1,5 +1,5 @@
-import time
 from dataclasses import dataclass
+import time
 
 from DAWPY.models.daw import DAWStatus
 from DAWPY.models.settings import AppSettings

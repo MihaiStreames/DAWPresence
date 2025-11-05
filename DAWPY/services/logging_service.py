@@ -1,11 +1,12 @@
-import sys
 from collections.abc import Callable
 from functools import wraps
 from pathlib import Path
+import sys
 from time import time
 from typing import Any, TypeVar
 
 from loguru import logger
+
 
 # Type variable for decorators
 F = TypeVar("F", bound=Callable[..., Any])

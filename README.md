@@ -72,7 +72,7 @@ regex patterns, and updates your Discord Rich Presence accordingly.
 | `ProcessName` | `string`  | DAW's process name without `.exe`                                                                                     |
 | `DisplayText` | `string`  | The text to be displayed when detected in DAWPresence                                                                 |
 | `TitleRegex`  | `string`  | Regular expression from the DAW's window title. DAWPresence will take the first matched string as the "project name". |
-| `ClientID`    | `string`  | Discord Client ID for displaying Rich Presence.                                                                       
+| `ClientID`    | `string`  | Discord Client ID for displaying Rich Presence.                                                                       |
 | `HideVersion` | `boolean` | Whether to hide the DAW version in DAWPresence.                                                                       |
 
 ```json

@@ -1,5 +1,5 @@
-import time
 from collections.abc import Callable
+import time
 
 from loguru import logger
 from pypresence import Presence

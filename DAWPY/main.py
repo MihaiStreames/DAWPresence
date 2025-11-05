@@ -4,6 +4,7 @@ import traceback
 
 from PyQt5.QtWidgets import QApplication
 
+
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 

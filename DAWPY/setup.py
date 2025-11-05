@@ -2,6 +2,7 @@ import os
 
 from setuptools import find_packages, setup
 
+
 setup(
     name="dawpresence",
     version="1.0.0",

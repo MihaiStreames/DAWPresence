@@ -1,10 +1,10 @@
 import ctypes
 from dataclasses import dataclass
 
+from loguru import logger
 import psutil
 import win32gui
 import win32process
-from loguru import logger
 
 from DAWPY.services.logging_service import log_errors, log_performance
 from DAWPY.utils import ProcessUtils, SystemUtils
