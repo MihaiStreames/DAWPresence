@@ -29,9 +29,7 @@ pub struct DawStatus {
     pub project_name: String,
     pub cpu_usage: f32,
     pub memory_mb: u64,
-    pub memory_percent: f32,
     pub version: String,
-    pub pid: u32,
     pub client_id: String,
     pub hide_version: bool,
 }
@@ -49,7 +47,15 @@ impl DawStatus {
     /// Format RAM usage for display (e.g., "1024MB")
     pub fn ram_usage_str(&self) -> String {
         if self.is_running {
-            format!("{}MB", self.memory_mb)
+            let memory_kb = self.memory_mb.saturating_mul(1024);
+            if memory_kb >= 1024 * 1024 {
+                let memory_gb = memory_kb as f64 / (1024.0 * 1024.0);
+                format!("{:.2}GB", memory_gb)
+            } else if memory_kb >= 1024 {
+                format!("{}MB", self.memory_mb)
+            } else {
+                format!("{}KB", memory_kb)
+            }
         } else {
             "Undefined".to_string()
         }
@@ -129,9 +135,7 @@ impl DawMonitor {
                         project_name,
                         cpu_usage: normalized_cpu,
                         memory_mb,
-                        memory_percent,
                         version,
-                        pid: pid.as_u32(),
                         client_id: config.client_id.clone(),
                         hide_version: config.hide_version,
                     });

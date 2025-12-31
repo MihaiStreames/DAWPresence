@@ -133,14 +133,18 @@ fn update(state: &mut AppState, message: Message) -> Task<Message> {
             window::close(window_id)
         }
         Message::ToggleCloseToTray(close_to_tray) => {
-            state.settings.close_to_tray = close_to_tray;
+            if state.settings.close_to_tray != close_to_tray {
+                state.settings.toggle_close_to_tray();
+            }
             if let Err(error) = state.settings.save() {
                 warn!("Couldn't save settings: {error}");
             }
             Task::none()
         }
         Message::ToggleHideProjectName(hide_project_name) => {
-            state.settings.hide_project_name = hide_project_name;
+            if state.settings.hide_project_name != hide_project_name {
+                state.settings.toggle_hide_project_name();
+            }
             if let Err(error) = state.settings.save() {
                 warn!("Couldn't save settings: {error}");
             }
@@ -148,7 +152,9 @@ fn update(state: &mut AppState, message: Message) -> Task<Message> {
             Task::none()
         }
         Message::ToggleHideSystemUsage(hide_system_usage) => {
-            state.settings.hide_system_usage = hide_system_usage;
+            if state.settings.hide_system_usage != hide_system_usage {
+                state.settings.toggle_hide_system_usage();
+            }
             if let Err(error) = state.settings.save() {
                 warn!("Couldn't save settings: {error}");
             }
