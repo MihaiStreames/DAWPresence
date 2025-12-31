@@ -1,7 +1,11 @@
+use std::path::Path;
+
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sysinfo::System;
+use tracing::{debug, error, trace};
 
+/// DAW configuration loaded from daws.json
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DawConfig {
     #[serde(rename = "ProcessName")]
@@ -13,45 +17,81 @@ pub struct DawConfig {
     #[serde(rename = "ClientID")]
     pub client_id: String,
     #[serde(rename = "HideVersion")]
+    #[serde(default)]
     pub hide_version: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+/// Current state of a detected DAW
+#[derive(Debug, Clone, Default)]
 pub struct DawStatus {
     pub is_running: bool,
     pub display_name: String,
     pub project_name: String,
     pub cpu_usage: f32,
-    pub memory_usage: u64,
+    pub memory_mb: u64,
     pub version: String,
     pub pid: u32,
     pub client_id: String,
     pub hide_version: bool,
 }
 
+impl DawStatus {
+    /// Format CPU usage for display (e.g., "12.34%")
+    pub fn cpu_usage_str(&self) -> String {
+        if self.is_running {
+            format!("{:.2}%", self.cpu_usage)
+        } else {
+            "Undefined".to_string()
+        }
+    }
+
+    /// Format RAM usage for display (e.g., "1024MB")
+    pub fn ram_usage_str(&self) -> String {
+        if self.is_running {
+            format!("{}MB", self.memory_mb)
+        } else {
+            "Undefined".to_string()
+        }
+    }
+}
+
+/// Monitors system processes for running DAWs
 pub struct DawMonitor {
     configs: Vec<DawConfig>,
     system: System,
 }
 
 fn normalize_process_name(name: &str) -> String {
-    let name = name.trim().to_lowercase();
-    name.strip_suffix(".exe").unwrap_or(&name).to_string()
+    name.trim()
+        .to_lowercase()
+        .strip_suffix(".exe")
+        .unwrap_or(name.trim())
+        .to_lowercase()
 }
 
 impl DawMonitor {
+    /// Create a new monitor with the given DAW configs
     pub fn new(configs: Vec<DawConfig>) -> Self {
+        debug!("Loaded {} DAW configs", configs.len());
         Self {
             configs,
             system: System::new_all(),
         }
     }
 
-    pub fn cpu_count(&self) -> usize {
+    /// Load DAW configs from a JSON file
+    pub fn load_configs(path: &Path) -> Result<Vec<DawConfig>, String> {
+        let content =
+            std::fs::read_to_string(path).map_err(|e| format!("Couldn't read daws.json: {e}"))?;
+        serde_json::from_str(&content).map_err(|e| format!("Couldn't parse daws.json: {e}"))
+    }
+
+    fn cpu_count(&self) -> usize {
         self.system.cpus().len().max(1)
     }
 
-    pub fn get_running_daw(&mut self, hide_project_name: bool) -> Option<DawStatus> {
+    /// Scan for running DAWs and return the first match
+    pub fn scan(&mut self, hide_project_name: bool) -> Option<DawStatus> {
         self.system.refresh_all();
 
         for config in &self.configs {
@@ -68,12 +108,24 @@ impl DawMonitor {
                     };
                     let version = get_process_version(process.exe());
 
+                    let cpu_count = self.cpu_count() as f32;
+                    let normalized_cpu = process.cpu_usage() / cpu_count;
+                    let memory_mb = process.memory() / (1024 * 1024);
+
+                    trace!(
+                        "Found {} (PID {}): {}MB RAM, {:.1}% CPU",
+                        config.display_text,
+                        pid.as_u32(),
+                        memory_mb,
+                        normalized_cpu
+                    );
+
                     return Some(DawStatus {
                         is_running: true,
                         display_name: config.display_text.clone(),
                         project_name,
-                        cpu_usage: process.cpu_usage(),
-                        memory_usage: process.memory(),
+                        cpu_usage: normalized_cpu,
+                        memory_mb,
                         version,
                         pid: pid.as_u32(),
                         client_id: config.client_id.clone(),
@@ -93,6 +145,7 @@ fn extract_project_name(title: &str, regex_pattern: &str) -> String {
     }
 
     let Ok(re) = Regex::new(regex_pattern) else {
+        error!("Invalid regex pattern: {}", regex_pattern);
         return "None".to_string();
     };
 
@@ -219,7 +272,9 @@ fn get_process_version(exe_path: Option<&std::path::Path>) -> String {
         .iter()
         .position(|c| *c == 0)
         .unwrap_or(version_wide.len());
-    let version = String::from_utf16_lossy(&version_wide[..len]).trim().to_string();
+    let version = String::from_utf16_lossy(&version_wide[..len])
+        .trim()
+        .to_string();
 
     if version.is_empty() {
         return "0.0.0".to_string();
@@ -298,13 +353,4 @@ fn get_window_title(pid: sysinfo::Pid) -> String {
 fn get_window_title(_pid: sysinfo::Pid) -> String {
     // TODO: implement for X11/Wayland
     String::new()
-}
-
-pub fn format_memory(bytes: u64) -> String {
-    let mb = bytes / (1024 * 1024);
-    format!("{}MB", mb)
-}
-
-pub fn format_cpu(usage: f32) -> String {
-    format!("{:.2}%", usage)
 }

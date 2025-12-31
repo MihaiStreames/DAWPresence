@@ -54,15 +54,22 @@
 
 DAWPresence monitors your running DAW and displays what you're working on in your Discord profile. It detects your project name from the window title and updates your Rich Presence automatically.
 
-This is a complete rewrite of [Serena1432's DAWRPC](https://github.com/Serena1432/DAWRPC), rebuilt from the ground up with Tauri, Rust, and Svelte.
+This is a complete rewrite of [Serena1432's DAWRPC](https://github.com/Serena1432/DAWRPC), rebuilt from the ground up in pure Rust.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
 
-- [Tauri](https://tauri.app/)
 - [Rust](https://www.rust-lang.org/)
-- [Svelte 5](https://svelte.dev/)
+- [iced](https://iced.rs/)
+- [tray-icon](https://crates.io/crates/tray-icon)
+- [notify-rust]
+- [tracing] + [tracing-subscriber]
+- [confy]
+- [serde] + [serde_json]
+- [sysinfo]
+- [regex]
+- [windows]
 - [discord-rich-presence](https://crates.io/crates/discord-rich-presence)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -84,16 +91,13 @@ Download the latest release from the [Releases](https://github.com/MihaiStreames
 ```bash
 # clone the repo
 git clone https://github.com/MihaiStreames/DAWPresence.git
-cd DAWPresence/DAWPresence
-
-# install dependencies
-pnpm install
+cd DAWPresence
 
 # run in dev mode
-pnpm tauri dev
+cargo run
 
 # build for production
-pnpm tauri build
+cargo build --release
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -127,7 +131,7 @@ DAWPresence scans running processes to detect supported DAWs. When it finds one,
 
 1. Create a Discord application at [Discord Developer Portal](https://discord.com/developers/applications)
 2. Add a Rich Presence asset named `icon` with the DAW's icon
-3. Add an entry to `DAWPresence/src-tauri/daws.json`:
+3. Add an entry to `daws.json`:
 
 ```json
 {
