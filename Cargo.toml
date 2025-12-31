@@ -7,22 +7,26 @@ license = "MIT"
 edition = "2021"
 
 [dependencies]
-iced = { version = "0.13", features = ["tokio"] }
-tray-icon = "0.19"
+iced = { version = "0.14.0", features = ["tokio"] }
+tray-icon = "0.21.2"
 notify-rust = "4"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-appender = "0.2"
-confy = "0.6"
+confy = "2.0.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "time"] }
-discord-rich-presence = "0.2"
-sysinfo = "0.35"
+discord-rich-presence = "1.0.0"
+sysinfo = "0.37.2"
 regex = "1"
+image = "0.25"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+gtk = "0.18"
 
 [target.'cfg(windows)'.dependencies]
-windows = { version = "0.61", features = [
+windows = { version = "0.62.2", features = [
     "Win32_Foundation",
     "Win32_UI_WindowsAndMessaging",
     "Win32_System_Threading",

@@ -2,10 +2,11 @@
 .vscode/
 .idea/
 
-# Claude
+# LLMS
 .claude/
-CLAUDE.md
 .mcp.json
+CLAUDE.md
+AGENTS.md
 
 # Rust
 target/

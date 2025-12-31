@@ -97,8 +97,7 @@ impl DiscordManager {
             *timestamp_guard = None;
         }
 
-        let mut new_client =
-            DiscordIpcClient::new(client_id).map_err(|e| format!("Couldn't create client: {e}"))?;
+        let mut new_client = DiscordIpcClient::new(client_id);
 
         new_client
             .connect()

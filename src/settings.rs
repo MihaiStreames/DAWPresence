@@ -11,6 +11,8 @@ pub struct AppSettings {
     pub hide_project_name: bool,
     #[serde(default)]
     pub hide_system_usage: bool,
+    #[serde(default)]
+    pub close_to_tray: bool,
     #[serde(default = "default_update_interval")]
     pub update_interval: u64,
 }
@@ -24,6 +26,7 @@ impl Default for AppSettings {
         Self {
             hide_project_name: false,
             hide_system_usage: false,
+            close_to_tray: true,
             update_interval: DEFAULT_UPDATE_INTERVAL,
         }
     }
@@ -60,5 +63,10 @@ impl AppSettings {
     /// Toggle system usage (CPU/RAM) visibility in presence
     pub fn toggle_hide_system_usage(&mut self) {
         self.hide_system_usage = !self.hide_system_usage;
+    }
+
+    /// Toggle close-to-tray behavior
+    pub fn toggle_close_to_tray(&mut self) {
+        self.close_to_tray = !self.close_to_tray;
     }
 }
