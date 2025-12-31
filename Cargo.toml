@@ -24,6 +24,7 @@ image = "0.25"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 gtk = "0.18"
+x11rb = "0.13"
 
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.62.2", features = [
