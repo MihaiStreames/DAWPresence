@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "DAW Discord Rich Presence",
+        "title": "DAWPresence",
         "width": 1280,
         "height": 720,
         "minWidth": 750,

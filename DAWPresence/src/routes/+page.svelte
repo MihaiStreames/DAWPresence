@@ -19,10 +19,10 @@
   }
 
   let status = $state<Status>({
-    daw_name: "",
-    project_name: "",
-    cpu_usage: "",
-    ram_usage: "",
+    daw_name: "None",
+    project_name: "None",
+    cpu_usage: "Undefined",
+    ram_usage: "Undefined",
     is_connected: false,
   });
 
@@ -75,6 +75,7 @@
   <MenuBar
     hideProjectName={settings.hide_project_name}
     hideSystemUsage={settings.hide_system_usage}
+    updateInterval={settings.update_interval}
     onSettingsChange={handleSettingsChange}
   />
 
