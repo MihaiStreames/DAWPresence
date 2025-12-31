@@ -7,7 +7,7 @@ license = "MIT"
 edition = "2021"
 
 [dependencies]
-iced = { version = "0.14.0", features = ["tokio"] }
+iced = { version = "0.14.0", features = ["tokio", "image"] }
 tray-icon = "0.21.2"
 notify-rust = "4"
 tracing = "0.1"

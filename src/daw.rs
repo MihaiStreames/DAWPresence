@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -29,6 +29,7 @@ pub struct DawStatus {
     pub project_name: String,
     pub cpu_usage: f32,
     pub memory_mb: u64,
+    pub memory_percent: f32,
     pub version: String,
     pub pid: u32,
     pub client_id: String,
@@ -111,6 +112,8 @@ impl DawMonitor {
                     let cpu_count = self.cpu_count() as f32;
                     let normalized_cpu = process.cpu_usage() / cpu_count;
                     let memory_mb = process.memory() / (1024 * 1024);
+                    let total_memory = self.system.total_memory().max(1);
+                    let memory_percent = (process.memory() as f32 / total_memory as f32) * 100.0;
 
                     trace!(
                         "Found {} (PID {}): {}MB RAM, {:.1}% CPU",
@@ -126,6 +129,7 @@ impl DawMonitor {
                         project_name,
                         cpu_usage: normalized_cpu,
                         memory_mb,
+                        memory_percent,
                         version,
                         pid: pid.as_u32(),
                         client_id: config.client_id.clone(),
@@ -137,6 +141,26 @@ impl DawMonitor {
 
         None
     }
+}
+
+/// Ensure a bundled daws.json exists in the config directory
+pub fn ensure_daw_config() -> Result<PathBuf, String> {
+    let config_path =
+        confy::get_configuration_file_path("dawpresence", None).map_err(|e| e.to_string())?;
+    let config_dir = config_path
+        .parent()
+        .ok_or_else(|| "Couldn't resolve config directory".to_string())?;
+    let daws_path = config_dir.join("daws.json");
+
+    if !daws_path.exists() {
+        std::fs::create_dir_all(config_dir)
+            .map_err(|e| format!("Couldn't create config directory: {e}"))?;
+        std::fs::write(&daws_path, include_bytes!("../daws.json"))
+            .map_err(|e| format!("Couldn't write daws.json: {e}"))?;
+        debug!("Copied bundled daws.json to {}", daws_path.display());
+    }
+
+    Ok(daws_path)
 }
 
 fn extract_project_name(title: &str, regex_pattern: &str) -> String {

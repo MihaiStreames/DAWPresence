@@ -45,12 +45,7 @@ impl AppSettings {
 
     /// Set update interval with validation (1000ms - 100,000,000ms)
     pub fn set_update_interval(&mut self, interval: u64) -> Result<(), String> {
-        if !(MIN_UPDATE_INTERVAL..=MAX_UPDATE_INTERVAL).contains(&interval) {
-            return Err(format!(
-                "Interval must be between {}ms and {}ms",
-                MIN_UPDATE_INTERVAL, MAX_UPDATE_INTERVAL
-            ));
-        }
+        Self::validate_update_interval(interval)?;
         self.update_interval = interval;
         Ok(())
     }
@@ -68,5 +63,16 @@ impl AppSettings {
     /// Toggle close-to-tray behavior
     pub fn toggle_close_to_tray(&mut self) {
         self.close_to_tray = !self.close_to_tray;
+    }
+
+    /// Validate update interval without mutating settings
+    pub fn validate_update_interval(interval: u64) -> Result<(), String> {
+        if !(MIN_UPDATE_INTERVAL..=MAX_UPDATE_INTERVAL).contains(&interval) {
+            return Err(format!(
+                "Interval must be between {}ms and {}ms",
+                MIN_UPDATE_INTERVAL, MAX_UPDATE_INTERVAL
+            ));
+        }
+        Ok(())
     }
 }

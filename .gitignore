@@ -10,3 +10,4 @@ AGENTS.md
 
 # Rust
 target/
+dist/

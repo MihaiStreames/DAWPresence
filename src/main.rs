@@ -4,15 +4,18 @@
 mod daw;
 mod discord;
 mod settings;
+mod tray;
 mod ui;
 
-use iced::{event, window, Subscription, Task};
+use iced::{event, time, window, Size, Subscription, Task};
+use std::time::{Duration, Instant};
 use tracing::{info, warn};
 use tracing_subscriber::EnvFilter;
-use tray_icon::menu::{Menu, MenuEvent, MenuId, MenuItem};
-use tray_icon::{Icon, TrayIcon, TrayIconBuilder};
 
+use crate::daw::{ensure_daw_config, DawMonitor, DawStatus};
+use crate::discord::DiscordManager;
 use crate::settings::AppSettings;
+use crate::tray::{load_window_icon, tray_subscription, TrayUpdate};
 
 #[derive(Debug, Clone)]
 pub(crate) enum Message {
@@ -21,19 +24,25 @@ pub(crate) enum Message {
     TrayShow,
     TrayQuit,
     ToggleCloseToTray(bool),
-    SelectPanel(Panel),
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Panel {
-    Home,
-    Settings,
+    ToggleHideProjectName(bool),
+    ToggleHideSystemUsage(bool),
+    UpdateIntervalInput(String),
+    OpenIntervalModal,
+    CloseIntervalModal,
+    ApplyInterval,
+    Tick(Instant),
 }
 
 pub(crate) struct AppState {
     pub(crate) settings: AppSettings,
-    pub(crate) active_panel: Panel,
+    pub(crate) update_interval_input: String,
+    pub(crate) update_interval_error: Option<String>,
+    pub(crate) show_interval_modal: bool,
+    pub(crate) daw_status: Option<DawStatus>,
+    pub(crate) discord_connected: bool,
     window_id: Option<window::Id>,
+    daw_monitor: Option<DawMonitor>,
+    discord: DiscordManager,
 }
 
 fn main() -> iced::Result {
@@ -52,6 +61,7 @@ fn main() -> iced::Result {
         .window(window::Settings {
             resizable: true,
             icon: window_icon,
+            min_size: Some(Size::new(640.0, 360.0)),
             exit_on_close_request: false,
             ..window::Settings::default()
         })
@@ -60,11 +70,34 @@ fn main() -> iced::Result {
 
 /// Load settings and initialize state
 fn boot() -> (AppState, Task<Message>) {
+    let config_path = match ensure_daw_config() {
+        Ok(path) => Some(path),
+        Err(error) => {
+            warn!("Couldn't initialize daws.json: {error}");
+            None
+        }
+    };
+
+    let settings = AppSettings::load();
+    let update_interval_input = settings.update_interval.to_string();
+    let daw_monitor = config_path.and_then(|path| {
+        DawMonitor::load_configs(&path)
+            .map(DawMonitor::new)
+            .map_err(|error| warn!("Couldn't load daws.json: {error}"))
+            .ok()
+    });
+
     (
         AppState {
-            settings: AppSettings::load(),
-            active_panel: Panel::Home,
+            settings,
+            update_interval_input,
+            update_interval_error: None,
+            show_interval_modal: false,
+            daw_status: None,
+            discord_connected: false,
             window_id: None,
+            daw_monitor,
+            discord: DiscordManager::default(),
         },
         Task::none(),
     )
@@ -106,8 +139,80 @@ fn update(state: &mut AppState, message: Message) -> Task<Message> {
             }
             Task::none()
         }
-        Message::SelectPanel(panel) => {
-            state.active_panel = panel;
+        Message::ToggleHideProjectName(hide_project_name) => {
+            state.settings.hide_project_name = hide_project_name;
+            if let Err(error) = state.settings.save() {
+                warn!("Couldn't save settings: {error}");
+            }
+            tray::send_tray_update(TrayUpdate::HideProjectName(hide_project_name));
+            Task::none()
+        }
+        Message::ToggleHideSystemUsage(hide_system_usage) => {
+            state.settings.hide_system_usage = hide_system_usage;
+            if let Err(error) = state.settings.save() {
+                warn!("Couldn't save settings: {error}");
+            }
+            tray::send_tray_update(TrayUpdate::HideSystemUsage(hide_system_usage));
+            Task::none()
+        }
+        Message::UpdateIntervalInput(value) => {
+            state.update_interval_input = value.clone();
+            if value.trim().is_empty() {
+                state.update_interval_error = Some("Interval must be a number".to_string());
+            } else if let Ok(interval) = value.parse::<u64>() {
+                match AppSettings::validate_update_interval(interval) {
+                    Ok(()) => state.update_interval_error = None,
+                    Err(error) => state.update_interval_error = Some(error),
+                }
+            } else {
+                state.update_interval_error = Some("Interval must be a number".to_string());
+            }
+            Task::none()
+        }
+        Message::OpenIntervalModal => {
+            state.update_interval_input = state.settings.update_interval.to_string();
+            state.update_interval_error = None;
+            state.show_interval_modal = true;
+            Task::none()
+        }
+        Message::CloseIntervalModal => {
+            state.show_interval_modal = false;
+            Task::none()
+        }
+        Message::ApplyInterval => {
+            let Ok(interval) = state.update_interval_input.parse::<u64>() else {
+                state.update_interval_error = Some("Interval must be a number".to_string());
+                return Task::none();
+            };
+            if let Err(error) = state.settings.set_update_interval(interval) {
+                state.update_interval_error = Some(error);
+                return Task::none();
+            }
+            state.update_interval_error = None;
+            if let Err(error) = state.settings.save() {
+                warn!("Couldn't save settings: {error}");
+            }
+            state.show_interval_modal = false;
+            Task::none()
+        }
+        Message::Tick(_instant) => {
+            if let Some(monitor) = state.daw_monitor.as_mut() {
+                let status = monitor.scan(state.settings.hide_project_name);
+                state.daw_status = status;
+                if let Err(error) = state
+                    .discord
+                    .update_from_daw_status(state.daw_status.as_ref(), &state.settings)
+                {
+                    warn!("Couldn't update Discord presence: {error}");
+                }
+            } else if let Err(error) = state.discord.update_from_daw_status(None, &state.settings) {
+                warn!("Couldn't update Discord presence: {error}");
+            }
+            let connected = state.discord.is_connected();
+            if connected != state.discord_connected {
+                state.discord_connected = connected;
+                tray::send_tray_update(TrayUpdate::DiscordConnected(connected));
+            }
             Task::none()
         }
     }
@@ -119,8 +224,10 @@ fn view(state: &AppState) -> iced::Element<'_, Message> {
 }
 
 /// Subscribe to tray and window events
-fn subscription(_state: &AppState) -> Subscription<Message> {
-    Subscription::batch(vec![tray_subscription(), window_events()])
+fn subscription(state: &AppState) -> Subscription<Message> {
+    let tick =
+        time::every(Duration::from_millis(state.settings.update_interval)).map(Message::Tick);
+    Subscription::batch(vec![tray_subscription(), window_events(), tick])
 }
 
 /// Forward window close/open events into the app
@@ -132,192 +239,4 @@ fn window_events() -> Subscription<Message> {
         iced::Event::Window(window::Event::Opened { .. }) => Some(Message::WindowOpened(window_id)),
         _ => None,
     })
-}
-
-#[derive(Clone, Copy, Debug)]
-enum TrayAction {
-    Show,
-    Quit,
-}
-
-struct TrayMenuIds {
-    show: MenuId,
-    quit: MenuId,
-}
-
-/// Bridge tray menu events into the app
-fn tray_subscription() -> Subscription<Message> {
-    Subscription::run(|| {
-        iced::stream::channel::<Message>(
-            100,
-            |output: iced::futures::channel::mpsc::Sender<Message>| async move {
-                std::thread::spawn(move || {
-                    #[cfg(target_os = "linux")]
-                    {
-                        run_tray_linux(output);
-                    }
-
-                    #[cfg(not(target_os = "linux"))]
-                    {
-                        run_tray_generic(output);
-                    }
-                });
-
-                iced::futures::future::pending::<()>().await;
-            },
-        )
-    })
-}
-
-/// Run tray icon handling for non-Linux platforms
-/// Uses its own thread for event handling
-#[cfg(not(target_os = "linux"))]
-fn run_tray_generic(mut output: iced::futures::channel::mpsc::Sender<Message>) {
-    let (tray_icon, menu_ids) = match create_tray_icon() {
-        Ok(tray) => tray,
-        Err(error) => {
-            warn!("Couldn't create tray icon: {error}");
-            return;
-        }
-    };
-
-    let receiver = MenuEvent::receiver().clone();
-    loop {
-        let Ok(event) = receiver.recv() else {
-            break;
-        };
-        let action = if event.id() == &menu_ids.show {
-            Some(TrayAction::Show)
-        } else if event.id() == &menu_ids.quit {
-            Some(TrayAction::Quit)
-        } else {
-            None
-        };
-
-        if let Some(action) = action {
-            let message = match action {
-                TrayAction::Show => Message::TrayShow,
-                TrayAction::Quit => Message::TrayQuit,
-            };
-
-            if output.try_send(message).is_err() {
-                break;
-            }
-
-            if matches!(action, TrayAction::Quit) {
-                break;
-            }
-        }
-    }
-
-    drop(tray_icon);
-}
-
-/// Run tray icon handling for Linux
-/// This requires GTK's main loop to be run on the main thread
-#[cfg(target_os = "linux")]
-fn run_tray_linux(output: iced::futures::channel::mpsc::Sender<Message>) {
-    if let Err(error) = gtk::init() {
-        warn!("Couldn't init GTK for tray icon: {error}");
-        return;
-    }
-
-    let (tray_icon, menu_ids) = match create_tray_icon() {
-        Ok(tray) => tray,
-        Err(error) => {
-            warn!("Couldn't create tray icon: {error}");
-            return;
-        }
-    };
-
-    let receiver = MenuEvent::receiver().clone();
-    std::thread::spawn(move || {
-        let mut output = output;
-        loop {
-            let Ok(event) = receiver.recv() else {
-                break;
-            };
-            let action = if event.id() == &menu_ids.show {
-                Some(TrayAction::Show)
-            } else if event.id() == &menu_ids.quit {
-                Some(TrayAction::Quit)
-            } else {
-                None
-            };
-
-            if let Some(action) = action {
-                let message = match action {
-                    TrayAction::Show => Message::TrayShow,
-                    TrayAction::Quit => Message::TrayQuit,
-                };
-
-                if output.try_send(message).is_err() {
-                    break;
-                }
-
-                if matches!(action, TrayAction::Quit) {
-                    gtk::glib::MainContext::default().invoke(gtk::main_quit);
-                    break;
-                }
-            }
-        }
-    });
-
-    gtk::main();
-    drop(tray_icon);
-}
-
-/// Build the tray icon and return menu item ids
-fn create_tray_icon() -> Result<(TrayIcon, TrayMenuIds), String> {
-    let menu = Menu::new();
-    let show = MenuItem::new("Show", true, None);
-    let quit = MenuItem::new("Quit", true, None);
-    menu.append(&show).map_err(|error| error.to_string())?;
-    menu.append(&quit).map_err(|error| error.to_string())?;
-
-    let icon = load_tray_icon()?;
-    let tray_icon = TrayIconBuilder::new()
-        .with_menu(Box::new(menu))
-        .with_tooltip("DAWPresence")
-        .with_icon(icon)
-        .build()
-        .map_err(|error| error.to_string())?;
-
-    Ok((
-        tray_icon,
-        TrayMenuIds {
-            show: show.id().clone(),
-            quit: quit.id().clone(),
-        },
-    ))
-}
-
-/// Load the tray icon from embedded assets
-fn load_tray_icon() -> Result<Icon, String> {
-    let (rgba, width, height) = load_icon_rgba()?;
-    Icon::from_rgba(rgba, width, height).map_err(|error| error.to_string())
-}
-
-/// Load the window icon from embedded assets
-fn load_window_icon() -> Result<window::Icon, String> {
-    let (rgba, width, height) = load_icon_rgba()?;
-    window::icon::from_rgba(rgba, width, height).map_err(|error| error.to_string())
-}
-
-#[cfg(target_os = "windows")]
-const ICON_DATA: &[u8] = include_bytes!("assets/red.ico");
-#[cfg(not(target_os = "windows"))]
-const ICON_DATA: &[u8] = include_bytes!("assets/red.png");
-
-#[cfg(target_os = "windows")]
-const ICON_FORMAT: image::ImageFormat = image::ImageFormat::Ico;
-#[cfg(not(target_os = "windows"))]
-const ICON_FORMAT: image::ImageFormat = image::ImageFormat::Png;
-
-/// Decode the selected icon asset into RGBA pixels
-fn load_icon_rgba() -> Result<(Vec<u8>, u32, u32), String> {
-    let image = image::load_from_memory_with_format(ICON_DATA, ICON_FORMAT)
-        .map_err(|error| error.to_string())?
-        .into_rgba8();
-    Ok((image.to_vec(), image.width(), image.height()))
 }
