@@ -2,7 +2,7 @@
 name = "DAWPresence"
 version = "1.0.2"
 description = "A Discord Rich Presence client for Digital Audio Workstations (DAWs)"
-authors = ["MihaiStreames"]
+authors = ["MihaiStreames <72852703+MihaiStreames@users.noreply.github.com>"]
 license = "MIT"
 edition = "2021"
 
@@ -32,3 +32,29 @@ windows = { version = "0.62.2", features = [
     "Win32_System_ProcessStatus",
     "Win32_Storage_FileSystem",
 ] }
+
+[lints.rust]
+unsafe_code = "warn"
+
+[lints.clippy]
+# style/correctness (like pycodestyle E, W, F)
+cloned_instead_of_copied = "warn"
+flat_map_option = "warn"
+inefficient_to_string = "warn"
+manual_let_else = "warn"
+manual_ok_or = "warn"
+manual_string_new = "warn"
+map_unwrap_or = "warn"
+semicolon_if_nothing_returned = "warn"
+uninlined_format_args = "warn"
+unnested_or_patterns = "warn"
+
+# complexity/simplify (like flake8-simplify SIM)
+fn_params_excessive_bools = "warn"
+needless_pass_by_value = "warn"
+trivially_copy_pass_by_ref = "warn"
+unused_self = "warn"
+redundant_closure_for_method_calls = "warn"
+
+# performance (like perflint PERF)
+redundant_clone = "warn"

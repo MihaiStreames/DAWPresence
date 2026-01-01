@@ -1,0 +1,4 @@
+# matches my python style
+max_width = 100
+use_small_heuristics = "Default"
+edition = "2021"

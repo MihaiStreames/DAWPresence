@@ -1,6 +1,9 @@
+#![allow(unsafe_code)] // FFI with Win32 APIs requires unsafe
+
 use std::path::Path;
 
 use sysinfo::Pid;
+use tracing::{debug, trace};
 
 #[cfg(windows)]
 use std::ffi::OsString;
@@ -87,10 +90,7 @@ pub fn get_process_version(exe_path: Option<&Path>) -> String {
     let lang = translation[0];
     let codepage = translation[1];
 
-    let version_query = format!(
-        "\\StringFileInfo\\{:04X}{:04X}\\ProductVersion",
-        lang, codepage
-    );
+    let version_query = format!("\\StringFileInfo\\{lang:04X}{codepage:04X}\\ProductVersion");
     let version_query: Vec<u16> = version_query
         .encode_utf16()
         .chain(std::iter::once(0))
@@ -135,13 +135,13 @@ pub fn get_process_version(exe_path: Option<&Path>) -> String {
     version
 }
 
-/// Look up the first visible window title for a PID on Windows
+/// Look up window titles for a PID on Windows, returning the longest one
+/// (main windows typically have longer titles than toolbars/palettes)
 #[cfg(windows)]
 pub fn get_window_title(pid: Pid) -> String {
-    // TODO: investigate Windows 10 DAW window titles not detected (project name stays None)
     struct SearchState {
         target_pid: u32,
-        result: Option<String>,
+        titles: Vec<String>,
     }
 
     unsafe extern "system" fn enum_callback(hwnd: HWND, lparam: LPARAM) -> BOOL {
@@ -151,14 +151,15 @@ pub fn get_window_title(pid: Pid) -> String {
 
         let state = &mut *(lparam.0 as *mut SearchState);
 
-        if !IsWindowVisible(hwnd).as_bool() {
-            return BOOL(1);
-        }
-
         let mut process_id: u32 = 0;
         GetWindowThreadProcessId(hwnd, Some(&mut process_id));
 
         if process_id != state.target_pid {
+            return BOOL(1);
+        }
+
+        // check visibility after PID match for better debugging
+        if !IsWindowVisible(hwnd).as_bool() {
             return BOOL(1);
         }
 
@@ -176,24 +177,40 @@ pub fn get_window_title(pid: Pid) -> String {
         let title = OsString::from_wide(&buffer[..len as usize])
             .to_string_lossy()
             .to_string();
-        if title.trim().is_empty() {
-            return BOOL(1);
+        if !title.trim().is_empty() {
+            state.titles.push(title);
         }
 
-        state.result = Some(title);
-        BOOL(0)
+        BOOL(1) // continue enumeration to find all windows
     }
 
     let mut state = SearchState {
         target_pid: pid.as_u32(),
-        result: None,
+        titles: Vec::new(),
     };
 
     unsafe {
         let _ = EnumWindows(Some(enum_callback), LPARAM(&mut state as *mut _ as isize));
     }
 
-    state.result.unwrap_or_default()
+    if state.titles.is_empty() {
+        debug!("no window titles found for PID {}", pid.as_u32());
+        return String::new();
+    }
+
+    trace!(
+        "found {} window(s) for PID {}: {:?}",
+        state.titles.len(),
+        pid.as_u32(),
+        state.titles
+    );
+
+    // return the longest title (main window usually has project name, toolbars are short)
+    state
+        .titles
+        .into_iter()
+        .max_by_key(String::len)
+        .unwrap_or_default()
 }
 
 /// Return a default version on unsupported platforms

@@ -28,7 +28,7 @@ impl DiscordPresence {
         let details = if project == "None" || project == "Untitled" {
             "Opening an untitled project".to_string()
         } else {
-            format!("Opening project: {}", project)
+            format!("Opening project: {project}")
         };
 
         let state = if settings.hide_system_usage {
@@ -47,7 +47,7 @@ impl DiscordPresence {
             details,
             state,
             large_image: "icon".to_string(),
-            large_text: format!("DAWPresence v{}", APP_VERSION),
+            large_text: format!("DAWPresence v{APP_VERSION}"),
         }
     }
 }

@@ -69,8 +69,7 @@ impl AppSettings {
     pub fn validate_update_interval(interval: u64) -> Result<(), String> {
         if !(MIN_UPDATE_INTERVAL..=MAX_UPDATE_INTERVAL).contains(&interval) {
             return Err(format!(
-                "Interval must be between {}ms and {}ms",
-                MIN_UPDATE_INTERVAL, MAX_UPDATE_INTERVAL
+                "Interval must be between {MIN_UPDATE_INTERVAL}ms and {MAX_UPDATE_INTERVAL}ms"
             ));
         }
         Ok(())

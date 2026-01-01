@@ -1,3 +1,5 @@
+#![allow(unsafe_code)] // tray icon message pump requires unsafe on Windows
+
 use crossbeam_channel::RecvTimeoutError;
 use iced::{window, Subscription};
 use std::sync::{LazyLock, Mutex};
@@ -72,7 +74,7 @@ fn run_tray_handling(mut output: iced::futures::channel::mpsc::Sender<Message>) 
         pump_windows_messages();
         match receiver.recv_timeout(Duration::from_millis(100)) {
             Ok(event) => {
-                if handle_tray_event(&menu_items, &mut output, event) {
+                if handle_tray_event(&menu_items, &mut output, &event) {
                     break;
                 }
             }
@@ -139,7 +141,7 @@ fn create_tray_icon() -> Result<(TrayIcon, TrayMenuIds), String> {
 fn handle_tray_event(
     menu_items: &TrayMenuIds,
     output: &mut iced::futures::channel::mpsc::Sender<Message>,
-    event: tray_icon::menu::MenuEvent,
+    event: &tray_icon::menu::MenuEvent,
 ) -> bool {
     if event.id() == &menu_items.show {
         return output.try_send(Message::TrayShow).is_err();

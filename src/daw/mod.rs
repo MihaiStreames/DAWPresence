@@ -54,11 +54,11 @@ impl DawStatus {
             let memory_kb = self.memory_mb.saturating_mul(1024);
             if memory_kb >= 1024 * 1024 {
                 let memory_gb = memory_kb as f64 / (1024.0 * 1024.0);
-                format!("{:.2}GB", memory_gb)
+                format!("{memory_gb:.2}GB")
             } else if memory_kb >= 1024 {
                 format!("{}MB", self.memory_mb)
             } else {
-                format!("{}KB", memory_kb)
+                format!("{memory_kb}KB")
             }
         } else {
             "Undefined".to_string()
@@ -191,6 +191,5 @@ fn extract_project_name(title: &str, regex_pattern: &str) -> String {
         .map(|m| m.as_str().trim())
         .map(|s| s.trim_end_matches('*').trim())
         .map(|s| if s.is_empty() { "Untitled" } else { s })
-        .map(String::from)
-        .unwrap_or_else(|| "None".to_string())
+        .map_or_else(|| "None".to_string(), String::from)
 }

@@ -168,9 +168,10 @@ fn status_icon(connected: bool) -> image::Image<image::Handle> {
 /// Render the update interval modal
 fn interval_modal(state: &AppState) -> iced::Element<'_, Message> {
     let error_text = state.update_interval_error.as_deref();
-    let error_line = error_text
-        .map(|message| text(message).color(Color::from_rgb8(220, 60, 60)).into())
-        .unwrap_or_else(|| text("").into());
+    let error_line = error_text.map_or_else(
+        || text("").into(),
+        |message| text(message).color(Color::from_rgb8(220, 60, 60)).into(),
+    );
 
     let can_submit = state.update_interval_error.is_none();
     let modal = container(
