@@ -20,6 +20,11 @@
 
   <p align="center">
     Discord Rich Presence for Digital Audio Workstations
+    <br />
+    <a href="https://github.com/MihaiStreames/DAWPresence/issues/new">Report Bug</a>
+    ·
+    <a href="https://github.com/MihaiStreames/DAWPresence/issues/new">Request Feature</a>
+    <br />
   </p>
 </div>
 
