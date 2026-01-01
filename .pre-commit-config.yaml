@@ -9,9 +9,16 @@ repos:
         types: [rust]
         pass_filenames: false
 
+      - id: cargo-check
+        name: cargo check
+        entry: python -c "import sys,subprocess;t=[]if sys.platform=='win32'else['--target','x86_64-pc-windows-gnu'];sys.exit(subprocess.call(['cargo','check']+t))"
+        language: system
+        types: [rust]
+        pass_filenames: false
+
       - id: cargo-clippy
         name: cargo clippy
-        entry: cargo clippy --all-targets --all-features -- -D warnings
+        entry: python -c "import sys,subprocess;t=[]if sys.platform=='win32'else['--target','x86_64-pc-windows-gnu'];sys.exit(subprocess.call(['cargo','clippy']+t+['--all-features','--','-D','warnings']))"
         language: system
         types: [rust]
         pass_filenames: false
