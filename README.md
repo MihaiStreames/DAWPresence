@@ -80,7 +80,7 @@ This is a complete rewrite of [Serena1432's DAWRPC](https://github.com/Serena143
 - [serde](https://crates.io/crates/serde) + [serde_json](https://crates.io/crates/serde_json)
 - [tokio](https://crates.io/crates/tokio)
 - [sysinfo](https://crates.io/crates/sysinfo)
-- [regex](https://crates.io/crates/regex)
+- [fancy-regex](https://crates.io/crates/fancy-regex)
 - [image](https://crates.io/crates/image)
 - [windows](https://crates.io/crates/windows)
 - [discord-rich-presence](https://crates.io/crates/discord-rich-presence)
@@ -111,7 +111,11 @@ cd DAWPresence
 # build for production
 cargo build --release
 
-# run the app
+# run the app (Windows)
+./target/release/DAWPresence.exe
+
+# or cross-compile from Linux
+cargo build --release --target x86_64-pc-windows-gnu
 ./target/x86_64-pc-windows-gnu/release/DAWPresence.exe
 ```
 

@@ -10,11 +10,28 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v200--first-functional-rust-release">v2.0.0</a></li>
     <li><a href="#v102--bugfixes">v1.0.2</a></li>
     <li><a href="#v101--rust-rewrite">v1.0.1</a></li>
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.0.0 — First functional Rust release
+
+The Rust rewrite is now fully functional. All DAW project names are detected correctly on Windows 10 and 11.
+
+**Fixed:**
+
+- Project name detection now works on all Windows versions (fixes #2)
+- Switched from `regex` to `fancy-regex` crate - the old crate doesn't support lookaheads, which some DAW patterns require
+
+**Changed:**
+
+- Added clippy lints matching Python linting style
+- Refactored issue templates and workflows
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v1.0.2 — Bugfixes
 
@@ -32,10 +49,6 @@ Bug fixes for tray icon responsiveness and window title detection.
 - GitHub Actions release workflow for automated builds
 - GitHub issue templates for bug reports and feature requests
 - GitHub funding configuration
-
-**Known issues:**
-
-- Windows 10 may have issues detecting DAW window titles (project name stays "None") - under investigation
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 

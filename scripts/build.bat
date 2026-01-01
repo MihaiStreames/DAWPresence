@@ -12,22 +12,13 @@ echo Building release binary...
 cargo build --release
 
 echo Copying to dist\...
-set "FOUND="
-for %%P in (
-    "target\release\%BIN_NAME%"
-    "target\x86_64-pc-windows-gnu\release\%BIN_NAME%"
-    "target\x86_64-pc-windows-msvc\release\%BIN_NAME%"
-) do (
-    if exist "%%~P" if not defined FOUND (
-        set "FOUND=%%~P"
-    )
-)
+set "BUILT_PATH=%ROOT%\target\release\%BIN_NAME%"
 
-if defined FOUND (
-    copy /Y "%FOUND%" "%DIST%\%BIN_NAME%" >nul
+if exist "%BUILT_PATH%" (
+    copy /Y "%BUILT_PATH%" "%DIST%\%BIN_NAME%" >nul
     echo Built: %DIST%\%BIN_NAME%
 ) else (
-    echo Could not find built binary
+    echo Could not find built binary at: %BUILT_PATH%
     exit /b 1
 )
 

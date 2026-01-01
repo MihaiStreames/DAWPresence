@@ -4,15 +4,15 @@ version = 4
 
 [[package]]
 name = "DAWPresence"
-version = "1.0.2"
+version = "2.0.0"
 dependencies = [
  "confy",
  "crossbeam-channel",
  "discord-rich-presence",
+ "fancy-regex",
  "iced",
  "image",
  "notify-rust",
- "regex",
  "serde",
  "serde_json",
  "sysinfo",
@@ -1136,6 +1136,17 @@ dependencies = [
  "rayon-core",
  "smallvec",
  "zune-inflate",
+]
+
+[[package]]
+name = "fancy-regex"
+version = "0.17.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72cf461f865c862bb7dc573f643dd6a2b6842f7c30b07882b56bd148cc2761b8"
+dependencies = [
+ "bit-set",
+ "regex-automata",
+ "regex-syntax",
 ]
 
 [[package]]
@@ -3600,18 +3611,6 @@ dependencies = [
  "getrandom 0.2.16",
  "libredox",
  "thiserror 2.0.17",
-]
-
-[[package]]
-name = "regex"
-version = "1.12.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "843bc0191f75f3e22651ae5f1e72939ab2f72a4bc30fa80a066bd66edefc24d4"
-dependencies = [
- "aho-corasick",
- "memchr",
- "regex-automata",
- "regex-syntax",
 ]
 
 [[package]]

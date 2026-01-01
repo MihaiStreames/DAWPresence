@@ -3,6 +3,7 @@
 use std::path::Path;
 
 use sysinfo::Pid;
+#[cfg(windows)]
 use tracing::{debug, trace};
 
 #[cfg(windows)]

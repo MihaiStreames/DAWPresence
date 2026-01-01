@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use regex::Regex;
+use fancy_regex::Regex;
 use serde::{Deserialize, Serialize};
 use sysinfo::System;
 use tracing::{debug, error, trace};
@@ -181,7 +181,7 @@ fn extract_project_name(title: &str, regex_pattern: &str) -> String {
         return "None".to_string();
     };
 
-    let Some(captures) = re.captures(title) else {
+    let Ok(Some(captures)) = re.captures(title) else {
         return "None".to_string();
     };
 
