@@ -1,8 +1,9 @@
 use std::path::{Path, PathBuf};
+use std::thread;
 
 use fancy_regex::Regex;
 use serde::{Deserialize, Serialize};
-use sysinfo::System;
+use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, RefreshKind, System, UpdateKind};
 use tracing::{debug, error, trace};
 
 use crate::daw::windows::{get_process_version, get_window_title};
@@ -70,6 +71,7 @@ impl DawStatus {
 pub struct DawMonitor {
     configs: Vec<DawConfig>,
     system: System,
+    cpu_count: usize,
 }
 
 /// Normalize process names for comparison
@@ -85,9 +87,11 @@ impl DawMonitor {
     /// Create a new monitor with the given DAW configs
     pub fn new(configs: Vec<DawConfig>) -> Self {
         debug!("Loaded {} DAW configs", configs.len());
+        let cpu_count = thread::available_parallelism().map_or(1, std::num::NonZeroUsize::get);
         Self {
             configs,
-            system: System::new_all(),
+            system: System::new_with_specifics(RefreshKind::nothing()),
+            cpu_count,
         }
     }
 
@@ -98,13 +102,17 @@ impl DawMonitor {
         serde_json::from_str(&content).map_err(|e| format!("Couldn't parse daws.json: {e}"))
     }
 
-    fn cpu_count(&self) -> usize {
-        self.system.cpus().len().max(1)
-    }
-
     /// Scan for running DAWs and return the first match
     pub fn scan(&mut self, hide_project_name: bool) -> Option<DawStatus> {
-        self.system.refresh_all();
+        self.system.refresh_processes_specifics(
+            ProcessesToUpdate::All,
+            true,
+            ProcessRefreshKind::nothing()
+                .with_cpu()
+                .with_memory()
+                .with_exe(UpdateKind::OnlyIfNotSet)
+                .without_tasks(),
+        );
 
         for config in &self.configs {
             for (pid, process) in self.system.processes() {
@@ -120,8 +128,7 @@ impl DawMonitor {
                     };
                     let version = get_process_version(process.exe());
 
-                    let cpu_count = self.cpu_count() as f32;
-                    let normalized_cpu = process.cpu_usage() / cpu_count;
+                    let normalized_cpu = process.cpu_usage() / self.cpu_count as f32;
                     let memory_mb = process.memory() / (1024 * 1024);
 
                     trace!(

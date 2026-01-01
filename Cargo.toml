@@ -1,18 +1,21 @@
 [package]
 name = "DAWPresence"
-version = "2.0.0"
+version = "2.0.1"
 description = "A Discord Rich Presence client for Digital Audio Workstations (DAWs)"
 authors = ["MihaiStreames <72852703+MihaiStreames@users.noreply.github.com>"]
 license = "MIT"
 edition = "2021"
 
 [dependencies]
-iced = { version = "0.14.0", features = ["tokio", "image"] }
+iced = { version = "0.14.0", default-features = false, features = [
+    "crisp",
+    "image-without-codecs",
+    "tiny-skia",
+    "tokio",
+] }
 tray-icon = "0.21.2"
-notify-rust = "4.11.7"
-tracing = "0.1.44"
+tracing = { version = "0.1.44", features = ["release_max_level_off"] }
 tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
-tracing-appender = "0.2.4"
 confy = "2.0.0"
 crossbeam-channel = "0.5.15"
 serde = { version = "1.0.228", features = ["derive"] }
@@ -21,7 +24,10 @@ tokio = { version = "1.48.0", features = ["rt-multi-thread", "macros", "time"] }
 discord-rich-presence = "1.0.0"
 sysinfo = "0.37.2"
 fancy-regex = "0.17.0"
-image = "0.25.9"
+image = { version = "0.25.9", default-features = false, features = [
+    "ico",
+    "png",
+] }
 
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.62.2", features = [
@@ -32,6 +38,12 @@ windows = { version = "0.62.2", features = [
     "Win32_System_ProcessStatus",
     "Win32_Storage_FileSystem",
 ] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = "symbols"
 
 [lints.rust]
 unsafe_code = "warn"

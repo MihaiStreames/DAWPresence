@@ -10,12 +10,30 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v201--size-and-memory-optimizations">v2.0.1</a></li>
     <li><a href="#v200--first-functional-rust-release">v2.0.0</a></li>
     <li><a href="#v102--bugfixes">v1.0.2</a></li>
     <li><a href="#v101--rust-rewrite">v1.0.1</a></li>
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v2.0.1 — Size and memory optimizations
+
+Leaned hard on size and idle RAM reductions for Windows builds.
+
+**Changed:**
+
+- Release builds now strip logging and favor smaller binaries by default
+- Process monitoring refreshes only the data we use
+- Windows-only guard for unsupported platforms
+
+**Performance:**
+
+- Binary size shrank from ~36MB to ~17MB to ~4MB
+- RAM usage dropped from ~70MB+ to ~7MB
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v2.0.0 — First functional Rust release
 

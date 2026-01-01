@@ -11,6 +11,7 @@ mod version;
 use iced::{event, time, window, Size, Subscription, Task};
 use std::time::{Duration, Instant};
 use tracing::{info, warn};
+#[cfg(debug_assertions)]
 use tracing_subscriber::EnvFilter;
 
 use crate::daw::{ensure_daw_config, DawMonitor, DawStatus};
@@ -46,12 +47,9 @@ pub(crate) struct AppState {
     discord: DiscordManager,
 }
 
+#[cfg(windows)]
 fn main() -> iced::Result {
-    tracing_subscriber::fmt()
-        .with_env_filter(
-            EnvFilter::try_from_env("DAWPRESENCE_LOG").unwrap_or_else(|_| EnvFilter::new("info")),
-        )
-        .init();
+    init_logging();
 
     info!("DAWPresence v{} starting up", version::APP_VERSION);
 
@@ -68,6 +66,24 @@ fn main() -> iced::Result {
         })
         .run()
 }
+
+#[cfg(not(windows))]
+fn main() -> ! {
+    eprintln!("DAWPresence is Windows-only (for now)");
+    std::process::exit(1);
+}
+
+#[cfg(debug_assertions)]
+fn init_logging() {
+    tracing_subscriber::fmt()
+        .with_env_filter(
+            EnvFilter::try_from_env("DAWPRESENCE_LOG").unwrap_or_else(|_| EnvFilter::new("info")),
+        )
+        .init();
+}
+
+#[cfg(not(debug_assertions))]
+fn init_logging() {}
 
 /// Load settings and initialize state
 fn boot() -> (AppState, Task<Message>) {
