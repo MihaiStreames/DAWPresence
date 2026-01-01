@@ -19,7 +19,7 @@ jobs:
         run: ./scripts/build.ps1
 
       - name: Upload release artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: dawpresence-windows
           path: dist/DAWPresence.exe
