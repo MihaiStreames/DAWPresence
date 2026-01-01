@@ -4,6 +4,9 @@
 <div align="center">
 
 [![Stars](https://img.shields.io/github/stars/MihaiStreames/DAWPresence?style=social)](https://github.com/MihaiStreames/DAWPresence/stargazers)
+[![Rust Edition](https://img.shields.io/badge/Rust-2021-ed7a1f)](https://www.rust-lang.org/)
+[![Platform](https://img.shields.io/badge/Platform-Windows-0078D6)](https://github.com/MihaiStreames/DAWPresence/issues/1)
+[![Release](https://img.shields.io/github/v/release/MihaiStreames/DAWPresence?label=Release)](https://github.com/MihaiStreames/DAWPresence/releases)
 [![License](https://img.shields.io/github/license/MihaiStreames/DAWPresence?label=License)](LICENSE)
 [![Issues](https://img.shields.io/github/issues/MihaiStreames/DAWPresence?label=Issues)](https://github.com/MihaiStreames/DAWPresence/issues)
 
@@ -63,13 +66,18 @@ This is a complete rewrite of [Serena1432's DAWRPC](https://github.com/Serena143
 - [Rust](https://www.rust-lang.org/)
 - [iced](https://iced.rs/)
 - [tray-icon](https://crates.io/crates/tray-icon)
-- [notify-rust]
-- [tracing] + [tracing-subscriber]
-- [confy]
-- [serde] + [serde_json]
-- [sysinfo]
-- [regex]
-- [windows]
+- [notify-rust](https://crates.io/crates/notify-rust)
+- [tracing](https://crates.io/crates/tracing)
+- [tracing-subscriber](https://crates.io/crates/tracing-subscriber)
+- [tracing-appender](https://crates.io/crates/tracing-appender)
+- [confy](https://crates.io/crates/confy)
+- [crossbeam-channel](https://crates.io/crates/crossbeam-channel)
+- [serde](https://crates.io/crates/serde) + [serde_json](https://crates.io/crates/serde_json)
+- [tokio](https://crates.io/crates/tokio)
+- [sysinfo](https://crates.io/crates/sysinfo)
+- [regex](https://crates.io/crates/regex)
+- [image](https://crates.io/crates/image)
+- [windows](https://crates.io/crates/windows)
 - [discord-rich-presence](https://crates.io/crates/discord-rich-presence)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -79,12 +87,14 @@ This is a complete rewrite of [Serena1432's DAWRPC](https://github.com/Serena143
 
 ### Prerequisites
 
-- Windows (Linux/macOS support planned)
+- Windows only for now. If you want to help with Linux support, see
+  [issue #1](https://github.com/MihaiStreames/DAWPresence/issues/1).
 - Discord Desktop App
 
 ### Installation
 
 Download the latest release from the [Releases](https://github.com/MihaiStreames/DAWPresence/releases) page.
+Run `DAWPresence.exe` to start the app.
 
 #### Building from Source
 
@@ -93,11 +103,11 @@ Download the latest release from the [Releases](https://github.com/MihaiStreames
 git clone https://github.com/MihaiStreames/DAWPresence.git
 cd DAWPresence
 
-# run in dev mode
-cargo run
-
 # build for production
 cargo build --release
+
+# run the app
+./target/x86_64-pc-windows-gnu/release/DAWPresence.exe
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

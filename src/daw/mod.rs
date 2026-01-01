@@ -5,9 +5,9 @@ use serde::{Deserialize, Serialize};
 use sysinfo::System;
 use tracing::{debug, error, trace};
 
-use crate::daw::platform::{get_process_version, get_window_title};
+use crate::daw::windows::{get_process_version, get_window_title};
 
-mod platform;
+mod windows;
 
 /// DAW configuration loaded from daws.json
 #[derive(Debug, Clone, Serialize, Deserialize)]

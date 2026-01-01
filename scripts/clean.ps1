@@ -13,5 +13,5 @@ cargo clean
 $dist = Join-Path $Root "dist"
 if (Test-Path $dist) {
     Remove-Item -Recurse -Force $dist
-    Write-Host "Removed dist/"
+    Write-Host "Removed dist\"
 }

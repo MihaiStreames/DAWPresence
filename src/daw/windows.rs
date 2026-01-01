@@ -1,18 +1,30 @@
-use std::ffi::OsString;
 use std::path::Path;
-use std::os::windows::ffi::OsStringExt;
 
 use sysinfo::Pid;
-use windows::core::PCWSTR;
-use windows::Win32::Foundation::{BOOL, HWND, LPARAM};
+
+#[cfg(windows)]
+use std::ffi::OsString;
+#[cfg(windows)]
+use std::os::windows::ffi::OsStrExt;
+#[cfg(windows)]
+use std::os::windows::ffi::OsStringExt;
+#[cfg(windows)]
+use windows::core::{BOOL, PCWSTR};
+#[cfg(windows)]
+use windows::Win32::Foundation::{HWND, LPARAM};
+#[cfg(windows)]
 use windows::Win32::Storage::FileSystem::{
     GetFileVersionInfoSizeW, GetFileVersionInfoW, VerQueryValueW,
 };
+#[cfg(windows)]
+use windows::Win32::UI::Input::KeyboardAndMouse::IsWindowEnabled;
+#[cfg(windows)]
 use windows::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GetWindowTextW, GetWindowThreadProcessId, IsWindowEnabled, IsWindowVisible,
+    EnumWindows, GetWindowTextW, GetWindowThreadProcessId, IsWindowVisible,
 };
 
 /// Fetch a Windows file version string from the executable metadata
+#[cfg(windows)]
 pub fn get_process_version(exe_path: Option<&Path>) -> String {
     let Some(path) = exe_path else {
         return "0.0.0".to_string();
@@ -126,6 +138,7 @@ pub fn get_process_version(exe_path: Option<&Path>) -> String {
 }
 
 /// Look up the first visible window title for a PID on Windows
+#[cfg(windows)]
 pub fn get_window_title(pid: Pid) -> String {
     struct SearchState {
         target_pid: u32,
@@ -177,4 +190,16 @@ pub fn get_window_title(pid: Pid) -> String {
     }
 
     state.result.unwrap_or_default()
+}
+
+/// Return a default version on unsupported platforms
+#[cfg(not(windows))]
+pub fn get_process_version(_exe_path: Option<&Path>) -> String {
+    "0.0.0".to_string()
+}
+
+/// Return empty window titles on unsupported platforms
+#[cfg(not(windows))]
+pub fn get_window_title(_pid: Pid) -> String {
+    String::new()
 }

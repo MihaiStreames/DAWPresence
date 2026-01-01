@@ -1,6 +1,6 @@
+use crossbeam_channel::RecvTimeoutError;
 use iced::{window, Subscription};
 use std::sync::{LazyLock, Mutex};
-#[cfg(not(target_os = "linux"))]
 use std::time::Duration;
 use tracing::warn;
 use tray_icon::menu::{CheckMenuItem, Menu, MenuEvent, MenuId, MenuItem};
@@ -42,15 +42,7 @@ pub(crate) fn tray_subscription() -> Subscription<Message> {
             100,
             |output: iced::futures::channel::mpsc::Sender<Message>| async move {
                 std::thread::spawn(move || {
-                    #[cfg(target_os = "linux")]
-                    {
-                        run_tray_linux(output);
-                    }
-
-                    #[cfg(not(target_os = "linux"))]
-                    {
-                        run_tray_generic(output);
-                    }
+                    run_tray_handling(output);
                 });
 
                 iced::futures::future::pending::<()>().await;
@@ -59,10 +51,8 @@ pub(crate) fn tray_subscription() -> Subscription<Message> {
     })
 }
 
-/// Run tray icon handling for non-Linux platforms
-/// uses a blocking loop
-#[cfg(not(target_os = "linux"))]
-fn run_tray_generic(mut output: iced::futures::channel::mpsc::Sender<Message>) {
+/// Run tray icon handling in a separate thread
+fn run_tray_handling(mut output: iced::futures::channel::mpsc::Sender<Message>) {
     let (tray_icon, menu_items) = match create_tray_icon() {
         Ok(tray) => tray,
         Err(error) => {
@@ -80,46 +70,11 @@ fn run_tray_generic(mut output: iced::futures::channel::mpsc::Sender<Message>) {
                     break;
                 }
             }
-            Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {}
-            Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => break,
+            Err(RecvTimeoutError::Timeout) => {}
+            Err(RecvTimeoutError::Disconnected) => break,
         }
     }
 
-    drop(tray_icon);
-}
-
-/// Run tray icon handling for Linux
-/// uses GTK's main loop
-#[cfg(target_os = "linux")]
-fn run_tray_linux(output: iced::futures::channel::mpsc::Sender<Message>) {
-    if let Err(error) = gtk::init() {
-        warn!("Couldn't init GTK for tray icon: {error}");
-        return;
-    }
-
-    let (tray_icon, menu_items) = match create_tray_icon() {
-        Ok(tray) => tray,
-        Err(error) => {
-            warn!("Couldn't create tray icon: {error}");
-            return;
-        }
-    };
-
-    let receiver = MenuEvent::receiver().clone();
-    let mut output = output;
-    let tray_icon_handle = tray_icon.clone();
-    gtk::glib::timeout_add_local(std::time::Duration::from_millis(50), move || {
-        drain_tray_updates(&menu_items, &tray_icon_handle);
-        while let Ok(event) = receiver.try_recv() {
-            if handle_tray_event(&menu_items, &mut output, event) {
-                gtk::main_quit();
-                return gtk::glib::ControlFlow::Break;
-            }
-        }
-        gtk::glib::ControlFlow::Continue
-    });
-
-    gtk::main();
     drop(tray_icon);
 }
 

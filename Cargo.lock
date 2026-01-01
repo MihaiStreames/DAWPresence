@@ -7,8 +7,8 @@ name = "DAWPresence"
 version = "0.1.0"
 dependencies = [
  "confy",
+ "crossbeam-channel",
  "discord-rich-presence",
- "gtk",
  "iced",
  "image",
  "notify-rust",
@@ -22,7 +22,6 @@ dependencies = [
  "tracing-subscriber",
  "tray-icon",
  "windows 0.62.2",
- "x11rb",
 ]
 
 [[package]]
