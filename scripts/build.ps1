@@ -15,6 +15,18 @@ Write-Host "Building release binary..."
 cargo build --release
 
 Write-Host "Copying to dist\..."
-Copy-Item -Force (Join-Path $Root "target\release\$binName") (Join-Path $dist $binName)
+$possiblePaths = @(
+    (Join-Path $Root "target\release\$binName"),
+    (Join-Path $Root "target\x86_64-pc-windows-gnu\release\$binName"),
+    (Join-Path $Root "target\x86_64-pc-windows-msvc\release\$binName")
+)
+
+$foundPath = $possiblePaths | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+if ($foundPath) {
+    Copy-Item -Force $foundPath (Join-Path $dist $binName)
+} else {
+    throw "Could not find built binary in any of: $($possiblePaths -join ', ')"
+}
 
 Write-Host "Built: $dist\$binName"
