@@ -4,9 +4,9 @@
 <div align="center">
 
 [![Stars](https://img.shields.io/github/stars/MihaiStreames/DAWPresence?style=social)](https://github.com/MihaiStreames/DAWPresence/stargazers)
+[![Release](https://img.shields.io/github/v/release/MihaiStreames/DAWPresence?label=Release)](https://github.com/MihaiStreames/DAWPresence/releases)
 [![Rust Edition](https://img.shields.io/badge/Rust-2021-ed7a1f)](https://www.rust-lang.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows-0078D6)](https://github.com/MihaiStreames/DAWPresence/issues/1)
-[![Release](https://img.shields.io/github/v/release/MihaiStreames/DAWPresence?label=Release)](https://github.com/MihaiStreames/DAWPresence/releases)
 [![License](https://img.shields.io/github/license/MihaiStreames/DAWPresence?label=License)](LICENSE)
 [![Issues](https://img.shields.io/github/issues/MihaiStreames/DAWPresence?label=Issues)](https://github.com/MihaiStreames/DAWPresence/issues)
 
