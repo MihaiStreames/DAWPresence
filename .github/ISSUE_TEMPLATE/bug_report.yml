@@ -1,0 +1,73 @@
+name: Bug Report
+description: Something's not working right
+labels: ["bug"]
+body:
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and this hasn't been reported
+          required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - Windows 10
+        - Windows 11
+        - Linux
+        - macOS
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: DAWPresence Version
+      placeholder: "e.g., v1.0.2"
+    validations:
+      required: true
+
+  - type: input
+    id: daw
+    attributes:
+      label: DAW
+      placeholder: "e.g., Ableton Live 12, FL Studio 21, Reaper"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      placeholder: Describe the bug clearly and concisely.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Launch DAWPresence
+        2. Open [DAW]...
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Screenshots
+      description: Set `DAWPRESENCE_LOG=debug` and paste relevant output, or attach screenshots.
+      render: shell

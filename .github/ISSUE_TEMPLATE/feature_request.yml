@@ -1,0 +1,39 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+labels: ["enhancement"]
+body:
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and this hasn't been requested
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      placeholder: A clear description of the feature you'd like to see.
+    validations:
+      required: true
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use Case
+      placeholder: Why would this be useful? What problem does it solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      placeholder: How do you think this should work? (optional)
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      placeholder: Any alternative solutions or workarounds you've thought about. (optional)

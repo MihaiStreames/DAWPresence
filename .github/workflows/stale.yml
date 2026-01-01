@@ -1,0 +1,24 @@
+name: Stale Issues
+
+on:
+  schedule:
+    - cron: "0 0 * * 0" # Every Sunday
+  workflow_dispatch:
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/stale@v9
+        with:
+          stale-issue-message: |
+            Hey, this issue has been quiet for 60 days. I'll close it in 14 days if there's no activity.
+
+            If it's still relevant, just leave a comment or add the `in-progress` label!
+          close-issue-message: "Closed due to inactivity. Feel free to reopen if it's still relevant!"
+          stale-issue-label: "stale"
+          days-before-stale: 60
+          days-before-close: 14
+          exempt-issue-labels: "priority,in-progress,blocked"

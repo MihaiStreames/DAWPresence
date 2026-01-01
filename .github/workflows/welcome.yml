@@ -1,0 +1,26 @@
+name: Welcome
+
+on:
+  pull_request_target:
+    types: [opened]
+  issues:
+    types: [opened]
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            Hey, thanks for opening your first issue!
+
+            I'll take a look soon. Just make sure you've included the info in the template (OS, DAW, version, logs if you can).
+          pr-message: |
+            Hey, thanks for your first PR!
+
+            I'll review it soon. Just make sure CI passes and you've run `cargo fmt` + `cargo clippy`.
