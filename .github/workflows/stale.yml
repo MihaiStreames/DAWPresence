@@ -11,7 +11,7 @@ jobs:
     permissions:
       issues: write
     steps:
-      - uses: actions/stale@v9
+      - uses: actions/stale@v10
         with:
           stale-issue-message: |
             Hey, this issue has been quiet for 60 days. I'll close it in 14 days if there's no activity.
