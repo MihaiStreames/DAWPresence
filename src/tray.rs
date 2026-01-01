@@ -9,6 +9,11 @@ use tray_icon::{Icon, TrayIcon, TrayIconBuilder};
 use crate::settings::AppSettings;
 use crate::Message;
 
+#[cfg(windows)]
+use windows::Win32::UI::WindowsAndMessaging::{
+    DispatchMessageW, PeekMessageW, TranslateMessage, MSG, PM_REMOVE,
+};
+
 static TRAY_UPDATES: LazyLock<(
     std::sync::mpsc::Sender<TrayUpdate>,
     Mutex<std::sync::mpsc::Receiver<TrayUpdate>>,
@@ -64,6 +69,7 @@ fn run_tray_handling(mut output: iced::futures::channel::mpsc::Sender<Message>) 
     let receiver = MenuEvent::receiver().clone();
     loop {
         drain_tray_updates(&menu_items, &tray_icon);
+        pump_windows_messages();
         match receiver.recv_timeout(Duration::from_millis(100)) {
             Ok(event) => {
                 if handle_tray_event(&menu_items, &mut output, event) {
@@ -77,6 +83,21 @@ fn run_tray_handling(mut output: iced::futures::channel::mpsc::Sender<Message>) 
 
     drop(tray_icon);
 }
+
+#[cfg(windows)]
+/// Pump Windows messages to keep the tray icon responsive
+fn pump_windows_messages() {
+    unsafe {
+        let mut msg = MSG::default();
+        while PeekMessageW(&mut msg, None, 0, 0, PM_REMOVE).as_bool() {
+            let _ = TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
+    }
+}
+
+#[cfg(not(windows))]
+fn pump_windows_messages() {}
 
 /// Build the tray icon and return menu item ids
 fn create_tray_icon() -> Result<(TrayIcon, TrayMenuIds), String> {

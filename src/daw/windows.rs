@@ -17,10 +17,8 @@ use windows::Win32::Storage::FileSystem::{
     GetFileVersionInfoSizeW, GetFileVersionInfoW, VerQueryValueW,
 };
 #[cfg(windows)]
-use windows::Win32::UI::Input::KeyboardAndMouse::IsWindowEnabled;
-#[cfg(windows)]
 use windows::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GetWindowTextW, GetWindowThreadProcessId, IsWindowVisible,
+    EnumWindows, GetWindowTextLengthW, GetWindowTextW, GetWindowThreadProcessId, IsWindowVisible,
 };
 
 /// Fetch a Windows file version string from the executable metadata
@@ -140,6 +138,7 @@ pub fn get_process_version(exe_path: Option<&Path>) -> String {
 /// Look up the first visible window title for a PID on Windows
 #[cfg(windows)]
 pub fn get_window_title(pid: Pid) -> String {
+    // TODO: investigate Windows 10 DAW window titles not detected (project name stays None)
     struct SearchState {
         target_pid: u32,
         result: Option<String>,
@@ -152,7 +151,7 @@ pub fn get_window_title(pid: Pid) -> String {
 
         let state = &mut *(lparam.0 as *mut SearchState);
 
-        if !IsWindowVisible(hwnd).as_bool() || !IsWindowEnabled(hwnd).as_bool() {
+        if !IsWindowVisible(hwnd).as_bool() {
             return BOOL(1);
         }
 
@@ -163,7 +162,12 @@ pub fn get_window_title(pid: Pid) -> String {
             return BOOL(1);
         }
 
-        let mut buffer = [0u16; 512];
+        let text_len = GetWindowTextLengthW(hwnd);
+        if text_len == 0 {
+            return BOOL(1);
+        }
+
+        let mut buffer = vec![0u16; text_len as usize + 1];
         let len = GetWindowTextW(hwnd, &mut buffer);
         if len == 0 {
             return BOOL(1);

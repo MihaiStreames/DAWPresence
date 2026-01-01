@@ -6,6 +6,7 @@ use tracing::{debug, error, info, warn};
 
 use crate::daw::DawStatus;
 use crate::settings::AppSettings;
+use crate::version::APP_VERSION;
 
 /// Rich Presence data to display on Discord
 pub struct DiscordPresence {
@@ -46,7 +47,7 @@ impl DiscordPresence {
             details,
             state,
             large_image: "icon".to_string(),
-            large_text: format!("DAWPresence v{}", env!("CARGO_PKG_VERSION")),
+            large_text: format!("DAWPresence v{}", APP_VERSION),
         }
     }
 }

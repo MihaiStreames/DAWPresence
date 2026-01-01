@@ -6,6 +6,7 @@ mod discord;
 mod settings;
 mod tray;
 mod ui;
+mod version;
 
 use iced::{event, time, window, Size, Subscription, Task};
 use std::time::{Duration, Instant};
@@ -52,7 +53,7 @@ fn main() -> iced::Result {
         )
         .init();
 
-    info!("DAWPresence v{} starting up", env!("CARGO_PKG_VERSION"));
+    info!("DAWPresence v{} starting up", version::APP_VERSION);
 
     let window_icon = load_window_icon().ok();
 
