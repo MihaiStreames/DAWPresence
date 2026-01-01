@@ -47,11 +47,3 @@ jobs:
           body_path: release_notes.md
           generate_release_notes: false
           files: dist/DAWPresence.exe
-
-      - name: Scan with VirusTotal
-        uses: crazy-max/ghaction-virustotal@v4
-        with:
-          vt_api_key: ${{ secrets.VT_API_KEY }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          update_release_body: true
-          files: dist/DAWPresence.exe
