@@ -13,7 +13,7 @@ iced = { version = "0.14.0", default-features = false, features = [
     "tiny-skia",
     "tokio",
 ] }
-tray-icon = "0.21.2"
+tray-icon = "0.21.3"
 tracing = { version = "0.1.44", features = ["release_max_level_off"] }
 tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
 confy = "2.0.0"
