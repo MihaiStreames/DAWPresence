@@ -6,9 +6,17 @@ use serde::{Deserialize, Serialize};
 use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, RefreshKind, System, UpdateKind};
 use tracing::{debug, error, trace};
 
+#[cfg(windows)]
+mod windows;
+
+#[cfg(windows)]
 use crate::daw::windows::{get_process_version, get_window_title};
 
-mod windows;
+#[cfg(not(windows))]
+mod unsupported;
+
+#[cfg(not(windows))]
+use crate::daw::unsupported::{get_process_version, get_window_title};
 
 /// DAW configuration loaded from daws.json
 #[derive(Debug, Clone, Serialize, Deserialize)]

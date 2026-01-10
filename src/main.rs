@@ -1,5 +1,8 @@
 // prevents additional console window on Windows in release
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![cfg_attr(
+    all(target_os = "windows", not(debug_assertions)),
+    windows_subsystem = "windows"
+)]
 
 mod daw;
 mod discord;
@@ -11,6 +14,7 @@ mod version;
 use iced::{event, time, window, Size, Subscription, Task};
 use std::time::{Duration, Instant};
 use tracing::{info, warn};
+
 #[cfg(debug_assertions)]
 use tracing_subscriber::EnvFilter;
 
@@ -20,7 +24,7 @@ use crate::settings::AppSettings;
 use crate::tray::{load_window_icon, tray_subscription, TrayUpdate};
 
 #[derive(Debug, Clone)]
-pub(crate) enum Message {
+pub enum Message {
     CloseRequested(window::Id),
     WindowOpened(window::Id),
     TrayShow,
@@ -35,13 +39,13 @@ pub(crate) enum Message {
     Tick(Instant),
 }
 
-pub(crate) struct AppState {
-    pub(crate) settings: AppSettings,
-    pub(crate) update_interval_input: String,
-    pub(crate) update_interval_error: Option<String>,
-    pub(crate) show_interval_modal: bool,
-    pub(crate) daw_status: Option<DawStatus>,
-    pub(crate) discord_connected: bool,
+pub struct AppState {
+    pub settings: AppSettings,
+    pub update_interval_input: String,
+    pub update_interval_error: Option<String>,
+    pub show_interval_modal: bool,
+    pub daw_status: Option<DawStatus>,
+    pub discord_connected: bool,
     window_id: Option<window::Id>,
     daw_monitor: Option<DawMonitor>,
     discord: DiscordManager,

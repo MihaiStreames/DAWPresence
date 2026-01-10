@@ -24,14 +24,14 @@ static TRAY_UPDATES: LazyLock<(
     (sender, Mutex::new(receiver))
 });
 
-pub(crate) enum TrayUpdate {
+pub enum TrayUpdate {
     HideProjectName(bool),
     HideSystemUsage(bool),
     DiscordConnected(bool),
 }
 
 /// Send a tray update to modify the tray menu
-pub(crate) fn send_tray_update(update: TrayUpdate) {
+pub fn send_tray_update(update: TrayUpdate) {
     let _ = TRAY_UPDATES.0.send(update);
 }
 
@@ -43,7 +43,7 @@ struct TrayMenuIds {
 }
 
 /// Bridge tray menu events into the app
-pub(crate) fn tray_subscription() -> Subscription<Message> {
+pub fn tray_subscription() -> Subscription<Message> {
     Subscription::run(|| {
         iced::stream::channel::<Message>(
             100,
@@ -203,7 +203,7 @@ fn load_tray_icon(connected: bool) -> Result<Icon, String> {
 }
 
 /// Load the window icon from embedded assets
-pub(crate) fn load_window_icon() -> Result<window::Icon, String> {
+pub fn load_window_icon() -> Result<window::Icon, String> {
     let (rgba, width, height) = load_icon_rgba(false)?;
     window::icon::from_rgba(rgba, width, height).map_err(|error| error.to_string())
 }

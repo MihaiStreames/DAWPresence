@@ -3,30 +3,20 @@
 use std::path::Path;
 
 use sysinfo::Pid;
-#[cfg(windows)]
 use tracing::{debug, trace};
 
-#[cfg(windows)]
 use std::ffi::OsString;
-#[cfg(windows)]
-use std::os::windows::ffi::OsStrExt;
-#[cfg(windows)]
-use std::os::windows::ffi::OsStringExt;
-#[cfg(windows)]
+use std::os::windows::ffi::{OsStrExt, OsStringExt};
 use windows::core::{BOOL, PCWSTR};
-#[cfg(windows)]
-use windows::Win32::Foundation::{HWND, LPARAM};
-#[cfg(windows)]
+use windows::Win32::Foundation::{HWND, LPARAM, TRUE};
 use windows::Win32::Storage::FileSystem::{
     GetFileVersionInfoSizeW, GetFileVersionInfoW, VerQueryValueW,
 };
-#[cfg(windows)]
 use windows::Win32::UI::WindowsAndMessaging::{
     EnumWindows, GetWindowTextLengthW, GetWindowTextW, GetWindowThreadProcessId, IsWindowVisible,
 };
 
 /// Fetch a Windows file version string from the executable metadata
-#[cfg(windows)]
 pub fn get_process_version(exe_path: Option<&Path>) -> String {
     let Some(path) = exe_path else {
         return "0.0.0".to_string();
@@ -136,9 +126,8 @@ pub fn get_process_version(exe_path: Option<&Path>) -> String {
     version
 }
 
-/// Look up window titles for a PID on Windows, returning the longest one
+/// Look up window titles windowsfor a PID on Windows, returning the longest one
 /// (main windows typically have longer titles than toolbars/palettes)
-#[cfg(windows)]
 pub fn get_window_title(pid: Pid) -> String {
     struct SearchState {
         target_pid: u32,
@@ -147,7 +136,7 @@ pub fn get_window_title(pid: Pid) -> String {
 
     unsafe extern "system" fn enum_callback(hwnd: HWND, lparam: LPARAM) -> BOOL {
         if lparam.0 == 0 {
-            return BOOL(1);
+            return TRUE;
         }
 
         let state = &mut *(lparam.0 as *mut SearchState);
@@ -156,23 +145,23 @@ pub fn get_window_title(pid: Pid) -> String {
         GetWindowThreadProcessId(hwnd, Some(&mut process_id));
 
         if process_id != state.target_pid {
-            return BOOL(1);
+            return TRUE;
         }
 
         // check visibility after PID match for better debugging
         if !IsWindowVisible(hwnd).as_bool() {
-            return BOOL(1);
+            return TRUE;
         }
 
         let text_len = GetWindowTextLengthW(hwnd);
         if text_len == 0 {
-            return BOOL(1);
+            return TRUE;
         }
 
         let mut buffer = vec![0u16; text_len as usize + 1];
         let len = GetWindowTextW(hwnd, &mut buffer);
         if len == 0 {
-            return BOOL(1);
+            return TRUE;
         }
 
         let title = OsString::from_wide(&buffer[..len as usize])
@@ -182,7 +171,7 @@ pub fn get_window_title(pid: Pid) -> String {
             state.titles.push(title);
         }
 
-        BOOL(1) // continue enumeration to find all windows
+        TRUE // continue enumeration to find all windows
     }
 
     let mut state = SearchState {
@@ -212,16 +201,4 @@ pub fn get_window_title(pid: Pid) -> String {
         .into_iter()
         .max_by_key(String::len)
         .unwrap_or_default()
-}
-
-/// Return a default version on unsupported platforms
-#[cfg(not(windows))]
-pub fn get_process_version(_exe_path: Option<&Path>) -> String {
-    "0.0.0".to_string()
-}
-
-/// Return empty window titles on unsupported platforms
-#[cfg(not(windows))]
-pub fn get_window_title(_pid: Pid) -> String {
-    String::new()
 }
