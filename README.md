@@ -188,10 +188,6 @@ MIT. Do whatever you want with it. See [LICENSE](LICENSE) for more information.
 
 <div align="center">
 
-### 🌟 Found this cool?
-
-If you did, consider giving it a star! It helps others discover the project.
-
 Made with ❤️
 
 </div>
