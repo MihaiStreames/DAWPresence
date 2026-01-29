@@ -21,7 +21,7 @@ crossbeam-channel = "0.5.15"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 tokio = { version = "1.49.0", features = ["rt-multi-thread", "macros", "time"] }
-discord-rich-presence = "1.0.0"
+discord-rich-presence = "1.1.0"
 sysinfo = "0.37.2"
 fancy-regex = "0.17.0"
 image = { version = "0.25.9", default-features = false, features = [
