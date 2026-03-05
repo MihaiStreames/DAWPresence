@@ -36,7 +36,7 @@ jobs:
           bash scripts/extract-changelog.sh "$VERSION" > release_notes.md
 
       - name: Download release artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: dawpresence-windows
           path: dist
