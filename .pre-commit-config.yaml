@@ -22,15 +22,16 @@ repos:
         types: [rust]
         pass_filenames: false
 
+      - id: cargo-test
+        name: cargo test
+        entry: cargo test
+        language: system
+        types: [rust]
+        pass_filenames: false
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
-
-ci:
-  skip:
-    - cargo-fmt
-    - cargo-check
-    - cargo-clippy

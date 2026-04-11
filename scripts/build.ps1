@@ -7,19 +7,16 @@ $ErrorActionPreference = "Stop"
 
 Set-Location $Root
 
-$binName = "DAWPresence.exe"
 $dist = Join-Path $Root "dist"
 New-Item -ItemType Directory -Force -Path $dist | Out-Null
 
 Write-Host "Building release binary..."
 cargo build --release
 
-Write-Host "Copying to dist\..."
-$builtPath = Join-Path $Root "target\release\$binName"
-
-if (Test-Path $builtPath) {
-    Copy-Item -Force $builtPath (Join-Path $dist $binName)
-    Write-Host "Built: $dist\$binName"
-} else {
+$builtPath = Join-Path $Root "target\release\DAWPresence.exe"
+if (-not (Test-Path $builtPath)) {
     throw "Could not find built binary at: $builtPath"
 }
+
+Copy-Item -Force $builtPath (Join-Path $dist "DAWPresence.exe")
+Write-Host "Built: dist/DAWPresence.exe"

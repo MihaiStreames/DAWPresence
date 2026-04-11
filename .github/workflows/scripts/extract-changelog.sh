@@ -7,7 +7,6 @@ CHANGELOG="${2:-CHANGELOG.md}"
 [[ -z "$VERSION" ]] && exit 1
 [[ ! -f "$CHANGELOG" ]] && exit 1
 
-# extract section for this version (between this ## and the next ##)
 awk -v ver="$VERSION" '
     /^## / {
         if (found) exit

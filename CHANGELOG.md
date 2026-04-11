@@ -10,7 +10,8 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
-    <li><a href="#v210--multi-process-daws-and-restructure">v2.1.0</a></li>
+    <li><a href="#v220--architecture-rewrite">v2.2.0</a></li>
+    <li><a href="#v210--multi-process-daws">v2.1.0</a></li>
     <li><a href="#v201--size-and-memory-optimizations">v2.0.1</a></li>
     <li><a href="#v200--first-functional-rust-release">v2.0.0</a></li>
     <li><a href="#v102--bugfixes">v1.0.2</a></li>
@@ -19,23 +20,53 @@
   </ol>
 </details>
 
-## v2.1.0 - Multi-process DAWs and restructure
+## v2.2.0 - Architecture rewrite
 
-Fixes Bitwig Studio (and other multi-process DAWs) showing incorrect stats, restructures the codebase, and adds CI improvements.
+Complete architecture rewrite with direct Win32 APIs, event-driven process monitoring, and a Windows installer.
+
+**New stuff:**
+
+- Windows installer (Inno Setup) with start menu shortcut, desktop shortcut, auto-start option, and uninstaller
+- Direct Win32 process monitoring via `CreateToolhelp32Snapshot` (replaces `sysinfo` crate)
+- Event-driven process exit detection via `RegisterWaitForSingleObject` (NT kernel threadpool, zero CPU idle)
+- Typed error handling via `thiserror` (replaces string errors)
+- Compiled regex cache - patterns compiled once, reused every tick
+- Pre-normalized DAW configs - process names lowercased and stripped at startup
+- 28 unit tests covering config parsing, regex extraction, process matching, status formatting
+
+**Changed:**
+
+- Stable Rust toolchain (dropped nightly requirement)
+- Split monolithic modules into focused files (20+ files, all under 250 lines)
+- Discord IPC uses single `Mutex<DiscordState>` with poison recovery (was three separate Mutexes)
+- Icon decoding cached via `LazyLock` (was re-decoded on every state change)
+- Uninstaller removes settings and logs from `%APPDATA%`
+
+**Removed:**
+
+- `sysinfo` dependency (replaced by direct Win32 APIs)
+- Nightly Rust requirement (`generic_const_exprs`)
+- Platform stubs (`unsupported.rs`)
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
+
+## v2.1.0 - Multi-process DAWs
+
+Fixes Bitwig Studio (and other multi-process DAWs) showing incorrect stats.
+
+**New stuff:**
+
+- `AdditionalProcessNames` config field for multi-process DAWs (prefix matching)
+- Versioned `daws.json` format - auto-updates local config when a new version ships
+- Window icon shows Discord connection state (red/green)
 
 **Fixed:**
 
 - Bitwig Studio now aggregates CPU/RAM across all processes (main UI, audio engine, plugin hosts)
-- Window icon now switches between red/green based on Discord connection state
-- DAW config (`daws.json`) auto-updates when a new version ships -- uses versioned format
 
 **Changed:**
 
 - Extracted `app.rs` from `main.rs` for cleaner MVU separation
-- Added `AdditionalProcessNames` config field for multi-process DAWs (prefix matching)
-- Merged VirusTotal scan into release workflow (was missing `github_token`)
-- Moved CI scripts to `.github/workflows/scripts/`
-- Added binary size check to release CI (must be under 5 MB)
 - Stricter clippy linting (`pub` to `pub(crate)`, unsafe blocks in unsafe fns)
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
@@ -46,14 +77,13 @@ Leaned hard on size and idle RAM reductions for Windows builds.
 
 **Changed:**
 
-- Release builds now strip logging and favor smaller binaries by default
+- Release builds strip logging and favor smaller binaries
 - Process monitoring refreshes only the data we use
-- Windows-only guard for unsupported platforms
 
 **Performance:**
 
-- Binary size shrank from ~36MB to ~17MB to ~4MB
-- RAM usage dropped from ~70MB+ to ~7MB
+- Binary size: ~36 MB -> ~17 MB -> ~4 MB
+- RAM usage: ~70 MB+ -> ~7 MB
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
@@ -64,12 +94,7 @@ The Rust rewrite is now fully functional. All DAW project names are detected cor
 **Fixed:**
 
 - Project name detection now works on all Windows versions (fixes #2)
-- Switched from `regex` to `fancy-regex` crate - the old crate doesn't support lookaheads, which some DAW patterns require
-
-**Changed:**
-
-- Added clippy lints matching Python linting style
-- Refactored issue templates and workflows
+- Switched from `regex` to `fancy-regex` crate (the old crate doesn't support lookaheads)
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
@@ -79,58 +104,34 @@ Bug fixes for tray icon responsiveness and window title detection.
 
 **Fixed:**
 
-- Tray icon now stays responsive by pumping Windows messages in the event loop
-- Window title detection no longer requires `IsWindowEnabled` check (was causing some DAW windows to be skipped)
-- Fixed buffer size for window titles - now dynamically sized using `GetWindowTextLengthW` instead of fixed 512-char buffer
-- Skip windows with empty titles early to avoid unnecessary processing
-
-**New stuff:**
-
-- GitHub Actions release workflow for automated builds
-- GitHub issue templates for bug reports and feature requests
-- GitHub funding configuration
+- Tray icon stays responsive by pumping Windows messages in the event loop
+- Window title detection no longer requires `IsWindowEnabled` check
+- Dynamic buffer size for window titles via `GetWindowTextLengthW`
+- Skip windows with empty titles early
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v1.0.1 - Rust rewrite
 
-Complete rewrite from Python to Rust. Same functionality, but faster, smaller, and no runtime dependencies.
+Complete rewrite from Python to Rust. Same functionality, faster, smaller, no runtime dependencies.
 
 **New stuff:**
 
 - Single standalone `.exe` - no Python or dependencies needed
-- Native Windows GUI using [iced](https://iced.rs/)
-- System tray with status indicator (green = connected, red = disconnected)
-- Desktop notifications via `notify-rust`
+- Native Windows GUI using iced
+- System tray with status indicator
 - Persistent settings via `confy` (stored in `%APPDATA%`)
-- File logging via `tracing-appender`
-- Cross-compilation support from Linux using `x86_64-pc-windows-gnu`
-
-**Changed:**
-
-- Replaced PyQt5 with iced for the GUI
-- Replaced pypresence with `discord-rich-presence` crate
-- Replaced psutil with `sysinfo` crate
-- Process monitoring now uses Win32 APIs directly for window titles and version info
-- Configuration moved from `config.toml` to platform-specific app data directory
+- Cross-compilation support from Linux
 
 **Removed:**
 
-- Python codebase (`DAWPY/` directory)
-- PyInstaller build system
-- All Python dependencies
-
-**Technical:**
-
-- ~38MB standalone binary (includes all assets)
-- Async runtime via tokio
-- Proper shutdown handling with cleanup
+- Python codebase, PyInstaller build system, all Python dependencies
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v1.0.0 - Initial release
 
-Python version. A rewrite of [Serena1432's DAWRPC](https://github.com/Serena1432/DAWRPC) with cleaner architecture.
+Python version. A rewrite of [Serena1432's DAWRPC](https://github.com/Serena1432/DAWRPC).
 
 **Features:**
 
@@ -138,14 +139,7 @@ Python version. A rewrite of [Serena1432's DAWRPC](https://github.com/Serena1432
 - Automatic DAW detection via process monitoring
 - Project name extraction from window titles using regex
 - System tray icon with status indicator
-- Configurable refresh interval and start minimized option
-- MVC architecture with PyQt5 GUI
-
-**Technical:**
-
-- Python 3.7+ required
-- Dependencies: PyQt5, pypresence, psutil
-- Windows only
+- Configurable refresh interval
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 

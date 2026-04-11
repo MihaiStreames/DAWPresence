@@ -1,34 +1,27 @@
 <a id="readme-top"></a>
 
 <!-- PROJECT SHIELDS -->
+
 <div align="center">
 
 [![Stars](https://img.shields.io/github/stars/MihaiStreames/DAWPresence?style=social)](https://github.com/MihaiStreames/DAWPresence/stargazers)
 [![Release](https://img.shields.io/github/v/release/MihaiStreames/DAWPresence?label=Release)](https://github.com/MihaiStreames/DAWPresence/releases)
-[![Rust Edition](https://img.shields.io/badge/Rust-2021-ed7a1f)](https://www.rust-lang.org/)
+[![Rust Edition](https://img.shields.io/badge/Rust-2024-ed7a1f)](https://www.rust-lang.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows-0078D6)](https://github.com/MihaiStreames/DAWPresence/issues/1)
 [![License](https://img.shields.io/github/license/MihaiStreames/DAWPresence?label=License)](LICENSE)
-[![Issues](https://img.shields.io/github/issues/MihaiStreames/DAWPresence?label=Issues)](https://github.com/MihaiStreames/DAWPresence/issues)
 
 </div>
 
 <!-- PROJECT LOGO -->
+
 <div align="center">
   <h1>DAWPresence</h1>
 
-  <h3 align="center">Show what you're creating on Discord</h3>
-
-  <p align="center">
-    Discord Rich Presence for Digital Audio Workstations
-    <br />
-    <a href="https://github.com/MihaiStreames/DAWPresence/issues/new">Report Bug</a>
-    ·
-    <a href="https://github.com/MihaiStreames/DAWPresence/issues/new">Request Feature</a>
-    <br />
-  </p>
+  <h3 align="center"> Show what you're creating on Discord. </h3>
 </div>
 
 <!-- TABLE OF CONTENTS -->
+
 <details>
   <summary>Table of Contents</summary>
   <ol>
@@ -54,6 +47,7 @@
 </details>
 
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
 
 <div align="center">
@@ -69,37 +63,47 @@ This is a complete rewrite of [Serena1432's DAWRPC](https://github.com/Serena143
 ### Built With
 
 - [Rust](https://www.rust-lang.org/)
+- [windows-sys](https://crates.io/crates/windows-sys)
+- [discord-rich-presence](https://crates.io/crates/discord-rich-presence)
 - [iced](https://iced.rs/)
 - [tray-icon](https://crates.io/crates/tray-icon)
+- [serde](https://crates.io/crates/serde) + [serde_json](https://crates.io/crates/serde_json)
+- [tokio](https://crates.io/crates/tokio)
 - [tracing](https://crates.io/crates/tracing)
 - [tracing-subscriber](https://crates.io/crates/tracing-subscriber)
 - [confy](https://crates.io/crates/confy)
 - [crossbeam-channel](https://crates.io/crates/crossbeam-channel)
-- [serde](https://crates.io/crates/serde) + [serde_json](https://crates.io/crates/serde_json)
-- [tokio](https://crates.io/crates/tokio)
-- [sysinfo](https://crates.io/crates/sysinfo)
 - [fancy-regex](https://crates.io/crates/fancy-regex)
 - [image](https://crates.io/crates/image)
-- [windows](https://crates.io/crates/windows)
-- [discord-rich-presence](https://crates.io/crates/discord-rich-presence)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
+
 ## Getting Started
 
 ### Prerequisites
 
-- Windows only for now. If you want to help with Linux support, see
-  [issue #1](https://github.com/MihaiStreames/DAWPresence/issues/1).
+- Windows 10 or later
 - Discord Desktop App
+
+If you want to help with Linux support, see [issue #1](https://github.com/MihaiStreames/DAWPresence/issues/1).
 
 ### Installation
 
-Download the latest release from the [Releases](https://github.com/MihaiStreames/DAWPresence/releases) page.
-Run `DAWPresence.exe` to start the app.
+#### Installer (recommended)
 
-#### Building from Source
+Download the setup exe from [latest release](https://github.com/MihaiStreames/DAWPresence/releases/latest). The installer adds a start menu shortcut, optional desktop shortcut, and optional auto-start with Windows.
+
+> [**Download Installer**](https://github.com/MihaiStreames/DAWPresence/releases/latest)
+
+#### Portable
+
+Download `DAWPresence.exe` from the [latest release](https://github.com/MihaiStreames/DAWPresence/releases/latest) and run it directly. Settings are stored in `%APPDATA%\dawpresence`.
+
+> [**Download Portable**](https://github.com/MihaiStreames/DAWPresence/releases/latest)
+
+#### Building from source
 
 ```bash
 # clone the repo
@@ -120,28 +124,31 @@ cargo build --release --target x86_64-pc-windows-gnu
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- SUPPORTED DAWS -->
+
 ## Supported DAWs
 
-| DAW | Versions |
-|-----|----------|
-| FL Studio | 11+ |
-| Ableton Live | 9-12 (Intro/Standard/Suite) |
-| REAPER | All |
-| Bitwig Studio | All |
-| Studio One | All |
-| LMMS | All |
-| Cubase | 14 |
+| DAW           | Versions                    |
+|---------------|-----------------------------|
+| FL Studio     | 11+                         |
+| Ableton Live  | 9-12 (Intro/Standard/Suite) |
+| REAPER        | All                         |
+| Bitwig Studio | All                         |
+| Studio One    | All                         |
+| LMMS          | All                         |
+| Cubase        | 14                          |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- HOW IT WORKS -->
+
 ## How It Works
 
-DAWPresence scans running processes to detect supported DAWs. When it finds one, it extracts the project name from the window title using regex patterns and updates your Discord Rich Presence.
+DAWPresence uses direct Win32 APIs to detect running DAWs. When a DAW is found, it attaches to the process and monitors CPU, RAM, and window title. Project names are extracted via regex patterns from `daws.json`. Process exit is detected instantly via `RegisterWaitForSingleObject` (NT kernel threadpool). Discord Rich Presence updates automatically.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- CONTRIBUTING -->
+
 ## Contributing
 
 ### Adding New DAW Support
@@ -160,17 +167,19 @@ DAWPresence scans running processes to detect supported DAWs. When it finds one,
 }
 ```
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `ProcessName` | `string` | Process name without `.exe` |
-| `DisplayText` | `string` | Name shown in DAWPresence |
-| `TitleRegex` | `string` | Regex to extract project name from window title |
-| `ClientID` | `string` | Discord application client ID |
-| `HideVersion` | `boolean` | Whether to hide version info |
+| Field                    | Type       | Description                                     |
+|--------------------------|------------|-------------------------------------------------|
+| `ProcessName`            | `string`   | Process name without `.exe`                     |
+| `DisplayText`            | `string`   | Name shown in DAWPresence                       |
+| `TitleRegex`             | `string`   | Regex to extract project name from window title |
+| `ClientID`               | `string`   | Discord application client ID                   |
+| `HideVersion`            | `boolean`  | Whether to hide version info                    |
+| `AdditionalProcessNames` | `string[]` | Extra process name prefixes to aggregate        |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ACKNOWLEDGMENTS -->
+
 ## Acknowledgments
 
 - [Serena1432](https://github.com/Serena1432) - Original DAWRPC creator
@@ -178,6 +187,7 @@ DAWPresence scans running processes to detect supported DAWs. When it finds one,
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- LICENSE -->
+
 ## License
 
 MIT. Do whatever you want with it. See [LICENSE](LICENSE) for more information.

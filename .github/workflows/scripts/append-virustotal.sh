@@ -8,9 +8,16 @@ ANALYSIS="${2:-}"
 [[ -z "$ANALYSIS" ]] && { echo "No analysis output to append"; exit 0; }
 
 BODY=$(gh release view "$TAG" --json body -q .body)
-FILE="${ANALYSIS%%=*}"
-URL="${ANALYSIS#*=}"
 
-printf '%s\n\n---\n\n🛡 [VirusTotal Analysis](%s) for `%s`\n' "$BODY" "$URL" "$FILE" > body.md
+VT_SECTION=""
+while IFS= read -r line; do
+    [[ -z "$line" ]] && continue
+    FILE="${line%%=*}"
+    URL="${line#*=}"
+    BASENAME=$(basename "$FILE")
+    VT_SECTION="${VT_SECTION}- [${BASENAME}](${URL})\n"
+done <<< "$ANALYSIS"
+
+printf '%s\n\n---\n\n### VirusTotal Analysis\n\n%b\n' "$BODY" "$VT_SECTION" > body.md
 gh release edit "$TAG" --notes-file body.md
 rm -f body.md

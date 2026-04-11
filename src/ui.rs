@@ -1,3 +1,5 @@
+//! Main window view rendering.
+
 use std::sync::LazyLock;
 
 use iced::Background;
@@ -74,7 +76,9 @@ fn home_view(state: &AppState) -> iced::Element<'_, Message> {
     let (daw_name, project_name, memory_usage, cpu_usage) = match &state.daw_status {
         Some(status) if status.is_running => (
             status.display_name.clone(),
-            if status.project_name.trim().is_empty()
+            if state.settings.hide_project_name {
+                "(hidden)".to_string()
+            } else if status.project_name.trim().is_empty()
                 || status.project_name.eq_ignore_ascii_case("none")
             {
                 "No project open".to_string()
@@ -149,6 +153,7 @@ fn toggle_button(
     off_message: Message,
 ) -> iced::Element<'static, Message> {
     let message = if enabled { off_message } else { on_message };
+
     let label = if enabled {
         format!("[ON] {label}")
     } else {

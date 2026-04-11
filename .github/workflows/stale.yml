@@ -2,7 +2,7 @@ name: Stale Issues
 
 on:
   schedule:
-    - cron: "0 0 * * 0" # Every Sunday
+    - cron: "0 0 * * 0" # every sunday
   workflow_dispatch:
 
 jobs:

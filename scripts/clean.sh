@@ -8,6 +8,6 @@ echo "Cleaning build artifacts..."
 cargo clean
 
 if [[ -d dist ]]; then
-  rm -rf dist
-  echo "Removed dist/"
+    rm -rf dist
+    echo "Removed dist/"
 fi

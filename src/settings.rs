@@ -1,12 +1,16 @@
+//! User settings with confy persistence.
+
 use serde::Deserialize;
 use serde::Serialize;
+
+use crate::error::ConfigError;
 
 const DEFAULT_UPDATE_INTERVAL: u64 = 2500;
 const MIN_UPDATE_INTERVAL: u64 = 1000;
 const MAX_UPDATE_INTERVAL: u64 = 100_000_000;
 
-/// User-configurable app settings
 #[derive(Debug, Clone, Serialize, Deserialize)]
+/// User preferences persisted via confy.
 pub(crate) struct AppSettings {
     #[serde(default)]
     pub(crate) hide_project_name: bool,
@@ -34,45 +38,28 @@ impl Default for AppSettings {
 }
 
 impl AppSettings {
-    /// Load settings from disk, or return defaults if not found
     pub(crate) fn load() -> Self {
         confy::load("dawpresence", None).unwrap_or_default()
     }
 
-    /// Save settings to disk
-    pub(crate) fn save(&self) -> Result<(), String> {
-        confy::store("dawpresence", None, self).map_err(|e| e.to_string())
+    pub(crate) fn save(&self) -> Result<(), ConfigError> {
+        confy::store("dawpresence", None, self).map_err(|e| ConfigError::SaveFailed(e.to_string()))
     }
 
-    /// Set update interval with validation (1000ms - 100,000,000ms)
-    pub(crate) fn set_update_interval(&mut self, interval: u64) -> Result<(), String> {
+    pub(crate) fn set_update_interval(&mut self, interval: u64) -> Result<(), ConfigError> {
         Self::validate_update_interval(interval)?;
         self.update_interval = interval;
         Ok(())
     }
 
-    /// Toggle project name visibility in presence
-    pub(crate) fn toggle_hide_project_name(&mut self) {
-        self.hide_project_name = !self.hide_project_name;
-    }
-
-    /// Toggle system usage (CPU/RAM) visibility in presence
-    pub(crate) fn toggle_hide_system_usage(&mut self) {
-        self.hide_system_usage = !self.hide_system_usage;
-    }
-
-    /// Toggle close-to-tray behavior
-    pub(crate) fn toggle_close_to_tray(&mut self) {
-        self.close_to_tray = !self.close_to_tray;
-    }
-
-    /// Validate update interval without mutating settings
-    pub(crate) fn validate_update_interval(interval: u64) -> Result<(), String> {
+    pub(crate) fn validate_update_interval(interval: u64) -> Result<(), ConfigError> {
         if !(MIN_UPDATE_INTERVAL..=MAX_UPDATE_INTERVAL).contains(&interval) {
-            return Err(format!(
-                "Interval must be between {MIN_UPDATE_INTERVAL}ms and {MAX_UPDATE_INTERVAL}ms"
-            ));
+            return Err(ConfigError::InvalidInterval {
+                min: MIN_UPDATE_INTERVAL,
+                max: MAX_UPDATE_INTERVAL,
+            });
         }
+
         Ok(())
     }
 }

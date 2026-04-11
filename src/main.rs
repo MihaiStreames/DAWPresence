@@ -1,4 +1,5 @@
-// prevents additional console window on Windows in release
+//! DAWPresence entry point, logging setup, and Iced wiring.
+
 #![cfg_attr(
     all(target_os = "windows", not(debug_assertions)),
     windows_subsystem = "windows"
@@ -7,6 +8,7 @@
 mod app;
 mod daw;
 mod discord;
+mod error;
 mod settings;
 mod tray;
 mod ui;
@@ -59,7 +61,7 @@ fn init_logging() {
 #[cfg(not(debug_assertions))]
 fn init_logging() {}
 
-/// Render the main window content
+/// Render the main window content.
 fn view(state: &app::AppState) -> iced::Element<'_, app::Message> {
     ui::view(state)
 }
