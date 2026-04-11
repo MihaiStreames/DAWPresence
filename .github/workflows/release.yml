@@ -8,6 +8,9 @@ on:
 permissions:
   contents: write
 
+env:
+  VERSION: ${{ github.ref_name }}
+
 jobs:
   build:
     runs-on: windows-latest
@@ -35,7 +38,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Extract release notes from changelog
-        run: bash .github/workflows/scripts/extract-changelog.sh "${GITHUB_REF#refs/tags/}" > release_notes.md
+        run: bash .github/workflows/scripts/extract-changelog.sh "$VERSION" > release_notes.md
 
       - name: Download release artifact
         uses: actions/download-artifact@v8
@@ -74,4 +77,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-        run: bash .github/workflows/scripts/append-virustotal.sh "${GITHUB_REF#refs/tags/}" "${{ steps.vt.outputs.analysis }}"
+        run: bash .github/workflows/scripts/append-virustotal.sh "$VERSION" "${{ steps.vt.outputs.analysis }}"
