@@ -35,9 +35,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Extract release notes from changelog
-        run: |
-          VERSION="${GITHUB_REF#refs/tags/}"
-          bash .github/workflows/scripts/extract-changelog.sh "$VERSION" > release_notes.md
+        run: bash .github/workflows/scripts/extract-changelog.sh "${GITHUB_REF#refs/tags/}" > release_notes.md
 
       - name: Download release artifact
         uses: actions/download-artifact@v8
@@ -51,3 +49,29 @@ jobs:
           body_path: release_notes.md
           generate_release_notes: false
           files: dist/DAWPresence.exe
+
+  virustotal:
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download release artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: dawpresence-windows
+          path: dist
+
+      - name: Scan with VirusTotal
+        uses: crazy-max/ghaction-virustotal@v5
+        id: vt
+        with:
+          vt_api_key: ${{ secrets.VT_API_KEY }}
+          files: |
+            dist/DAWPresence.exe
+
+      - name: Append VirusTotal results to release body
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: bash .github/workflows/scripts/append-virustotal.sh "${GITHUB_REF#refs/tags/}" "${{ steps.vt.outputs.analysis }}"
