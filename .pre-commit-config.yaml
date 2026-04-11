@@ -1,33 +1,36 @@
 repos:
-  # Rust formatting and linting
   - repo: local
     hooks:
       - id: cargo-fmt
         name: cargo fmt
-        entry: cargo fmt --check
+        entry: cargo fmt --all -- --check
         language: system
         types: [rust]
         pass_filenames: false
 
       - id: cargo-check
         name: cargo check
-        entry: python -c "import sys,subprocess;t=[]if sys.platform=='win32'else['--target','x86_64-pc-windows-gnu'];sys.exit(subprocess.call(['cargo','check']+t))"
+        entry: cargo check
         language: system
         types: [rust]
         pass_filenames: false
 
       - id: cargo-clippy
         name: cargo clippy
-        entry: python -c "import sys,subprocess;t=[]if sys.platform=='win32'else['--target','x86_64-pc-windows-gnu'];sys.exit(subprocess.call(['cargo','clippy']+t+['--all-features','--','-D','warnings']))"
+        entry: cargo clippy --all-targets -- -D warnings
         language: system
         types: [rust]
         pass_filenames: false
 
-  # General checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
-      - id: check-added-large-files
+
+ci:
+  skip:
+    - cargo-fmt
+    - cargo-check
+    - cargo-clippy

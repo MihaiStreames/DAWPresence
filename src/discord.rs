@@ -1,24 +1,30 @@
 use std::sync::Mutex;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::SystemTime;
+use std::time::UNIX_EPOCH;
 
-use discord_rich_presence::{activity, DiscordIpc, DiscordIpcClient};
-use tracing::{debug, error, info, warn};
+use discord_rich_presence::DiscordIpc;
+use discord_rich_presence::DiscordIpcClient;
+use discord_rich_presence::activity;
+use tracing::debug;
+use tracing::error;
+use tracing::info;
+use tracing::warn;
 
 use crate::daw::DawStatus;
 use crate::settings::AppSettings;
 use crate::version::APP_VERSION;
 
 /// Rich Presence data to display on Discord
-pub struct DiscordPresence {
-    pub details: String,
-    pub state: String,
-    pub large_image: String,
-    pub large_text: String,
+pub(crate) struct DiscordPresence {
+    pub(crate) details: String,
+    pub(crate) state: String,
+    pub(crate) large_image: String,
+    pub(crate) large_text: String,
 }
 
 impl DiscordPresence {
     /// Build presence from current DAW status
-    pub fn from_daw_status(daw_status: &DawStatus, settings: &AppSettings) -> Self {
+    pub(crate) fn from_daw_status(daw_status: &DawStatus, settings: &AppSettings) -> Self {
         let project = if settings.hide_project_name {
             "(hidden)".to_string()
         } else {
@@ -53,7 +59,7 @@ impl DiscordPresence {
 }
 
 /// Manages Discord IPC connection and presence updates
-pub struct DiscordManager {
+pub(crate) struct DiscordManager {
     client: Mutex<Option<DiscordIpcClient>>,
     current_client_id: Mutex<Option<String>>,
     start_timestamp: Mutex<Option<i64>>,
@@ -61,7 +67,7 @@ pub struct DiscordManager {
 
 impl DiscordManager {
     /// Create a new Discord manager (not connected yet)
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
             client: Mutex::new(None),
             current_client_id: Mutex::new(None),
@@ -70,12 +76,12 @@ impl DiscordManager {
     }
 
     /// Check if currently connected to Discord
-    pub fn is_connected(&self) -> bool {
+    pub(crate) fn is_connected(&self) -> bool {
         self.client.lock().unwrap().is_some()
     }
 
     /// Connect to Discord with the given client ID (reconnects if ID changed)
-    pub fn connect(&self, client_id: &str) -> Result<(), String> {
+    pub(crate) fn connect(&self, client_id: &str) -> Result<(), String> {
         let mut client_guard = self.client.lock().map_err(|e| e.to_string())?;
         let mut current_id_guard = self.current_client_id.lock().map_err(|e| e.to_string())?;
         let mut timestamp_guard = self.start_timestamp.lock().map_err(|e| e.to_string())?;
@@ -113,7 +119,7 @@ impl DiscordManager {
     }
 
     /// Update the current presence (auto-reconnects on failure)
-    pub fn update_presence(&self, presence: &DiscordPresence) -> Result<(), String> {
+    pub(crate) fn update_presence(&self, presence: &DiscordPresence) -> Result<(), String> {
         let mut client_guard = self.client.lock().map_err(|e| e.to_string())?;
         let mut current_id_guard = self.current_client_id.lock().map_err(|e| e.to_string())?;
         let mut timestamp_guard = self.start_timestamp.lock().map_err(|e| e.to_string())?;
@@ -160,7 +166,7 @@ impl DiscordManager {
     }
 
     /// Disconnect from Discord and clear presence
-    pub fn disconnect(&self) -> Result<(), String> {
+    pub(crate) fn disconnect(&self) -> Result<(), String> {
         let mut client_guard = self.client.lock().map_err(|e| e.to_string())?;
         let mut current_id_guard = self.current_client_id.lock().map_err(|e| e.to_string())?;
         let mut timestamp_guard = self.start_timestamp.lock().map_err(|e| e.to_string())?;
@@ -179,7 +185,7 @@ impl DiscordManager {
     }
 
     /// Convenience method: update presence from DAW status, or disconnect if no DAW
-    pub fn update_from_daw_status(
+    pub(crate) fn update_from_daw_status(
         &self,
         daw_status: Option<&DawStatus>,
         settings: &AppSettings,

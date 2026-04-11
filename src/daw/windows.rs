@@ -1,23 +1,29 @@
 #![allow(unsafe_code)] // FFI with Win32 APIs requires unsafe
 
+use std::ffi::OsString;
+use std::os::windows::ffi::OsStrExt;
+use std::os::windows::ffi::OsStringExt;
 use std::path::Path;
 
 use sysinfo::Pid;
-use tracing::{debug, trace};
-
-use std::ffi::OsString;
-use std::os::windows::ffi::{OsStrExt, OsStringExt};
-use windows::core::{BOOL, PCWSTR};
-use windows::Win32::Foundation::{HWND, LPARAM, TRUE};
-use windows::Win32::Storage::FileSystem::{
-    GetFileVersionInfoSizeW, GetFileVersionInfoW, VerQueryValueW,
-};
-use windows::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GetWindowTextLengthW, GetWindowTextW, GetWindowThreadProcessId, IsWindowVisible,
-};
+use tracing::debug;
+use tracing::trace;
+use windows::Win32::Foundation::HWND;
+use windows::Win32::Foundation::LPARAM;
+use windows::Win32::Foundation::TRUE;
+use windows::Win32::Storage::FileSystem::GetFileVersionInfoSizeW;
+use windows::Win32::Storage::FileSystem::GetFileVersionInfoW;
+use windows::Win32::Storage::FileSystem::VerQueryValueW;
+use windows::Win32::UI::WindowsAndMessaging::EnumWindows;
+use windows::Win32::UI::WindowsAndMessaging::GetWindowTextLengthW;
+use windows::Win32::UI::WindowsAndMessaging::GetWindowTextW;
+use windows::Win32::UI::WindowsAndMessaging::GetWindowThreadProcessId;
+use windows::Win32::UI::WindowsAndMessaging::IsWindowVisible;
+use windows::core::BOOL;
+use windows::core::PCWSTR;
 
 /// Fetch a Windows file version string from the executable metadata
-pub fn get_process_version(exe_path: Option<&Path>) -> String {
+pub(super) fn get_process_version(exe_path: Option<&Path>) -> String {
     let Some(path) = exe_path else {
         return "0.0.0".to_string();
     };
@@ -128,7 +134,7 @@ pub fn get_process_version(exe_path: Option<&Path>) -> String {
 
 /// Look up window titles windowsfor a PID on Windows, returning the longest one
 /// (main windows typically have longer titles than toolbars/palettes)
-pub fn get_window_title(pid: Pid) -> String {
+pub(super) fn get_window_title(pid: Pid) -> String {
     struct SearchState {
         target_pid: u32,
         titles: Vec<String>,
@@ -139,27 +145,27 @@ pub fn get_window_title(pid: Pid) -> String {
             return TRUE;
         }
 
-        let state = &mut *(lparam.0 as *mut SearchState);
+        let state = unsafe { &mut *(lparam.0 as *mut SearchState) };
 
         let mut process_id: u32 = 0;
-        GetWindowThreadProcessId(hwnd, Some(&mut process_id));
+        unsafe { GetWindowThreadProcessId(hwnd, Some(&mut process_id)) };
 
         if process_id != state.target_pid {
             return TRUE;
         }
 
         // check visibility after PID match for better debugging
-        if !IsWindowVisible(hwnd).as_bool() {
+        if unsafe { !IsWindowVisible(hwnd).as_bool() } {
             return TRUE;
         }
 
-        let text_len = GetWindowTextLengthW(hwnd);
+        let text_len = unsafe { GetWindowTextLengthW(hwnd) };
         if text_len == 0 {
             return TRUE;
         }
 
         let mut buffer = vec![0u16; text_len as usize + 1];
-        let len = GetWindowTextW(hwnd, &mut buffer);
+        let len = unsafe { GetWindowTextW(hwnd, &mut buffer) };
         if len == 0 {
             return TRUE;
         }

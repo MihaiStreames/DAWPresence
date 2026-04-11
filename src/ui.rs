@@ -1,11 +1,25 @@
-use iced::widget::{button, column, container, image, opaque, row, stack, text, text_input};
-use iced::{alignment, Background, Border, Color, Length};
 use std::sync::LazyLock;
 
-use crate::{AppState, Message};
+use iced::Background;
+use iced::Border;
+use iced::Color;
+use iced::Length;
+use iced::alignment;
+use iced::widget::button;
+use iced::widget::column;
+use iced::widget::container;
+use iced::widget::image;
+use iced::widget::opaque;
+use iced::widget::row;
+use iced::widget::stack;
+use iced::widget::text;
+use iced::widget::text_input;
+
+use crate::app::AppState;
+use crate::app::Message;
 
 /// Render the app UI
-pub fn view(state: &AppState) -> iced::Element<'_, Message> {
+pub(crate) fn view(state: &AppState) -> iced::Element<'_, Message> {
     let base = container(
         column(vec![menu_bar(state), home_view(state)])
             .padding(20)

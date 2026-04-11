@@ -18,6 +18,10 @@ jobs:
         shell: pwsh
         run: ./scripts/build.ps1
 
+      - name: Check binary size
+        shell: pwsh
+        run: ./.github/workflows/scripts/check-binary-size.ps1
+
       - name: Upload release artifact
         uses: actions/upload-artifact@v7
         with:
@@ -33,7 +37,7 @@ jobs:
       - name: Extract release notes from changelog
         run: |
           VERSION="${GITHUB_REF#refs/tags/}"
-          bash scripts/extract-changelog.sh "$VERSION" > release_notes.md
+          bash .github/workflows/scripts/extract-changelog.sh "$VERSION" > release_notes.md
 
       - name: Download release artifact
         uses: actions/download-artifact@v8

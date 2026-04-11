@@ -1,33 +1,38 @@
 [package]
 name = "DAWPresence"
-version = "2.0.1"
+version = "2.1.0"
 description = "A Discord Rich Presence client for Digital Audio Workstations (DAWs)"
 authors = ["MihaiStreames <72852703+MihaiStreames@users.noreply.github.com>"]
 license = "MIT"
-edition = "2021"
+homepage = "https://github.com/MihaiStreames/DAWPresence"
+repository = "https://github.com/MihaiStreames/DAWPresence"
+keywords = ["discord", "rich-presence", "daw", "audio-production", "music"]
+categories = ["desktop-applications"]
+edition = "2024"
+rust-version = "1.92"
 
 [dependencies]
+confy = "2.0.0"
+crossbeam-channel = "0.5.15"
+discord-rich-presence = "1.1.0"
+fancy-regex = "0.17.0"
 iced = { version = "0.14.0", default-features = false, features = [
     "crisp",
     "image-without-codecs",
     "tiny-skia",
     "tokio",
 ] }
-tray-icon = "0.21.3"
-tracing = { version = "0.1.44", features = ["release_max_level_off"] }
-tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
-confy = "2.0.0"
-crossbeam-channel = "0.5.15"
-serde = { version = "1.0.228", features = ["derive"] }
-serde_json = "1.0.149"
-tokio = { version = "1.50.0", features = ["rt-multi-thread", "macros", "time"] }
-sysinfo = "0.38.0"
-discord-rich-presence = "1.1.0"
-fancy-regex = "0.17.0"
-image = { version = "0.25.9", default-features = false, features = [
+image = { version = "0.25.10", default-features = false, features = [
     "ico",
     "png",
 ] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+sysinfo = "0.38.4"
+tokio = { version = "1.51.1", features = ["rt-multi-thread", "macros", "time"] }
+tracing = { version = "0.1.44", features = ["release_max_level_off"] }
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+tray-icon = "0.22.0"
 
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.62.2", features = [
@@ -47,26 +52,34 @@ strip = "symbols"
 
 [lints.rust]
 unsafe_code = "warn"
+unreachable_pub = "warn"
 
 [lints.clippy]
-# style/correctness (like pycodestyle E, W, F)
-cloned_instead_of_copied = "warn"
-flat_map_option = "warn"
-inefficient_to_string = "warn"
-manual_let_else = "warn"
-manual_ok_or = "warn"
-manual_string_new = "warn"
-map_unwrap_or = "warn"
-semicolon_if_nothing_returned = "warn"
-uninlined_format_args = "warn"
-unnested_or_patterns = "warn"
-
-# complexity/simplify (like flake8-simplify SIM)
-fn_params_excessive_bools = "warn"
-needless_pass_by_value = "warn"
-trivially_copy_pass_by_ref = "warn"
-unused_self = "warn"
-redundant_closure_for_method_calls = "warn"
-
-# performance (like perflint PERF)
-redundant_clone = "warn"
+cloned_instead_of_copied = "warn"            # match ruff's unnecessary copy/clone guidance
+flat_map_option = "warn"                     # keep option handling direct and readable
+inefficient_to_string = "warn"               # avoid extra allocations in string conversions
+manual_let_else = "warn"                     # prefer idiomatic let-else patterns
+manual_ok_or = "warn"                        # keep Result construction explicit
+manual_string_new = "warn"                   # avoid redundant String::new usage
+map_unwrap_or = "warn"                       # prefer map_or/map_or_else patterns
+semicolon_if_nothing_returned = "warn"       # avoid trailing semicolons that hide return values
+uninlined_format_args = "warn"               # encourage inline format args like Rustfmt/Clippy suggests
+unnested_or_patterns = "warn"                # keep match patterns flat
+fn_params_excessive_bools = "warn"           # mirror Python's "too many bool args" caution
+needless_pass_by_value = "warn"              # avoid unnecessary moves
+trivially_copy_pass_by_ref = "warn"          # keep tiny Copy types passed by value
+unused_self = "warn"                         # ensure self is used intentionally
+redundant_closure_for_method_calls = "warn"  # prefer direct method calls
+redundant_clone = "warn"                     # avoid redundant cloning
+too_many_arguments = "warn"                  # flag functions with too many params; threshold in clippy.toml
+too_many_lines = "warn"                      # keep functions short and focused; threshold in clippy.toml
+cognitive_complexity = "warn"                # limit branching/nesting complexity; threshold in clippy.toml
+enum_variant_names = "warn"                  # avoid redundant enum name prefix in variants; threshold in clippy.toml
+type_complexity = "warn"                     # flag overly nested/complex type expressions; threshold in clippy.toml
+dbg_macro = "warn"                           # no debug output left in committed code
+empty_drop = "warn"                          # drop impls with no body are pointless
+exit = "warn"                                # use proper error propagation instead of process::exit
+get_unwrap = "warn"                          # encode None/Err cases in the type system
+rc_buffer = "warn"                           # Rc<Vec<T>> / Rc<String> wastes a layer of indirection
+rc_mutex = "warn"                            # prefer RwLock or message passing over Rc<Mutex<T>>
+rest_pat_in_fully_bound_structs = "warn"     # catch stray .. in exhaustive struct patterns

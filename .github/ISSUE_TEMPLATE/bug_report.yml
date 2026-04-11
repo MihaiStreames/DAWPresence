@@ -17,8 +17,6 @@ body:
       options:
         - Windows 10
         - Windows 11
-        - Linux
-        - macOS
     validations:
       required: true
 

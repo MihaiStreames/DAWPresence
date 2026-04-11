@@ -1,20 +1,34 @@
 #![allow(unsafe_code)] // tray icon message pump requires unsafe on Windows
 
-use crossbeam_channel::RecvTimeoutError;
-use iced::{window, Subscription};
-use std::sync::{LazyLock, Mutex};
+use std::sync::LazyLock;
+use std::sync::Mutex;
 use std::time::Duration;
+
+use crossbeam_channel::RecvTimeoutError;
+use iced::Subscription;
+use iced::window;
 use tracing::warn;
-use tray_icon::menu::{CheckMenuItem, Menu, MenuEvent, MenuId, MenuItem};
-use tray_icon::{Icon, TrayIcon, TrayIconBuilder};
-
-use crate::settings::AppSettings;
-use crate::Message;
-
+use tray_icon::Icon;
+use tray_icon::TrayIcon;
+use tray_icon::TrayIconBuilder;
+use tray_icon::menu::CheckMenuItem;
+use tray_icon::menu::Menu;
+use tray_icon::menu::MenuEvent;
+use tray_icon::menu::MenuId;
+use tray_icon::menu::MenuItem;
 #[cfg(windows)]
-use windows::Win32::UI::WindowsAndMessaging::{
-    DispatchMessageW, PeekMessageW, TranslateMessage, MSG, PM_REMOVE,
-};
+use windows::Win32::UI::WindowsAndMessaging::DispatchMessageW;
+#[cfg(windows)]
+use windows::Win32::UI::WindowsAndMessaging::MSG;
+#[cfg(windows)]
+use windows::Win32::UI::WindowsAndMessaging::PM_REMOVE;
+#[cfg(windows)]
+use windows::Win32::UI::WindowsAndMessaging::PeekMessageW;
+#[cfg(windows)]
+use windows::Win32::UI::WindowsAndMessaging::TranslateMessage;
+
+use crate::app::Message;
+use crate::settings::AppSettings;
 
 static TRAY_UPDATES: LazyLock<(
     std::sync::mpsc::Sender<TrayUpdate>,
@@ -24,14 +38,14 @@ static TRAY_UPDATES: LazyLock<(
     (sender, Mutex::new(receiver))
 });
 
-pub enum TrayUpdate {
+pub(crate) enum TrayUpdate {
     HideProjectName(bool),
     HideSystemUsage(bool),
     DiscordConnected(bool),
 }
 
 /// Send a tray update to modify the tray menu
-pub fn send_tray_update(update: TrayUpdate) {
+pub(crate) fn send_tray_update(update: TrayUpdate) {
     let _ = TRAY_UPDATES.0.send(update);
 }
 
@@ -43,7 +57,7 @@ struct TrayMenuIds {
 }
 
 /// Bridge tray menu events into the app
-pub fn tray_subscription() -> Subscription<Message> {
+pub(crate) fn tray_subscription() -> Subscription<Message> {
     Subscription::run(|| {
         iced::stream::channel::<Message>(
             100,
@@ -202,9 +216,14 @@ fn load_tray_icon(connected: bool) -> Result<Icon, String> {
     Icon::from_rgba(rgba, width, height).map_err(|error| error.to_string())
 }
 
-/// Load the window icon from embedded assets
-pub fn load_window_icon() -> Result<window::Icon, String> {
-    let (rgba, width, height) = load_icon_rgba(false)?;
+/// Load the window icon from embedded assets (red/disconnected by default)
+pub(crate) fn load_window_icon() -> Result<window::Icon, String> {
+    load_window_icon_for_state(false)
+}
+
+/// Load the window icon matching the current connection state
+pub(crate) fn load_window_icon_for_state(connected: bool) -> Result<window::Icon, String> {
+    let (rgba, width, height) = load_icon_rgba(connected)?;
     window::icon::from_rgba(rgba, width, height).map_err(|error| error.to_string())
 }
 

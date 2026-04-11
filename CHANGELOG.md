@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v210--multi-process-daws-and-restructure">v2.1.0</a></li>
     <li><a href="#v201--size-and-memory-optimizations">v2.0.1</a></li>
     <li><a href="#v200--first-functional-rust-release">v2.0.0</a></li>
     <li><a href="#v102--bugfixes">v1.0.2</a></li>
@@ -18,7 +19,28 @@
   </ol>
 </details>
 
-## v2.0.1 — Size and memory optimizations
+## v2.1.0 - Multi-process DAWs and restructure
+
+Fixes Bitwig Studio (and other multi-process DAWs) showing incorrect stats, restructures the codebase, and adds CI improvements.
+
+**Fixed:**
+
+- Bitwig Studio now aggregates CPU/RAM across all processes (main UI, audio engine, plugin hosts)
+- Window icon now switches between red/green based on Discord connection state
+- DAW config (`daws.json`) auto-updates when a new version ships -- uses versioned format
+
+**Changed:**
+
+- Extracted `app.rs` from `main.rs` for cleaner MVU separation
+- Added `AdditionalProcessNames` config field for multi-process DAWs (prefix matching)
+- Merged VirusTotal scan into release workflow (was missing `github_token`)
+- Moved CI scripts to `.github/workflows/scripts/`
+- Added binary size check to release CI (must be under 5 MB)
+- Stricter clippy linting (`pub` to `pub(crate)`, unsafe blocks in unsafe fns)
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
+
+## v2.0.1 - Size and memory optimizations
 
 Leaned hard on size and idle RAM reductions for Windows builds.
 
@@ -35,7 +57,7 @@ Leaned hard on size and idle RAM reductions for Windows builds.
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v2.0.0 — First functional Rust release
+## v2.0.0 - First functional Rust release
 
 The Rust rewrite is now fully functional. All DAW project names are detected correctly on Windows 10 and 11.
 
@@ -51,7 +73,7 @@ The Rust rewrite is now fully functional. All DAW project names are detected cor
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v1.0.2 — Bugfixes
+## v1.0.2 - Bugfixes
 
 Bug fixes for tray icon responsiveness and window title detection.
 
@@ -70,7 +92,7 @@ Bug fixes for tray icon responsiveness and window title detection.
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v1.0.1 — Rust rewrite
+## v1.0.1 - Rust rewrite
 
 Complete rewrite from Python to Rust. Same functionality, but faster, smaller, and no runtime dependencies.
 
@@ -106,7 +128,7 @@ Complete rewrite from Python to Rust. Same functionality, but faster, smaller, a
 
 <p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
-## v1.0.0 — Initial release
+## v1.0.0 - Initial release
 
 Python version. A rewrite of [Serena1432's DAWRPC](https://github.com/Serena1432/DAWRPC) with cleaner architecture.
 
