@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v300--ui-redesign">v3.0.0</a></li>
     <li><a href="#v220--architecture-rewrite">v2.2.0</a></li>
     <li><a href="#v210--multi-process-daws">v2.1.0</a></li>
     <li><a href="#v201--size-and-memory-optimizations">v2.0.1</a></li>
@@ -20,7 +21,36 @@
   </ol>
 </details>
 
-## v2.2.0 - Architecture rewrite
+## v3.0.0 - UI redesign
+
+New UI with sidebar navigation, settings page, and several new features.
+
+**New stuff:**
+
+- Sidebar with Home and Settings pages
+- Settings page with togglers and inline interval editor
+- Auto-start with Windows toggle
+- Timer mode: session time (default) or project time (resets on project change)
+- App icon embedded in exe and shown in taskbar/titlebar
+- Dual renderer builds: tiny-skia (CPU, ~3.4 MB) and wgpu (GPU, ~4.6 MB)
+
+**Changed:**
+
+- Blue accent color scheme throughout the app
+- Smaller binary (trimmed dependencies, switched async executor)
+- Cleaner debug logging (app-only by default, no framework noise)
+
+**Fixed:**
+
+- Unnecessary Discord disconnects when no DAW running
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
+
+## v2.2.0 - Architecture rewrite (skipped)
+
+> v2.2.0 was not released due to installer build issues. All changes are included in v3.0.0.
+
+## v2.2.0 changes - Architecture rewrite
 
 Complete architecture rewrite with direct Win32 APIs, event-driven process monitoring, and a Windows installer.
 

@@ -39,13 +39,13 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
-      - name: Build release binary
+      - name: Build release binaries (tiny-skia + wgpu)
         shell: pwsh
         run: ./scripts/build.ps1
 
-      - name: Build installer
+      - name: Build installers (tiny-skia + wgpu)
         shell: pwsh
-        run: ./.github/workflows/scripts/build-installer.ps1 -Version "${{ needs.version.outputs.version }}"
+        run: ./scripts/build-installer.ps1 -Version "${{ needs.version.outputs.version }}"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
@@ -67,7 +67,7 @@ jobs:
           name: dawpresence-windows
           path: dist
 
-      - name: Check binary size
+      - name: Check binary sizes
         run: bash .github/workflows/scripts/check-binary-size.sh
 
   release:
@@ -96,8 +96,10 @@ jobs:
           body_path: release_notes.md
           generate_release_notes: false
           files: |
-            dist/DAWPresence.exe
-            dist/DAWPresence.exe.sha256
+            dist/DAWPresence-tiny-skia.exe
+            dist/DAWPresence-tiny-skia.exe.sha256
+            dist/DAWPresence-wgpu.exe
+            dist/DAWPresence-wgpu.exe.sha256
             dist/DAWPresence-*-setup.exe
             dist/DAWPresence-*-setup.exe.sha256
 
@@ -121,7 +123,8 @@ jobs:
         with:
           vt_api_key: ${{ secrets.VT_API_KEY }}
           files: |
-            dist/DAWPresence.exe
+            dist/DAWPresence-tiny-skia.exe
+            dist/DAWPresence-wgpu.exe
             dist/DAWPresence-*-setup.exe
 
       - name: Append VirusTotal results to release body

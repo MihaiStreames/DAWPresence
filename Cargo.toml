@@ -1,7 +1,7 @@
 [package]
-name = "DAWPresence"
-version = "2.2.0"
-description = "Show what you're creating on Discord."
+name = "dawpresence"
+version = "3.0.0"
+description = "Show what you are creating on Discord."
 authors = ["MihaiStreames <72852703+MihaiStreames@users.noreply.github.com>"]
 license = "MIT"
 homepage = "https://github.com/MihaiStreames/DAWPresence"
@@ -11,27 +11,43 @@ categories = ["desktop-applications"]
 edition = "2024"
 rust-version = "1.92"
 
+[[bin]]
+name = "DAWPresence"
+path = "src/main.rs"
+
+[features]
+default = ["renderer-tiny-skia"]
+renderer-tiny-skia = ["iced/tiny-skia"]
+renderer-wgpu = ["iced/wgpu-bare"]
+
 [dependencies]
 confy = "2.0.0"
 crossbeam-channel = "0.5.15"
 discord-rich-presence = "1.1.0"
-fancy-regex = "0.17.0"
+fancy-regex = { version = "0.17.0", default-features = false, features = [
+    "std",
+    "unicode",
+    "variable-lookbehinds"
+] }
 iced = { version = "0.14.0", default-features = false, features = [
     "crisp",
-    "image-without-codecs",
-    "tiny-skia",
-    "tokio",
+    "smol",
 ] }
 image = { version = "0.25.10", default-features = false, features = [
     "ico",
     "png",
 ] }
-serde = { version = "1.0.228", features = ["derive"] }
+serde = { version = "1.0.228", features = [
+    "derive"
+] }
 serde_json = "1.0.149"
 thiserror = "2.0.18"
-tokio = { version = "1.51.1", features = ["rt-multi-thread", "macros", "time"] }
 tracing = { version = "0.1.44", features = ["release_max_level_off"] }
-tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3.23", default-features = false, features = [
+    "fmt",
+    "env-filter",
+    "smallvec"
+] }
 tray-icon = "0.22.0"
 
 [target.'cfg(windows)'.dependencies]
@@ -42,7 +58,14 @@ windows-sys = { version = "0.61.2", features = [
     "Win32_System_ProcessStatus",
     "Win32_System_Diagnostics_ToolHelp",
     "Win32_Storage_FileSystem",
+    "Win32_System_Registry",
 ] }
+
+[build-dependencies]
+winres = "0.1.12"
+
+[dev-dependencies]
+toml = "1.1.2+spec-1.1.0"
 
 [profile.release]
 opt-level = "z"

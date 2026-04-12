@@ -24,13 +24,13 @@ use super::handle::OwnedHandle;
 
 /// A process from the system snapshot.
 #[derive(Debug, Clone)]
-pub(in crate::daw) struct ProcessEntry {
-    pub(in crate::daw) pid: u32,
-    pub(in crate::daw) name: String,
+pub(crate) struct ProcessEntry {
+    pub(crate) pid: u32,
+    pub(crate) name: String,
 }
 
 /// Enumerate all running processes.
-pub(in crate::daw) fn snapshot() -> Vec<ProcessEntry> {
+pub(crate) fn snapshot() -> Vec<ProcessEntry> {
     // SAFETY: standard Win32 call, snapshot handle cleaned up by OwnedHandle
     let raw = unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) };
     let Some(_guard) = OwnedHandle::new(raw) else {
@@ -68,7 +68,7 @@ pub(in crate::daw) fn snapshot() -> Vec<ProcessEntry> {
 }
 
 /// Open a process handle for monitoring and synchronization.
-pub(in crate::daw) fn open(pid: u32) -> Option<OwnedHandle> {
+pub(crate) fn open(pid: u32) -> Option<OwnedHandle> {
     // SAFETY: standard Win32 call, only requesting limited info + sync
     let raw = unsafe {
         OpenProcess(
@@ -82,7 +82,7 @@ pub(in crate::daw) fn open(pid: u32) -> Option<OwnedHandle> {
 }
 
 /// Working set memory in bytes.
-pub(in crate::daw) fn memory_bytes(handle: HANDLE) -> Option<u64> {
+pub(crate) fn memory_bytes(handle: HANDLE) -> Option<u64> {
     let mut counters: PROCESS_MEMORY_COUNTERS = unsafe { zeroed() };
     counters.cb = size_of::<PROCESS_MEMORY_COUNTERS>() as u32;
 
@@ -96,7 +96,7 @@ pub(in crate::daw) fn memory_bytes(handle: HANDLE) -> Option<u64> {
 }
 
 /// Kernel + user time in 100ns ticks.
-pub(in crate::daw) fn cpu_times(handle: HANDLE) -> Option<(u64, u64)> {
+pub(crate) fn cpu_times(handle: HANDLE) -> Option<(u64, u64)> {
     let mut creation = 0u64;
     let mut exit = 0u64;
     let mut kernel = 0u64;
@@ -121,7 +121,7 @@ pub(in crate::daw) fn cpu_times(handle: HANDLE) -> Option<(u64, u64)> {
 }
 
 /// Full executable path for a process.
-pub(in crate::daw) fn exe_path(handle: HANDLE) -> Option<PathBuf> {
+pub(crate) fn exe_path(handle: HANDLE) -> Option<PathBuf> {
     let mut buf = [0u16; MAX_PATH as usize];
     let mut len = buf.len() as u32;
 
@@ -137,7 +137,7 @@ pub(in crate::daw) fn exe_path(handle: HANDLE) -> Option<PathBuf> {
 }
 
 /// Wall-clock time in 100ns ticks.
-pub(in crate::daw) fn wall_ticks() -> u64 {
+pub(crate) fn wall_ticks() -> u64 {
     use std::time::SystemTime;
     use std::time::UNIX_EPOCH;
     // epoch offset cancels in delta calculations

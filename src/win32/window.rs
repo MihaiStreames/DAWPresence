@@ -15,7 +15,7 @@ use windows_sys::Win32::UI::WindowsAndMessaging::IsWindowVisible;
 use windows_sys::core::BOOL;
 
 /// Find the longest visible window title for a PID.
-pub(in crate::daw) fn window_title(pid: u32) -> String {
+pub(crate) fn window_title(pid: u32) -> String {
     struct State {
         target_pid: u32,
         titles: Vec<String>,

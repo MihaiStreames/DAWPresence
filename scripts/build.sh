@@ -4,16 +4,23 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
+TARGET="x86_64-pc-windows-gnu"
+BUILT_PATH="target/$TARGET/release/DAWPresence.exe"
+
 mkdir -p dist
 
-echo "Building release binary..."
-cargo build --release --target x86_64-pc-windows-gnu
+echo "Building tiny-skia variant..."
+cargo build --release --target "$TARGET"
 
-BUILT_PATH="target/x86_64-pc-windows-gnu/release/DAWPresence.exe"
-if [[ ! -f "$BUILT_PATH" ]]; then
-    echo "Could not find built binary at: $BUILT_PATH" >&2
-    exit 1
-fi
+[[ -f "$BUILT_PATH" ]] || { echo "Build failed: $BUILT_PATH not found" >&2; exit 1; }
 
-cp "$BUILT_PATH" dist/DAWPresence.exe
-echo "Built: dist/DAWPresence.exe"
+cp "$BUILT_PATH" dist/DAWPresence-tiny-skia.exe
+echo "Built: dist/DAWPresence-tiny-skia.exe"
+
+echo "Building wgpu variant..."
+cargo build --release --target "$TARGET" --no-default-features --features renderer-wgpu
+
+[[ -f "$BUILT_PATH" ]] || { echo "Build failed: $BUILT_PATH not found" >&2; exit 1; }
+
+cp "$BUILT_PATH" dist/DAWPresence-wgpu.exe
+echo "Built: dist/DAWPresence-wgpu.exe"

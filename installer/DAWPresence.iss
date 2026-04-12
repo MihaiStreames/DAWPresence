@@ -1,7 +1,7 @@
 ; DAWPresence installer script.
 
-; Version and ExeDir are passed via /D flags from the workflow:
-;   iscc /DAppVersion=2.2.0 /DExeDir=..\dist DAWPresence.iss
+; Version, ExeDir, and Renderer are passed via /D flags:
+;   iscc /DAppVersion=2.2.0 /DExeDir=..\dist\tiny-skia /DRenderer=tiny-skia DAWPresence.iss
 
 #ifndef ExeDir
   #define ExeDir "..\target\release"
@@ -9,6 +9,10 @@
 
 #ifndef AppVersion
   #define AppVersion "0.0.0"
+#endif
+
+#ifndef Renderer
+  #define Renderer "tiny-skia"
 #endif
 
 #define AppName "DAWPresence"
@@ -29,12 +33,14 @@ DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 LicenseFile=..\LICENSE
 OutputDir=output
-OutputBaseFilename=DAWPresence-{#AppVersion}-setup
-SetupIconFile=..\src\assets\main.ico
+OutputBaseFilename=DAWPresence-{#AppVersion}-{#Renderer}-setup
+SetupIconFile=..\assets\app\main.ico
 UninstallDisplayIcon={app}\{#AppExeName}
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
+WizardImageFile=..\assets\installer\wizard-image.bmp
+WizardSmallImageFile=..\assets\installer\wizard-small.bmp
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=lowest

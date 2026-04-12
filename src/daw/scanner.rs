@@ -15,12 +15,12 @@ use super::config::normalize_process_name;
 use super::regex_cache::RegexCache;
 use super::status::DawStatus;
 use super::status::UNKNOWN_VERSION;
-use super::win32::handle::OwnedHandle;
-use super::win32::process;
-use super::win32::version;
-use super::win32::watcher;
-use super::win32::watcher::ExitChannel;
-use super::win32::window;
+use crate::win32::handle::OwnedHandle;
+use crate::win32::process;
+use crate::win32::version;
+use crate::win32::watcher;
+use crate::win32::watcher::ExitChannel;
+use crate::win32::window;
 
 type Handle = windows_sys::Win32::Foundation::HANDLE;
 

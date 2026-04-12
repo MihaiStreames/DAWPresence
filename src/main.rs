@@ -13,6 +13,10 @@ mod state;
 mod ui;
 mod version;
 
+#[cfg(windows)]
+#[allow(unsafe_code)]
+mod win32;
+
 use iced::Size;
 use iced::window;
 use tracing::info;
@@ -35,7 +39,7 @@ fn main() -> iced::Result {
         .window(window::Settings {
             resizable: false,
             icon: window_icon,
-            size: Size::new(784.0, 300.0),
+            size: Size::new(784.0, 340.0),
             exit_on_close_request: false,
             ..window::Settings::default()
         })
@@ -52,7 +56,8 @@ fn main() -> ! {
 fn init_logging() {
     tracing_subscriber::fmt()
         .with_env_filter(
-            EnvFilter::try_from_env("DAWPRESENCE_LOG").unwrap_or_else(|_| EnvFilter::new("info")),
+            EnvFilter::try_from_env("DAWPRESENCE_LOG")
+                .unwrap_or_else(|_| EnvFilter::new("DAWPresence=debug,warn")),
         )
         .init();
 }

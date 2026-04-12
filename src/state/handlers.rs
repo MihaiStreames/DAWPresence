@@ -2,10 +2,12 @@
 
 use iced::Task;
 use iced::window;
+use tracing::debug;
 use tracing::warn;
 
 use super::AppState;
 use super::Message;
+use super::Page;
 use super::save_or_warn;
 use crate::daw::DawScanner;
 use crate::settings::AppSettings;
@@ -45,14 +47,36 @@ pub(super) fn tray_quit(window_id: Option<window::Id>) -> Task<Message> {
     window::close(id)
 }
 
+pub(super) fn navigate_to(state: &mut AppState, page: Page) -> Task<Message> {
+    state.active_page = page;
+    debug!("Navigated to {page:?}");
+
+    if page == Page::Settings {
+        state.update_interval_input = state.settings.update_interval.to_string();
+        state.update_interval_error = None;
+    }
+
+    Task::none()
+}
+
+pub(super) fn toggle_auto_start(state: &mut AppState, value: bool) -> Task<Message> {
+    crate::win32::autostart::set_enabled(value);
+    // re-read registry to confirm write succeeded
+    state.auto_start_enabled = crate::win32::autostart::is_enabled();
+    debug!("Auto-start toggled: {}", state.auto_start_enabled);
+    Task::none()
+}
+
 pub(super) fn toggle_close_to_tray(state: &mut AppState, value: bool) -> Task<Message> {
     state.settings.close_to_tray = value;
+    debug!("Close to tray toggled: {value}");
     save_or_warn(&state.settings);
     Task::none()
 }
 
 pub(super) fn toggle_hide_project_name(state: &mut AppState, value: bool) -> Task<Message> {
     state.settings.hide_project_name = value;
+    debug!("Hide project name toggled: {value}");
     save_or_warn(&state.settings);
     crate::ui::tray::send_tray_update(TrayUpdate::HideProjectName(value));
     Task::none()
@@ -60,13 +84,26 @@ pub(super) fn toggle_hide_project_name(state: &mut AppState, value: bool) -> Tas
 
 pub(super) fn toggle_hide_system_usage(state: &mut AppState, value: bool) -> Task<Message> {
     state.settings.hide_system_usage = value;
+    debug!("Hide system usage toggled: {value}");
     save_or_warn(&state.settings);
     crate::ui::tray::send_tray_update(TrayUpdate::HideSystemUsage(value));
     Task::none()
 }
 
+pub(super) fn toggle_timer_mode(state: &mut AppState) -> Task<Message> {
+    use crate::settings::TimerMode;
+    state.settings.timer_mode = match state.settings.timer_mode {
+        TimerMode::Session => TimerMode::Project,
+        TimerMode::Project => TimerMode::Session,
+    };
+    debug!("Timer mode changed to {:?}", state.settings.timer_mode);
+    save_or_warn(&state.settings);
+    Task::none()
+}
+
 pub(super) fn update_interval_input(state: &mut AppState, value: &str) -> Task<Message> {
     state.update_interval_input = value.to_string();
+    state.interval_applied = false;
 
     if value.trim().is_empty() {
         state.update_interval_error = Some(INTERVAL_PARSE_ERROR.to_string());
@@ -78,36 +115,6 @@ pub(super) fn update_interval_input(state: &mut AppState, value: &str) -> Task<M
         }
     } else {
         state.update_interval_error = Some(INTERVAL_PARSE_ERROR.to_string());
-    }
-
-    Task::none()
-}
-
-pub(super) fn open_interval_modal(state: &mut AppState) -> Task<Message> {
-    state.update_interval_input = state.settings.update_interval.to_string();
-    state.update_interval_error = None;
-    state.modal_dismiss_warning = false;
-    state.show_interval_modal = true;
-    Task::none()
-}
-
-pub(super) fn close_interval_modal(state: &mut AppState) -> Task<Message> {
-    state.show_interval_modal = false;
-    state.modal_dismiss_warning = false;
-    Task::none()
-}
-
-pub(super) fn overlay_clicked(state: &mut AppState) -> Task<Message> {
-    if !state.show_interval_modal {
-        return Task::none();
-    }
-
-    let original = state.settings.update_interval.to_string();
-    if state.update_interval_input == original {
-        state.show_interval_modal = false;
-        state.modal_dismiss_warning = false;
-    } else {
-        state.modal_dismiss_warning = true;
     }
 
     Task::none()
@@ -125,17 +132,37 @@ pub(super) fn apply_interval(state: &mut AppState) -> Task<Message> {
     }
 
     state.update_interval_error = None;
-    if let Err(error) = state.settings.save() {
-        warn!("Couldn't save settings: {error}");
-    }
-
-    state.show_interval_modal = false;
+    state.interval_applied = true;
+    debug!("Update interval applied: {interval}ms");
+    save_or_warn(&state.settings);
     Task::none()
 }
 
 pub(super) fn tick(state: &mut AppState) -> Task<Message> {
+    state.interval_applied = false;
+
     let status = state.daw_scanner.as_mut().and_then(DawScanner::poll);
     state.daw_status = status;
+
+    // reset timer on project change in Project timer mode
+    if state.settings.timer_mode == crate::settings::TimerMode::Project {
+        let current = state.daw_status.as_ref().map(|s| s.project_name.as_str());
+
+        let changed = match (&state.last_project_name, current) {
+            (Some(prev), Some(curr)) => prev != curr,
+            (None, Some(_)) => true,
+            (Some(_), None) => true,
+            (None, None) => false,
+        };
+
+        if changed {
+            if current.is_some() {
+                debug!("Project changed to {:?}, resetting timer", current);
+                state.discord.reset_timestamp();
+            }
+            state.last_project_name = current.map(String::from);
+        }
+    }
 
     if let Err(error) = state
         .discord
@@ -146,6 +173,7 @@ pub(super) fn tick(state: &mut AppState) -> Task<Message> {
 
     let connected = state.discord.is_connected();
     if connected != state.discord_connected {
+        debug!("Discord connection state: {connected}");
         state.discord_connected = connected;
         crate::ui::tray::send_tray_update(TrayUpdate::DiscordConnected(connected));
     }

@@ -1,32 +1,33 @@
-//! Main window view rendering.
+//! Application layout: sidebar + page routing.
 
-mod home;
-mod menu;
-mod modal;
-mod style;
+mod components;
+mod pages;
+mod strings;
+pub(crate) mod style;
 pub(crate) mod tray;
 
 use iced::Length;
-use iced::widget::column;
 use iced::widget::container;
-use iced::widget::stack;
+use iced::widget::row;
 
 use crate::state::AppState;
 use crate::state::Message;
+use crate::state::Page;
 
-/// Render the app UI.
+/// Render the app layout: sidebar + active page.
 pub(crate) fn view(state: &AppState) -> iced::Element<'_, Message> {
-    let base = container(
-        column(vec![menu::menu_bar(state), home::home_view(state)])
-            .padding(style::PADDING_PAGE)
-            .spacing(style::SPACING),
-    )
-    .width(Length::Fill)
-    .height(Length::Fill);
+    let content = match state.active_page {
+        Page::Home => pages::home_view(state),
+        Page::Settings => pages::settings_view(state),
+    };
 
-    if state.show_interval_modal {
-        stack(vec![base.into(), modal::interval_modal(state)]).into()
-    } else {
-        base.into()
-    }
+    let page = container(content)
+        .padding(style::PADDING_PAGE)
+        .width(Length::Fill)
+        .height(Length::Fill);
+
+    row(vec![components::sidebar(state), page.into()])
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .into()
 }

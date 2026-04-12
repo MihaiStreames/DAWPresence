@@ -8,17 +8,13 @@ use windows_sys::Win32::Storage::FileSystem::GetFileVersionInfoSizeW;
 use windows_sys::Win32::Storage::FileSystem::GetFileVersionInfoW;
 use windows_sys::Win32::Storage::FileSystem::VerQueryValueW;
 
+use super::to_wide_null;
 use crate::daw::UNKNOWN_VERSION;
-
-/// Encode a string as null-terminated UTF-16 for Win32 APIs.
-fn to_wide_null(s: &str) -> Vec<u16> {
-    s.encode_utf16().chain(std::iter::once(0)).collect()
-}
 
 /// Read the ProductVersion string from a PE file's version resource.
 ///
 /// Returns [`UNKNOWN_VERSION`] if the version cannot be read.
-pub(in crate::daw) fn exe_version(path: &Path) -> String {
+pub(crate) fn exe_version(path: &Path) -> String {
     let path_wide: Vec<u16> = path
         .as_os_str()
         .encode_wide()

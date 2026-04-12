@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-FILE="${1:-dist/DAWPresence.exe}"
-MAX_MB="${2:-5}"
+check_size() {
+    local file="$1"
+    local max_mb="$2"
+    local size limit
 
-SIZE=$(stat -c%s "$FILE" 2>/dev/null || stat -f%z "$FILE")
-LIMIT=$((MAX_MB * 1024 * 1024))
+    size=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
+    limit=$((max_mb * 1024 * 1024))
 
-echo "Binary size: ${SIZE} bytes (limit: ${LIMIT} bytes)"
+    echo "$file: ${size} bytes (limit: ${limit} bytes)"
 
-if [[ "$SIZE" -gt "$LIMIT" ]]; then
-    echo "Binary too large: ${SIZE} bytes (limit: ${LIMIT} bytes)"
-    exit 1
-fi
+    if [[ "$size" -gt "$limit" ]]; then
+        echo "FAIL: $file too large"
+        return 1
+    fi
+}
+
+check_size "dist/DAWPresence-tiny-skia.exe" 4
+check_size "dist/DAWPresence-wgpu.exe" 5

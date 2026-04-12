@@ -18,6 +18,14 @@ use crate::discord::DiscordManager;
 use crate::settings::AppSettings;
 use crate::ui::tray::tray_subscription;
 
+/// Active page in the sidebar navigation.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub(crate) enum Page {
+    #[default]
+    Home,
+    Settings,
+}
+
 /// Events flowing through the Iced update loop.
 #[derive(Debug, Clone)]
 pub(crate) enum Message {
@@ -25,13 +33,13 @@ pub(crate) enum Message {
     WindowOpened(window::Id),
     TrayShow,
     TrayQuit,
+    NavigateTo(Page),
+    ToggleAutoStart(bool),
     ToggleCloseToTray(bool),
     ToggleHideProjectName(bool),
     ToggleHideSystemUsage(bool),
+    ToggleTimerMode,
     UpdateIntervalInput(String),
-    OpenIntervalModal,
-    CloseIntervalModal,
-    OverlayClicked,
     ApplyInterval,
     Tick,
 }
@@ -39,15 +47,17 @@ pub(crate) enum Message {
 /// Root application state for the Iced MVU loop.
 pub(crate) struct AppState {
     pub(crate) settings: AppSettings,
+    pub(crate) active_page: Page,
     pub(crate) update_interval_input: String,
     pub(crate) update_interval_error: Option<String>,
-    pub(crate) modal_dismiss_warning: bool,
-    pub(crate) show_interval_modal: bool,
+    pub(crate) interval_applied: bool,
     pub(crate) daw_status: Option<DawStatus>,
     pub(crate) discord_connected: bool,
+    pub(crate) auto_start_enabled: bool,
     window_id: Option<window::Id>,
     daw_scanner: Option<DawScanner>,
     discord: DiscordManager,
+    last_project_name: Option<String>,
 }
 
 fn save_or_warn(settings: &AppSettings) {
@@ -67,6 +77,7 @@ pub(crate) fn boot() -> (AppState, Task<Message>) {
         }
     };
 
+    let auto_start_enabled = crate::win32::autostart::is_enabled();
     let settings = AppSettings::load();
     let update_interval_input = settings.update_interval.to_string();
     let daw_scanner = config_path.and_then(|path| {
@@ -79,15 +90,17 @@ pub(crate) fn boot() -> (AppState, Task<Message>) {
     (
         AppState {
             settings,
+            active_page: Page::Home,
             update_interval_input,
             update_interval_error: None,
-            modal_dismiss_warning: false,
-            show_interval_modal: false,
+            interval_applied: false,
             daw_status: None,
             discord_connected: false,
+            auto_start_enabled,
             window_id: None,
             daw_scanner,
             discord: DiscordManager::default(),
+            last_project_name: None,
         },
         Task::none(),
     )
@@ -100,13 +113,13 @@ pub(crate) fn update(state: &mut AppState, message: Message) -> Task<Message> {
         Message::WindowOpened(id) => handlers::window_opened(state, id),
         Message::TrayShow => handlers::tray_show(state.window_id),
         Message::TrayQuit => handlers::tray_quit(state.window_id),
+        Message::NavigateTo(page) => handlers::navigate_to(state, page),
+        Message::ToggleAutoStart(v) => handlers::toggle_auto_start(state, v),
         Message::ToggleCloseToTray(v) => handlers::toggle_close_to_tray(state, v),
         Message::ToggleHideProjectName(v) => handlers::toggle_hide_project_name(state, v),
         Message::ToggleHideSystemUsage(v) => handlers::toggle_hide_system_usage(state, v),
+        Message::ToggleTimerMode => handlers::toggle_timer_mode(state),
         Message::UpdateIntervalInput(v) => handlers::update_interval_input(state, &v),
-        Message::OpenIntervalModal => handlers::open_interval_modal(state),
-        Message::CloseIntervalModal => handlers::close_interval_modal(state),
-        Message::OverlayClicked => handlers::overlay_clicked(state),
         Message::ApplyInterval => handlers::apply_interval(state),
         Message::Tick => handlers::tick(state),
     }

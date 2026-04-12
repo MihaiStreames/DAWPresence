@@ -17,7 +17,7 @@
 <div align="center">
   <h1>DAWPresence</h1>
 
-  <h3 align="center"> Show what you're creating on Discord. </h3>
+  <h3 align="center">Show what you are creating on Discord.</h3>
 </div>
 
 <!-- TABLE OF CONTENTS -->
@@ -56,6 +56,8 @@
 
 DAWPresence monitors your running DAW and displays what you're working on in your Discord profile. It detects your project name from the window title and updates your Rich Presence automatically.
 
+Tiny, fast, and stays out of your way. The binary is under 5 MB with zero runtime dependencies.
+
 This is a complete rewrite of [Serena1432's DAWRPC](https://github.com/Serena1432/DAWRPC), rebuilt from the ground up in pure Rust.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -68,7 +70,6 @@ This is a complete rewrite of [Serena1432's DAWRPC](https://github.com/Serena143
 - [iced](https://iced.rs/)
 - [tray-icon](https://crates.io/crates/tray-icon)
 - [serde](https://crates.io/crates/serde) + [serde_json](https://crates.io/crates/serde_json)
-- [tokio](https://crates.io/crates/tokio)
 - [tracing](https://crates.io/crates/tracing)
 - [tracing-subscriber](https://crates.io/crates/tracing-subscriber)
 - [confy](https://crates.io/crates/confy)
@@ -91,17 +92,20 @@ If you want to help with Linux support, see [issue #1](https://github.com/MihaiS
 
 ### Installation
 
+Two renderer variants are available:
+
+| Variant       | Size    | Renderer                   |
+|---------------|---------|----------------------------|
+| **tiny-skia** | ~3.4 MB | CPU (software)             |
+| **wgpu**      | ~4.6 MB | GPU (hardware accelerated) |
+
 #### Installer (recommended)
 
-Download the setup exe from [latest release](https://github.com/MihaiStreames/DAWPresence/releases/latest). The installer adds a start menu shortcut, optional desktop shortcut, and optional auto-start with Windows.
-
-> [**Download Installer**](https://github.com/MihaiStreames/DAWPresence/releases/latest)
+Download the setup exe from the [latest release](https://github.com/MihaiStreames/DAWPresence/releases/latest). The installer adds a start menu shortcut, optional desktop shortcut, and optional auto-start with Windows.
 
 #### Portable
 
-Download `DAWPresence.exe` from the [latest release](https://github.com/MihaiStreames/DAWPresence/releases/latest) and run it directly. Settings are stored in `%APPDATA%\dawpresence`.
-
-> [**Download Portable**](https://github.com/MihaiStreames/DAWPresence/releases/latest)
+Download the exe from the [latest release](https://github.com/MihaiStreames/DAWPresence/releases/latest) and run it directly. Settings are stored in `%APPDATA%\dawpresence`.
 
 #### Building from source
 

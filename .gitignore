@@ -43,6 +43,10 @@ Cargo.lock
 flamegraph.svg
 perf.data
 
+# Build artifacts
+dist/
+installer/output/
+
 # Claude Code
 .claude/
 CLAUDE.md

@@ -14,6 +14,7 @@ use presence::DiscordPresence;
 use tracing::debug;
 use tracing::error;
 use tracing::info;
+use tracing::trace;
 use tracing::warn;
 
 use crate::daw::DawStatus;
@@ -113,10 +114,10 @@ impl DiscordManager {
         };
 
         if let Err(e) = client.set_activity(build_activity()) {
-            warn!("set_activity failed: {e}, trying to reconnect...");
+            warn!("Couldn't set activity: {e}, trying to reconnect...");
 
             if let Err(reconnect_err) = client.reconnect() {
-                error!("Reconnect failed: {reconnect_err}");
+                error!("Couldn't reconnect: {reconnect_err}");
 
                 let _ = client.close();
 
@@ -136,6 +137,12 @@ impl DiscordManager {
         }
 
         Ok(())
+    }
+
+    /// Reset the presence timer to now (for project-based timer mode).
+    pub(crate) fn reset_timestamp(&self) {
+        let mut s = self.lock();
+        s.start_timestamp = Some(current_timestamp());
     }
 
     pub(crate) fn disconnect(&self) {
@@ -158,7 +165,9 @@ impl DiscordManager {
         settings: &AppSettings,
     ) -> Result<(), DiscordError> {
         let Some(status) = daw_status else {
-            self.disconnect();
+            if self.is_connected() {
+                self.disconnect();
+            }
             return Ok(());
         };
 
@@ -167,7 +176,7 @@ impl DiscordManager {
         let presence = DiscordPresence::from_daw_status(status, settings);
         self.update_presence(&presence)?;
 
-        debug!("Presence updated: {}", presence.details);
+        trace!("Presence updated: {}", presence.details);
 
         Ok(())
     }

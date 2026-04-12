@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use fancy_regex::Regex;
-use tracing::error;
+use tracing::warn;
 
 use super::status::UNKNOWN_PROJECT;
 use super::status::UNTITLED_PROJECT;
@@ -31,7 +31,7 @@ impl RegexCache {
                 .or_insert_with(|| match Regex::new(pattern) {
                     Ok(re) => Some(re),
                     Err(e) => {
-                        error!("Invalid regex pattern: {pattern}: {e}");
+                        warn!("Invalid regex pattern: {pattern}: {e}");
                         None
                     }
                 });

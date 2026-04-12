@@ -13,6 +13,7 @@ use std::time::Duration;
 use crossbeam_channel::RecvTimeoutError;
 use iced::Subscription;
 pub(crate) use icon::load_window_icon;
+use tracing::debug;
 use tracing::warn;
 use tray_icon::menu::MenuEvent;
 
@@ -114,6 +115,7 @@ fn handle_tray_event(
     event: &tray_icon::menu::MenuEvent,
 ) -> bool {
     if event.id() == &menu_items.show {
+        debug!("Tray: show requested");
         if output.try_send(Message::TrayShow).is_err() {
             warn!("Tray channel closed, exiting tray loop");
             return true;
@@ -123,6 +125,7 @@ fn handle_tray_event(
     }
 
     if event.id() == &menu_items.quit {
+        debug!("Tray: quit requested");
         let _ = output.try_send(Message::TrayQuit);
         return true;
     }
@@ -159,6 +162,7 @@ fn drain_tray_updates(menu_items: &TrayMenuIds, tray_icon: &tray_icon::TrayIcon)
             }
 
             TrayUpdate::DiscordConnected(connected) => {
+                debug!("Tray: discord connected = {connected}");
                 let icon = match load_tray_icon(connected) {
                     Ok(icon) => icon,
 

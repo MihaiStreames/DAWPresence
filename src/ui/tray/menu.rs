@@ -8,6 +8,7 @@ use tray_icon::menu::Menu;
 use tray_icon::menu::MenuId;
 use tray_icon::menu::MenuItem;
 
+use super::super::strings;
 use super::icon::load_tray_icon;
 use crate::error::TrayError;
 use crate::settings::AppSettings;
@@ -27,12 +28,20 @@ pub(super) struct TrayMenuIds {
 pub(super) fn create_tray_icon() -> Result<(TrayIcon, TrayMenuIds), crate::error::TrayError> {
     let settings = AppSettings::load();
     let menu = Menu::new();
-    let hide_project =
-        CheckMenuItem::new("Hide project name", true, settings.hide_project_name, None);
-    let hide_system =
-        CheckMenuItem::new("Hide system usage", true, settings.hide_system_usage, None);
-    let show = MenuItem::new("Show", true, None);
-    let quit = MenuItem::new("Quit", true, None);
+    let hide_project = CheckMenuItem::new(
+        strings::HIDE_PROJECT_NAME,
+        true,
+        settings.hide_project_name,
+        None,
+    );
+    let hide_system = CheckMenuItem::new(
+        strings::HIDE_SYSTEM_USAGE,
+        true,
+        settings.hide_system_usage,
+        None,
+    );
+    let show = MenuItem::new(strings::TRAY_SHOW, true, None);
+    let quit = MenuItem::new(strings::TRAY_QUIT, true, None);
 
     menu.append(&hide_project).map_err(create_err)?;
     menu.append(&hide_system).map_err(create_err)?;
