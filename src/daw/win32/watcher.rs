@@ -6,8 +6,9 @@ use crossbeam_channel::Receiver;
 use crossbeam_channel::Sender;
 use windows_sys::Win32::Foundation::FALSE;
 use windows_sys::Win32::Foundation::HANDLE;
+use windows_sys::Win32::Foundation::INVALID_HANDLE_VALUE;
 use windows_sys::Win32::System::Threading::RegisterWaitForSingleObject;
-use windows_sys::Win32::System::Threading::UnregisterWait;
+use windows_sys::Win32::System::Threading::UnregisterWaitEx;
 use windows_sys::Win32::System::Threading::WT_EXECUTEONLYONCE;
 
 /// Channel pair for receiving process exit notifications.
@@ -57,17 +58,20 @@ impl ExitChannel {
     }
 }
 
-/// Cancel a registered wait. No-op if handle is null.
+/// Cancel a registered wait, blocking until any in-flight callback completes.
+/// No-op if handle is null.
 pub(in crate::daw) fn unregister(wait_handle: HANDLE) {
     if !wait_handle.is_null() {
-        // SAFETY: wait_handle is from RegisterWaitForSingleObject
+        // SAFETY: wait_handle is from RegisterWaitForSingleObject.
+        // INVALID_HANDLE_VALUE makes UnregisterWaitEx block until the callback finishes,
+        // preventing use-after-free if the callback is mid-execution during drop.
         unsafe {
-            UnregisterWait(wait_handle);
+            UnregisterWaitEx(wait_handle, INVALID_HANDLE_VALUE);
         }
     }
 }
 
-/// NT threadpool callback - fires when the watched process exits.
+/// NT threadpool callback fired when the watched process exits.
 unsafe extern "system" fn exit_callback(ctx: *mut c_void, _timed_out: bool) {
     if ctx.is_null() {
         return;

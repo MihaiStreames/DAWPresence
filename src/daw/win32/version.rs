@@ -8,7 +8,7 @@ use windows_sys::Win32::Storage::FileSystem::GetFileVersionInfoSizeW;
 use windows_sys::Win32::Storage::FileSystem::GetFileVersionInfoW;
 use windows_sys::Win32::Storage::FileSystem::VerQueryValueW;
 
-use crate::daw::status::UNKNOWN_VERSION;
+use crate::daw::UNKNOWN_VERSION;
 
 /// Encode a string as null-terminated UTF-16 for Win32 APIs.
 fn to_wide_null(s: &str) -> Vec<u16> {

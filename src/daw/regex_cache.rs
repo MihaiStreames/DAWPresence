@@ -5,21 +5,22 @@ use std::collections::HashMap;
 use fancy_regex::Regex;
 use tracing::error;
 
-const UNKNOWN_PROJECT: &str = "None";
+use super::status::UNKNOWN_PROJECT;
+use super::status::UNTITLED_PROJECT;
 
-pub(crate) struct RegexCache {
+pub(super) struct RegexCache {
     cache: HashMap<String, Option<Regex>>,
 }
 
 impl RegexCache {
-    pub(crate) fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self {
             cache: HashMap::new(),
         }
     }
 
     /// Extract project name from a window title using a cached compiled regex.
-    pub(crate) fn extract_project_name(&mut self, title: &str, pattern: &str) -> String {
+    pub(super) fn extract_project_name(&mut self, title: &str, pattern: &str) -> String {
         if title.is_empty() {
             return UNKNOWN_PROJECT.to_string();
         }
@@ -48,7 +49,7 @@ impl RegexCache {
             .or_else(|| captures.get(0))
             .map(|m| m.as_str().trim())
             .map(|s| s.trim_end_matches('*').trim())
-            .map(|s| if s.is_empty() { "Untitled" } else { s })
+            .map(|s| if s.is_empty() { UNTITLED_PROJECT } else { s })
             .map_or_else(|| UNKNOWN_PROJECT.to_string(), String::from)
     }
 }

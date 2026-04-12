@@ -1,9 +1,9 @@
 //! DAW detection domain: process scanning, status tracking, config loading.
 
-pub(crate) mod config;
+mod config;
 mod regex_cache;
-pub(crate) mod scanner;
-pub(crate) mod status;
+mod scanner;
+mod status;
 
 #[cfg(windows)]
 #[allow(unsafe_code)]
@@ -13,3 +13,6 @@ pub(crate) use config::ensure_daw_config;
 pub(crate) use config::load_configs;
 pub(crate) use scanner::DawScanner;
 pub(crate) use status::DawStatus;
+pub(crate) use status::UNKNOWN_PROJECT;
+pub(crate) use status::UNKNOWN_VERSION;
+pub(crate) use status::UNTITLED_PROJECT;

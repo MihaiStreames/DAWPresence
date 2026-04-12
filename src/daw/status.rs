@@ -3,6 +3,12 @@
 /// Placeholder when version cannot be read from a PE resource.
 pub(crate) const UNKNOWN_VERSION: &str = "0.0.0";
 
+/// Sentinel when no project name can be extracted from a window title.
+pub(crate) const UNKNOWN_PROJECT: &str = "None";
+
+/// Placeholder for an empty/untitled project.
+pub(crate) const UNTITLED_PROJECT: &str = "Untitled";
+
 /// Current state of a detected DAW.
 #[derive(Debug, Clone, Default)]
 pub(crate) struct DawStatus {
@@ -27,15 +33,10 @@ impl DawStatus {
 
     pub(crate) fn ram_usage_str(&self) -> String {
         if self.is_running {
-            let memory_kb = self.memory_mb.saturating_mul(1024);
-
-            if memory_kb >= 1024 * 1024 {
-                let memory_gb = memory_kb as f64 / (1024.0 * 1024.0);
-                format!("{memory_gb:.2}GB")
-            } else if memory_kb >= 1024 {
-                format!("{}MB", self.memory_mb)
+            if self.memory_mb >= 1024 {
+                format!("{:.2}GB", self.memory_mb as f64 / 1024.0)
             } else {
-                format!("{memory_kb}KB")
+                format!("{}MB", self.memory_mb)
             }
         } else {
             "Undefined".to_string()

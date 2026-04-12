@@ -8,9 +8,9 @@ use tray_icon::menu::Menu;
 use tray_icon::menu::MenuId;
 use tray_icon::menu::MenuItem;
 
+use super::icon::load_tray_icon;
 use crate::error::TrayError;
 use crate::settings::AppSettings;
-use crate::tray::icon::load_tray_icon;
 
 /// Map any Display error into `TrayError::CreateFailed`.
 fn create_err(error: impl std::fmt::Display) -> TrayError {

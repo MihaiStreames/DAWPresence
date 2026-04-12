@@ -1,28 +1,30 @@
 //! Discord Rich Presence data formatting.
 
 use crate::daw::DawStatus;
-use crate::daw::status::UNKNOWN_VERSION;
+use crate::daw::UNKNOWN_PROJECT;
+use crate::daw::UNKNOWN_VERSION;
+use crate::daw::UNTITLED_PROJECT;
 use crate::settings::AppSettings;
 use crate::version::APP_VERSION;
 
-/// Rich Presence data to display on Discord
-pub(crate) struct DiscordPresence {
-    pub(crate) details: String,
-    pub(crate) state: String,
-    pub(crate) large_image: String,
-    pub(crate) large_text: String,
+/// Rich Presence data to display on Discord.
+pub(super) struct DiscordPresence {
+    pub(super) details: String,
+    pub(super) state: String,
+    pub(super) large_image: String,
+    pub(super) large_text: String,
 }
 
 impl DiscordPresence {
-    /// Build presence from current DAW status
-    pub(crate) fn from_daw_status(daw_status: &DawStatus, settings: &AppSettings) -> Self {
+    /// Build presence from current DAW status.
+    pub(super) fn from_daw_status(daw_status: &DawStatus, settings: &AppSettings) -> Self {
         let project = if settings.hide_project_name {
             "(hidden)".to_string()
         } else {
             daw_status.project_name.clone()
         };
 
-        let details = if project == "None" || project == "Untitled" {
+        let details = if project == UNKNOWN_PROJECT || project == UNTITLED_PROJECT {
             "Opening an untitled project".to_string()
         } else {
             format!("Opening project: {project}")

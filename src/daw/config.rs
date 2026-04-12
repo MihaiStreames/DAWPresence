@@ -11,28 +11,28 @@ use crate::error::ConfigError;
 
 /// Versioned wrapper for the daws.json config file.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub(crate) struct DawConfigFile {
-    pub(crate) version: u32,
-    pub(crate) daws: Vec<DawConfig>,
+struct DawConfigFile {
+    version: u32,
+    daws: Vec<DawConfig>,
 }
 
 /// DAW configuration loaded from daws.json.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct DawConfig {
     #[serde(rename = "ProcessName")]
-    pub(crate) process_name: String,
+    process_name: String,
     #[serde(rename = "DisplayText")]
-    pub(crate) display_text: String,
+    display_text: String,
     #[serde(rename = "TitleRegex")]
-    pub(crate) title_regex: String,
+    title_regex: String,
     #[serde(rename = "ClientID")]
-    pub(crate) client_id: String,
+    client_id: String,
     #[serde(rename = "HideVersion")]
     #[serde(default)]
-    pub(crate) hide_version: bool,
+    hide_version: bool,
     #[serde(rename = "AdditionalProcessNames")]
     #[serde(default)]
-    pub(crate) additional_process_names: Vec<String>,
+    additional_process_names: Vec<String>,
 }
 
 /// Load DAW configs from a JSON file.
@@ -71,15 +71,15 @@ pub(crate) fn ensure_daw_config() -> Result<PathBuf, ConfigError> {
     Ok(daws_path)
 }
 
-/// Pre-normalized DAW config for fast matching during scanning
-pub(crate) struct NormalizedConfig {
+/// Pre-normalized DAW config for fast matching during scanning.
+pub(super) struct NormalizedConfig {
     config: DawConfig,
     normalized_name: String,
     additional_prefixes: Vec<String>,
 }
 
 impl NormalizedConfig {
-    pub(crate) fn from_configs(configs: Vec<DawConfig>) -> Vec<Self> {
+    pub(super) fn from_configs(configs: Vec<DawConfig>) -> Vec<Self> {
         configs
             .into_iter()
             .map(|config| {
@@ -100,7 +100,7 @@ impl NormalizedConfig {
     }
 
     /// Check if a normalized process name matches this config.
-    pub(crate) fn matches(&self, process_name: &str) -> bool {
+    pub(super) fn matches(&self, process_name: &str) -> bool {
         process_name.starts_with(&self.normalized_name)
             || self
                 .additional_prefixes
@@ -108,30 +108,27 @@ impl NormalizedConfig {
                 .any(|prefix| process_name.starts_with(prefix))
     }
 
-    pub(crate) fn display_text(&self) -> &str {
+    pub(super) fn display_text(&self) -> &str {
         &self.config.display_text
     }
 
-    pub(crate) fn title_regex(&self) -> &str {
+    pub(super) fn title_regex(&self) -> &str {
         &self.config.title_regex
     }
 
-    pub(crate) fn client_id(&self) -> &str {
+    pub(super) fn client_id(&self) -> &str {
         &self.config.client_id
     }
 
-    pub(crate) fn hide_version(&self) -> bool {
+    pub(super) fn hide_version(&self) -> bool {
         self.config.hide_version
     }
 }
 
-/// Normalize a process name for comparison (lowercase, strip .exe)
-pub(crate) fn normalize_process_name(name: &str) -> String {
-    name.trim()
-        .to_lowercase()
-        .strip_suffix(".exe")
-        .unwrap_or(name.trim())
-        .to_lowercase()
+/// Normalize a process name for comparison (lowercase, strip .exe).
+pub(super) fn normalize_process_name(name: &str) -> String {
+    let lower = name.trim().to_lowercase();
+    lower.strip_suffix(".exe").unwrap_or(&lower).to_string()
 }
 
 #[cfg(test)]

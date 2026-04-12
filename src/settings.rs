@@ -16,10 +16,14 @@ pub(crate) struct AppSettings {
     pub(crate) hide_project_name: bool,
     #[serde(default)]
     pub(crate) hide_system_usage: bool,
-    #[serde(default)]
+    #[serde(default = "default_close_to_tray")]
     pub(crate) close_to_tray: bool,
     #[serde(default = "default_update_interval")]
     pub(crate) update_interval: u64,
+}
+
+fn default_close_to_tray() -> bool {
+    true
 }
 
 fn default_update_interval() -> u64 {
@@ -39,7 +43,10 @@ impl Default for AppSettings {
 
 impl AppSettings {
     pub(crate) fn load() -> Self {
-        confy::load("dawpresence", None).unwrap_or_default()
+        confy::load("dawpresence", None).unwrap_or_else(|error| {
+            tracing::warn!("Couldn't load settings, using defaults: {error}");
+            Self::default()
+        })
     }
 
     pub(crate) fn save(&self) -> Result<(), ConfigError> {

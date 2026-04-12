@@ -38,9 +38,21 @@ Complete architecture rewrite with direct Win32 APIs, event-driven process monit
 
 - Stable Rust toolchain (dropped nightly requirement)
 - Split monolithic modules into focused files (20+ files, all under 250 lines)
-- Discord IPC uses single `Mutex<DiscordState>` with poison recovery (was three separate Mutexes)
-- Icon decoding cached via `LazyLock` (was re-decoded on every state change)
+- Discord IPC uses single mutex with poison recovery (was three separate mutexes)
+- Icon decoding cached (was re-decoded on every state change)
+- Tray and status icons are now circles with multi-size support for high-DPI displays
+- Interval modal shrinks when no validation error is shown
+- Click outside the interval modal to dismiss (warns if you have unsaved changes)
+- Faster DAW discovery when scanning running processes
 - Uninstaller removes settings and logs from `%APPDATA%`
+
+**Fixed:**
+
+- "Minimize to tray" defaulting to off when upgrading from older config files
+- Process exit detection could race with cleanup in rare timing conditions
+- RAM display logic had an unreachable code path
+- Tray icon thread not cleaning up properly on shutdown
+- Settings load errors were silently ignored (now logs a warning)
 
 **Removed:**
 

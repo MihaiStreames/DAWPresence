@@ -5,12 +5,11 @@
     windows_subsystem = "windows"
 )]
 
-mod app;
 mod daw;
 mod discord;
 mod error;
 mod settings;
-mod tray;
+mod state;
 mod ui;
 mod version;
 
@@ -20,7 +19,7 @@ use tracing::info;
 #[cfg(debug_assertions)]
 use tracing_subscriber::EnvFilter;
 
-use crate::tray::load_window_icon;
+use crate::ui::tray::load_window_icon;
 
 #[cfg(windows)]
 fn main() -> iced::Result {
@@ -30,9 +29,9 @@ fn main() -> iced::Result {
 
     let window_icon = load_window_icon().ok();
 
-    iced::application(app::boot, app::update, view)
+    iced::application(state::boot, state::update, view)
         .title("DAWPresence")
-        .subscription(app::subscription)
+        .subscription(state::subscription)
         .window(window::Settings {
             resizable: false,
             icon: window_icon,
@@ -62,6 +61,6 @@ fn init_logging() {
 fn init_logging() {}
 
 /// Render the main window content.
-fn view(state: &app::AppState) -> iced::Element<'_, app::Message> {
+fn view(state: &state::AppState) -> iced::Element<'_, state::Message> {
     ui::view(state)
 }

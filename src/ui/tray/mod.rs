@@ -3,8 +3,11 @@
 mod icon;
 mod menu;
 
+use std::sync::Arc;
 use std::sync::LazyLock;
 use std::sync::Mutex;
+use std::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering;
 use std::time::Duration;
 
 use crossbeam_channel::RecvTimeoutError;
@@ -13,11 +16,11 @@ pub(crate) use icon::load_window_icon;
 use tracing::warn;
 use tray_icon::menu::MenuEvent;
 
-use crate::app::Message;
-use crate::tray::icon::load_tray_icon;
-use crate::tray::menu::TrayMenuIds;
-use crate::tray::menu::create_tray_icon;
-use crate::tray::menu::pump_windows_messages;
+use self::icon::load_tray_icon;
+use self::menu::TrayMenuIds;
+use self::menu::create_tray_icon;
+use self::menu::pump_windows_messages;
+use crate::state::Message;
 
 static TRAY_UPDATES: LazyLock<(
     std::sync::mpsc::Sender<TrayUpdate>,
@@ -39,24 +42,41 @@ pub(crate) fn send_tray_update(update: TrayUpdate) {
     let _ = TRAY_UPDATES.0.send(update);
 }
 
-/// Bridge tray menu events into the app
+/// Bridge tray menu events into the app.
 pub(crate) fn tray_subscription() -> Subscription<Message> {
     Subscription::run(|| {
         iced::stream::channel::<Message>(
             100,
             |output: iced::futures::channel::mpsc::Sender<Message>| async move {
+                let shutdown = Arc::new(AtomicBool::new(false));
+                let shutdown_clone = Arc::clone(&shutdown);
+
                 std::thread::spawn(move || {
-                    run_tray_handling(output);
+                    run_tray_handling(output, &shutdown_clone);
                 });
 
+                // when iced drops this future, the guard signals the tray thread to exit
+                let _guard = ShutdownGuard(shutdown);
                 iced::futures::future::pending::<()>().await;
             },
         )
     })
 }
 
-/// Run tray icon handling in a separate thread
-fn run_tray_handling(mut output: iced::futures::channel::mpsc::Sender<Message>) {
+/// Sets the shutdown flag on drop so the tray thread exits cleanly.
+struct ShutdownGuard(Arc<AtomicBool>);
+
+impl Drop for ShutdownGuard {
+    fn drop(&mut self) {
+        self.0.store(true, Ordering::Relaxed);
+    }
+}
+
+/// Run tray icon handling in a separate thread.
+fn run_tray_handling(
+    mut output: iced::futures::channel::mpsc::Sender<Message>,
+    shutdown: &AtomicBool,
+) {
     let (tray_icon, menu_items) = match create_tray_icon() {
         Ok(tray) => tray,
 
@@ -67,7 +87,7 @@ fn run_tray_handling(mut output: iced::futures::channel::mpsc::Sender<Message>) 
     };
 
     let receiver = MenuEvent::receiver().clone();
-    loop {
+    while !shutdown.load(Ordering::Relaxed) {
         drain_tray_updates(&menu_items, &tray_icon);
         pump_windows_messages();
 
@@ -94,7 +114,12 @@ fn handle_tray_event(
     event: &tray_icon::menu::MenuEvent,
 ) -> bool {
     if event.id() == &menu_items.show {
-        return output.try_send(Message::TrayShow).is_err();
+        if output.try_send(Message::TrayShow).is_err() {
+            warn!("Tray channel closed, exiting tray loop");
+            return true;
+        }
+
+        return false;
     }
 
     if event.id() == &menu_items.quit {

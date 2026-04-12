@@ -10,7 +10,7 @@ use std::time::UNIX_EPOCH;
 use discord_rich_presence::DiscordIpc;
 use discord_rich_presence::DiscordIpcClient;
 use discord_rich_presence::activity;
-pub(crate) use presence::DiscordPresence;
+use presence::DiscordPresence;
 use tracing::debug;
 use tracing::error;
 use tracing::info;
@@ -91,7 +91,7 @@ impl DiscordManager {
     }
 
     /// Push presence to Discord, retrying once on connection failure.
-    pub(crate) fn update_presence(&self, presence: &DiscordPresence) -> Result<(), DiscordError> {
+    fn update_presence(&self, presence: &DiscordPresence) -> Result<(), DiscordError> {
         let mut s = self.lock();
 
         let timestamp = s.start_timestamp.unwrap_or_else(current_timestamp);

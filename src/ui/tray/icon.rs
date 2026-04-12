@@ -8,14 +8,14 @@ use tray_icon::Icon;
 use crate::error::TrayError;
 
 #[cfg(target_os = "windows")]
-const ICON_RED_DATA: &[u8] = include_bytes!("../assets/red.ico");
+const ICON_RED_DATA: &[u8] = include_bytes!("../../assets/red.ico");
 #[cfg(not(target_os = "windows"))]
-const ICON_RED_DATA: &[u8] = include_bytes!("../assets/red.png");
+const ICON_RED_DATA: &[u8] = include_bytes!("../../assets/red.png");
 
 #[cfg(target_os = "windows")]
-const ICON_GREEN_DATA: &[u8] = include_bytes!("../assets/green.ico");
+const ICON_GREEN_DATA: &[u8] = include_bytes!("../../assets/green.ico");
 #[cfg(not(target_os = "windows"))]
-const ICON_GREEN_DATA: &[u8] = include_bytes!("../assets/green.png");
+const ICON_GREEN_DATA: &[u8] = include_bytes!("../../assets/green.png");
 
 #[cfg(target_os = "windows")]
 const ICON_FORMAT: image::ImageFormat = image::ImageFormat::Ico;
@@ -44,7 +44,7 @@ fn cached_rgba(connected: bool) -> (Vec<u8>, u32, u32) {
 }
 
 /// Load tray icon from cached RGBA.
-pub(crate) fn load_tray_icon(connected: bool) -> Result<Icon, TrayError> {
+pub(super) fn load_tray_icon(connected: bool) -> Result<Icon, TrayError> {
     let (rgba, width, height) = cached_rgba(connected);
     Icon::from_rgba(rgba, width, height).map_err(|e| TrayError::IconFailed(e.to_string()))
 }

@@ -102,11 +102,17 @@ impl DawScanner {
     fn discover_and_attach(&mut self) -> Option<DawStatus> {
         let entries = process::snapshot();
 
+        // normalize once per entry, not once per (entry * config)
+        let normalized: Vec<(u32, String)> = entries
+            .iter()
+            .map(|e| (e.pid, normalize_process_name(&e.name)))
+            .collect();
+
         for (i, cfg) in self.configs.iter().enumerate() {
-            let pids: Vec<u32> = entries
+            let pids: Vec<u32> = normalized
                 .iter()
-                .filter(|e| cfg.matches(&normalize_process_name(&e.name)))
-                .map(|e| e.pid)
+                .filter(|(_, name)| cfg.matches(name))
+                .map(|(pid, _)| *pid)
                 .collect();
 
             if pids.is_empty() {
