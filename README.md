@@ -15,7 +15,7 @@
 <!-- PROJECT LOGO -->
 
 <div align="center">
-  <img src="assets/app/main.png" alt="DAWPresence" width="80" />
+  <img src="assets/app/main.png" alt="DAWPresence" width="120" />
   <h1>DAWPresence</h1>
 
   <h3 align="center">Show what you are creating on Discord.</h3>
