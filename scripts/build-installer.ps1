@@ -9,17 +9,9 @@ $IssPath = Join-Path $Root "installer\DAWPresence.iss"
 $Dist = Join-Path $Root "dist"
 $OutputDir = Join-Path $Root "installer\output"
 
-foreach ($renderer in @("tiny-skia", "wgpu")) {
-    $exeDir = Join-Path $Dist $renderer
-    New-Item -ItemType Directory -Force -Path $exeDir | Out-Null
-
-    $src = Join-Path $Dist "DAWPresence-$renderer.exe"
-    Copy-Item -Force $src (Join-Path $exeDir "DAWPresence.exe")
-
-    Write-Host "Building $renderer installer..."
-    iscc "/DAppVersion=$Version" "/DExeDir=..\dist\$renderer" "/DRenderer=$renderer" $IssPath
-    if ($LASTEXITCODE -ne 0) { throw "iscc failed for $renderer" }
-}
+Write-Host "Building installer..."
+iscc "/DAppVersion=$Version" "/DExeDir=..\dist" $IssPath
+if ($LASTEXITCODE -ne 0) { throw "iscc failed" }
 
 Get-ChildItem -Path $OutputDir -Filter "*.exe" |
     ForEach-Object {

@@ -1,7 +1,7 @@
 ; DAWPresence installer script.
 
-; Version, ExeDir, and Renderer are passed via /D flags:
-;   iscc /DAppVersion=2.2.0 /DExeDir=..\dist\tiny-skia /DRenderer=tiny-skia DAWPresence.iss
+; Version and ExeDir are passed via /D flags:
+;   iscc /DAppVersion=3.0.0 /DExeDir=..\dist DAWPresence.iss
 
 #ifndef ExeDir
   #define ExeDir "..\target\release"
@@ -9,10 +9,6 @@
 
 #ifndef AppVersion
   #define AppVersion "0.0.0"
-#endif
-
-#ifndef Renderer
-  #define Renderer "tiny-skia"
 #endif
 
 #define AppName "DAWPresence"
@@ -33,7 +29,7 @@ DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 LicenseFile=..\LICENSE
 OutputDir=output
-OutputBaseFilename=DAWPresence-{#AppVersion}-{#Renderer}-setup
+OutputBaseFilename=DAWPresence-{#AppVersion}-setup
 SetupIconFile=..\assets\app\main.ico
 UninstallDisplayIcon={app}\{#AppExeName}
 Compression=lzma2/ultra64
@@ -63,6 +59,10 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: deskto
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "{#AppName}"; ValueData: """{app}\{#AppExeName}"""; Flags: uninsdeletevalue; Tasks: autostart
+
+[Run]
+Filename: "{app}\{#AppExeName}"; Description: "Launch {#AppName}"; Flags: nowait postinstall skipifsilent
+Filename: "{#AppURL}"; Description: "Visit GitHub and leave a star!"; Flags: nowait postinstall skipifsilent shellexec unchecked
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{userappdata}\dawpresence"

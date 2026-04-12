@@ -15,6 +15,7 @@
 <!-- PROJECT LOGO -->
 
 <div align="center">
+  <img src="assets/app/main.png" alt="DAWPresence" width="80" />
   <h1>DAWPresence</h1>
 
   <h3 align="center">Show what you are creating on Discord.</h3>
@@ -51,7 +52,15 @@
 ## About The Project
 
 <div align="center">
-  <img src="./preview.png" alt="DAWPresence Preview" width="60%" />
+  <table><tr>
+    <td>
+      <img src="assets/home.png" alt="Home" width="100%" />
+      <img src="assets/settings.png" alt="Settings" width="100%" />
+    </td>
+    <td width="30%">
+      <img src="assets/preview.png" alt="Discord Preview" width="100%" />
+    </td>
+  </tr></table>
 </div>
 
 DAWPresence monitors your running DAW and displays what you're working on in your Discord profile. It detects your project name from the window title and updates your Rich Presence automatically.
@@ -92,20 +101,17 @@ If you want to help with Linux support, see [issue #1](https://github.com/MihaiS
 
 ### Installation
 
-Two renderer variants are available:
-
-| Variant       | Size    | Renderer                   |
-|---------------|---------|----------------------------|
-| **tiny-skia** | ~3.4 MB | CPU (software)             |
-| **wgpu**      | ~4.6 MB | GPU (hardware accelerated) |
-
 #### Installer (recommended)
 
 Download the setup exe from the [latest release](https://github.com/MihaiStreames/DAWPresence/releases/latest). The installer adds a start menu shortcut, optional desktop shortcut, and optional auto-start with Windows.
 
+> [**Download Installer**](https://github.com/MihaiStreames/DAWPresence/releases/latest)
+
 #### Portable
 
-Download the exe from the [latest release](https://github.com/MihaiStreames/DAWPresence/releases/latest) and run it directly. Settings are stored in `%APPDATA%\dawpresence`.
+Download `DAWPresence.exe` from the [latest release](https://github.com/MihaiStreames/DAWPresence/releases/latest) and run it directly. Settings are stored in `%APPDATA%\dawpresence`.
+
+> [**Download Portable**](https://github.com/MihaiStreames/DAWPresence/releases/latest)
 
 #### Building from source
 

@@ -10,6 +10,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#v301--fixes">v3.0.1</a></li>
     <li><a href="#v300--ui-redesign">v3.0.0</a></li>
     <li><a href="#v220--architecture-rewrite">v2.2.0</a></li>
     <li><a href="#v210--multi-process-daws">v2.1.0</a></li>
@@ -20,6 +21,15 @@
     <li><a href="#v100--initial-release">v1.0.0</a></li>
   </ol>
 </details>
+
+## v3.0.1 - Fixes
+
+**Fixed:**
+
+- Removed broken GPU renderer, single build only
+- Installer now offers to launch app after install
+
+<p align="right">(<a href="#changelog-top">back to top</a>)</p>
 
 ## v3.0.0 - UI redesign
 

@@ -1,6 +1,6 @@
 [package]
 name = "dawpresence"
-version = "3.0.0"
+version = "3.0.1"
 description = "Show what you are creating on Discord."
 authors = ["MihaiStreames <72852703+MihaiStreames@users.noreply.github.com>"]
 license = "MIT"
@@ -15,11 +15,6 @@ rust-version = "1.92"
 name = "DAWPresence"
 path = "src/main.rs"
 
-[features]
-default = ["renderer-tiny-skia"]
-renderer-tiny-skia = ["iced/tiny-skia"]
-renderer-wgpu = ["iced/wgpu-bare"]
-
 [dependencies]
 confy = "2.0.0"
 crossbeam-channel = "0.5.15"
@@ -32,6 +27,7 @@ fancy-regex = { version = "0.17.0", default-features = false, features = [
 iced = { version = "0.14.0", default-features = false, features = [
     "crisp",
     "smol",
+    "tiny-skia",
 ] }
 image = { version = "0.25.10", default-features = false, features = [
     "ico",

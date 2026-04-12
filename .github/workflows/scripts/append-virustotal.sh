@@ -9,15 +9,17 @@ ANALYSIS="${2:-}"
 
 BODY=$(gh release view "$TAG" --json body -q .body)
 
+# analysis output is comma-separated: file1=url1,file2=url2
 VT_SECTION=""
-while IFS= read -r line; do
-    [[ -z "$line" ]] && continue
-    FILE="${line%%=*}"
-    URL="${line#*=}"
+IFS=',' read -ra ENTRIES <<< "$ANALYSIS"
+for entry in "${ENTRIES[@]}"; do
+    [[ -z "$entry" ]] && continue
+    FILE="${entry%%=*}"
+    URL="${entry#*=}"
     BASENAME=$(basename "$FILE")
-    VT_SECTION="${VT_SECTION}- [${BASENAME}](${URL})\n"
-done <<< "$ANALYSIS"
+    VT_SECTION="${VT_SECTION}- [${BASENAME}](${URL})"$'\n'
+done
 
-printf '%s\n\n---\n\n### VirusTotal Analysis\n\n%b\n' "$BODY" "$VT_SECTION" > body.md
+printf '%s\n\n---\n\n### VirusTotal Analysis\n\n%s\n' "$BODY" "$VT_SECTION" > body.md
 gh release edit "$TAG" --notes-file body.md
 rm -f body.md
