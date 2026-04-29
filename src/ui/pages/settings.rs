@@ -1,5 +1,3 @@
-//! Settings page with grouped togglers and inline interval editor.
-
 use iced::widget::column;
 use iced::widget::container;
 use iced::widget::scrollable;

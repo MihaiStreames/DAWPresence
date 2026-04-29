@@ -1,5 +1,3 @@
-//! Stat card component with accent header and bordered container.
-
 use iced::Border;
 use iced::Length;
 use iced::widget::column;
@@ -17,8 +15,8 @@ pub(in crate::ui) fn stat_card(
     let label = text(title)
         .size(style::TEXT_LABEL)
         .color(style::COLOR_ACCENT);
-    let value = text(value).size(style::TEXT_LABEL);
 
+    let value = text(value).size(style::TEXT_LABEL);
     let card = column(vec![label.into(), value.into()]).spacing(style::SPACING_TIGHT);
 
     container(card)

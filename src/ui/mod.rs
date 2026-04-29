@@ -1,5 +1,3 @@
-//! Application layout: sidebar + page routing.
-
 mod components;
 mod pages;
 mod strings;

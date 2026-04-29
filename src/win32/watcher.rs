@@ -1,5 +1,3 @@
-//! Process exit detection via RegisterWaitForSingleObject.
-
 use std::ffi::c_void;
 
 use crossbeam_channel::Receiver;
@@ -62,16 +60,15 @@ impl ExitChannel {
 /// No-op if handle is null.
 pub(crate) fn unregister(wait_handle: HANDLE) {
     if !wait_handle.is_null() {
-        // SAFETY: wait_handle is from RegisterWaitForSingleObject.
+        // SAFETY: wait_handle is from RegisterWaitForSingleObject;
         // INVALID_HANDLE_VALUE makes UnregisterWaitEx block until the callback finishes,
-        // preventing use-after-free if the callback is mid-execution during drop.
+        // preventing use-after-free if the callback is mid-execution during drop
         unsafe {
             UnregisterWaitEx(wait_handle, INVALID_HANDLE_VALUE);
         }
     }
 }
 
-/// NT threadpool callback fired when the watched process exits.
 unsafe extern "system" fn exit_callback(ctx: *mut c_void, _timed_out: bool) {
     if ctx.is_null() {
         return;

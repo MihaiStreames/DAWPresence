@@ -1,5 +1,3 @@
-//! Win32 FFI wrappers for process, window, version, registry, and watcher operations.
-
 pub(crate) mod autostart;
 pub(crate) mod handle;
 pub(crate) mod process;

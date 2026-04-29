@@ -1,5 +1,3 @@
-//! Win32 process enumeration and metrics.
-
 use std::mem::size_of;
 use std::mem::zeroed;
 use std::path::PathBuf;
@@ -46,6 +44,7 @@ pub(crate) fn snapshot() -> Vec<ProcessEntry> {
     }
 
     let mut entries = Vec::new();
+
     loop {
         let name_len = entry
             .szExeFile

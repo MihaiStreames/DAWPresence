@@ -1,5 +1,3 @@
-//! Setting toggle component with label, description, and accent toggler.
-
 use iced::Background;
 use iced::Color;
 use iced::Length;

@@ -1,5 +1,3 @@
-//! Labeled input field with inline button and feedback text.
-
 use iced::Border;
 use iced::Length;
 use iced::widget::button;
@@ -71,6 +69,7 @@ pub(in crate::ui) fn labeled_input<'a>(
 
 fn input_style(theme: &iced::Theme, status: text_input::Status) -> text_input::Style {
     let palette = theme.palette();
+
     let border_color = match status {
         text_input::Status::Active => style::COLOR_TEXT_DIM,
         text_input::Status::Hovered => style::COLOR_ACCENT,

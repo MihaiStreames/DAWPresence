@@ -1,5 +1,3 @@
-//! DAW configuration types and daws.json loading.
-
 use std::path::Path;
 use std::path::PathBuf;
 
@@ -84,6 +82,7 @@ impl NormalizedConfig {
             .into_iter()
             .map(|config| {
                 let normalized_name = normalize_process_name(&config.process_name);
+
                 let additional_prefixes = config
                     .additional_process_names
                     .iter()

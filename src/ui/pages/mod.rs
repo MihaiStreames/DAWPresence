@@ -1,5 +1,3 @@
-//! Application pages.
-
 mod home;
 mod settings;
 

@@ -1,5 +1,3 @@
-//! RAII wrapper for Win32 HANDLE.
-
 use windows_sys::Win32::Foundation::CloseHandle;
 use windows_sys::Win32::Foundation::HANDLE;
 use windows_sys::Win32::Foundation::INVALID_HANDLE_VALUE;

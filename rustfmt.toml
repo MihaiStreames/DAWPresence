@@ -5,16 +5,13 @@ hard_tabs = false
 tab_spaces = 4
 newline_style = "Unix"
 
-# import handling (closest to isort)
 reorder_imports = true
 reorder_modules = true
 imports_granularity = "Item"
 group_imports = "StdExternalCrate"
 
-# trailing commas similar to ruff default
 trailing_comma = "Vertical"
 
-# formatting behavior
 use_small_heuristics = "Default"
 format_code_in_doc_comments = true
 wrap_comments = true

@@ -1,9 +1,3 @@
-//! Two-phase DAW scanner with event-driven exit detection.
-//!
-//! **Discovery**: polls process list via CreateToolhelp32Snapshot.
-//! **Monitoring**: reads CPU/RAM/title for tracked PIDs.
-//! Exit detection via RegisterWaitForSingleObject (NT threadpool, zero CPU idle).
-
 use std::thread;
 
 use tracing::debug;
@@ -142,7 +136,6 @@ impl DawScanner {
                 && let Some(path) = process::exe_path(handle.raw())
             {
                 let v = version::exe_version(&path);
-
                 if !v.is_empty() && v != UNKNOWN_VERSION {
                     cached_version = v;
                 }
@@ -216,7 +209,6 @@ impl DawScanner {
     }
 }
 
-/// Per-process CPU usage as a percentage, updating baseline times in place.
 fn calculate_cpu_percent(process: &mut TrackedProcess, cpu_count: usize) -> f32 {
     let Some((kernel, user)) = process::cpu_times(process.handle.raw()) else {
         return 0.0;

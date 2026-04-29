@@ -1,5 +1,3 @@
-//! DAW detection domain: process scanning, status tracking, config loading.
-
 mod config;
 mod regex_cache;
 mod scanner;

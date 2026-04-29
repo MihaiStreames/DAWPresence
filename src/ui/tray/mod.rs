@@ -1,5 +1,3 @@
-//! System tray icon, menu, and event handling.
-
 mod icon;
 mod menu;
 
@@ -73,7 +71,6 @@ impl Drop for ShutdownGuard {
     }
 }
 
-/// Run tray icon handling in a separate thread.
 fn run_tray_handling(
     mut output: iced::futures::channel::mpsc::Sender<Message>,
     shutdown: &AtomicBool,
@@ -88,6 +85,7 @@ fn run_tray_handling(
     };
 
     let receiver = MenuEvent::receiver().clone();
+
     while !shutdown.load(Ordering::Relaxed) {
         drain_tray_updates(&menu_items, &tray_icon);
         pump_windows_messages();
@@ -108,7 +106,6 @@ fn run_tray_handling(
     drop(tray_icon);
 }
 
-/// Handle tray menu events and return true if the tray loop should exit
 fn handle_tray_event(
     menu_items: &TrayMenuIds,
     output: &mut iced::futures::channel::mpsc::Sender<Message>,
@@ -116,6 +113,7 @@ fn handle_tray_event(
 ) -> bool {
     if event.id() == &menu_items.show {
         debug!("Tray: show requested");
+
         if output.try_send(Message::TrayShow).is_err() {
             warn!("Tray channel closed, exiting tray loop");
             return true;
@@ -145,7 +143,6 @@ fn handle_tray_event(
     false
 }
 
-/// Apply any pending tray updates to the menu items
 fn drain_tray_updates(menu_items: &TrayMenuIds, tray_icon: &tray_icon::TrayIcon) {
     let Ok(receiver) = TRAY_UPDATES.1.lock() else {
         return;

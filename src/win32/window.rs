@@ -1,5 +1,3 @@
-//! Window title extraction via EnumWindows.
-
 use std::ffi::OsString;
 use std::os::windows::ffi::OsStringExt;
 

@@ -1,5 +1,3 @@
-//! Compiled regex cache for window title pattern extraction.
-
 use std::collections::HashMap;
 
 use fancy_regex::Regex;

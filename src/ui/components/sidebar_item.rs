@@ -1,5 +1,3 @@
-//! Sidebar navigation item with accent indicator.
-
 use iced::Length;
 use iced::widget::button;
 use iced::widget::container;
@@ -42,7 +40,6 @@ pub(in crate::ui) fn sidebar_item(
         .style(item_style);
 
     let content = row(vec![accent.into(), label.into()]).height(Length::Shrink);
-
     button(content)
         .padding(0)
         .on_press(Message::NavigateTo(page))

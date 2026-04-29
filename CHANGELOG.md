@@ -1,41 +1,17 @@
-<a id="changelog-top"></a>
+# Changelog
 
-<div align="center">
-  <h1>Changelog</h1>
+All notable changes to DAWPresence.
 
-  <h3>All notable changes to DAWPresence</h3>
+## [3.0.1] - 2026-04-12
 
-</div>
-
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li><a href="#v301--fixes">v3.0.1</a></li>
-    <li><a href="#v300--ui-redesign">v3.0.0</a></li>
-    <li><a href="#v220--architecture-rewrite">v2.2.0</a></li>
-    <li><a href="#v210--multi-process-daws">v2.1.0</a></li>
-    <li><a href="#v201--size-and-memory-optimizations">v2.0.1</a></li>
-    <li><a href="#v200--first-functional-rust-release">v2.0.0</a></li>
-    <li><a href="#v102--bugfixes">v1.0.2</a></li>
-    <li><a href="#v101--rust-rewrite">v1.0.1</a></li>
-    <li><a href="#v100--initial-release">v1.0.0</a></li>
-  </ol>
-</details>
-
-## v3.0.1 - Fixes
-
-**Fixed:**
+### Fixed
 
 - Removed broken GPU renderer, single build only
 - Installer now offers to launch app after install
 
-<p align="right">(<a href="#changelog-top">back to top</a>)</p>
+## [3.0.0] - 2026-04-12
 
-## v3.0.0 - UI redesign
-
-New UI with sidebar navigation, settings page, and several new features.
-
-**New stuff:**
+### Added
 
 - Sidebar with Home and Settings pages
 - Settings page with togglers and inline interval editor
@@ -44,27 +20,21 @@ New UI with sidebar navigation, settings page, and several new features.
 - App icon embedded in exe and shown in taskbar/titlebar
 - Dual renderer builds: tiny-skia (CPU, ~3.4 MB) and wgpu (GPU, ~4.6 MB)
 
-**Changed:**
+### Changed
 
 - Blue accent color scheme throughout the app
 - Smaller binary (trimmed dependencies, switched async executor)
 - Cleaner debug logging (app-only by default, no framework noise)
 
-**Fixed:**
+### Fixed
 
 - Unnecessary Discord disconnects when no DAW running
 
-<p align="right">(<a href="#changelog-top">back to top</a>)</p>
+## [2.2.0] - skipped
 
-## v2.2.0 - Architecture rewrite (skipped)
+v2.2.0 was not released due to installer build issues. All changes are included in v3.0.0.
 
-> v2.2.0 was not released due to installer build issues. All changes are included in v3.0.0.
-
-## v2.2.0 changes - Architecture rewrite
-
-Complete architecture rewrite with direct Win32 APIs, event-driven process monitoring, and a Windows installer.
-
-**New stuff:**
+### Added
 
 - Windows installer (Inno Setup) with start menu shortcut, desktop shortcut, auto-start option, and uninstaller
 - Direct Win32 process monitoring via `CreateToolhelp32Snapshot` (replaces `sysinfo` crate)
@@ -74,7 +44,7 @@ Complete architecture rewrite with direct Win32 APIs, event-driven process monit
 - Pre-normalized DAW configs - process names lowercased and stripped at startup
 - 28 unit tests covering config parsing, regex extraction, process matching, status formatting
 
-**Changed:**
+### Changed
 
 - Stable Rust toolchain (dropped nightly requirement)
 - Split monolithic modules into focused files (20+ files, all under 250 lines)
@@ -86,7 +56,7 @@ Complete architecture rewrite with direct Win32 APIs, event-driven process monit
 - Faster DAW discovery when scanning running processes
 - Uninstaller removes settings and logs from `%APPDATA%`
 
-**Fixed:**
+### Fixed
 
 - "Minimize to tray" defaulting to off when upgrading from older config files
 - Process exit detection could race with cleanup in rare timing conditions
@@ -94,80 +64,62 @@ Complete architecture rewrite with direct Win32 APIs, event-driven process monit
 - Tray icon thread not cleaning up properly on shutdown
 - Settings load errors were silently ignored (now logs a warning)
 
-**Removed:**
+### Removed
 
 - `sysinfo` dependency (replaced by direct Win32 APIs)
 - Nightly Rust requirement (`generic_const_exprs`)
 - Platform stubs (`unsupported.rs`)
 
-<p align="right">(<a href="#changelog-top">back to top</a>)</p>
+## [2.1.0] - 2026-04-11
 
-## v2.1.0 - Multi-process DAWs
-
-Fixes Bitwig Studio (and other multi-process DAWs) showing incorrect stats.
-
-**New stuff:**
+### Added
 
 - `AdditionalProcessNames` config field for multi-process DAWs (prefix matching)
 - Versioned `daws.json` format - auto-updates local config when a new version ships
 - Window icon shows Discord connection state (red/green)
 
-**Fixed:**
-
-- Bitwig Studio now aggregates CPU/RAM across all processes (main UI, audio engine, plugin hosts)
-
-**Changed:**
+### Changed
 
 - Extracted `app.rs` from `main.rs` for cleaner MVU separation
 - Stricter clippy linting (`pub` to `pub(crate)`, unsafe blocks in unsafe fns)
 
-<p align="right">(<a href="#changelog-top">back to top</a>)</p>
+### Fixed
 
-## v2.0.1 - Size and memory optimizations
+- Bitwig Studio now aggregates CPU/RAM across all processes (main UI, audio engine, plugin hosts)
 
-Leaned hard on size and idle RAM reductions for Windows builds.
+## [2.0.1] - 2026-01-01
 
-**Changed:**
+### Changed
 
 - Release builds strip logging and favor smaller binaries
 - Process monitoring refreshes only the data we use
 
-**Performance:**
+### Performance
 
 - Binary size: ~36 MB -> ~17 MB -> ~4 MB
 - RAM usage: ~70 MB+ -> ~7 MB
 
-<p align="right">(<a href="#changelog-top">back to top</a>)</p>
+## [2.0.0] - 2026-01-01
 
-## v2.0.0 - First functional Rust release
-
-The Rust rewrite is now fully functional. All DAW project names are detected correctly on Windows 10 and 11.
-
-**Fixed:**
+### Fixed
 
 - Project name detection now works on all Windows versions (fixes #2)
 - Switched from `regex` to `fancy-regex` crate (the old crate doesn't support lookaheads)
 
-<p align="right">(<a href="#changelog-top">back to top</a>)</p>
+## [1.0.2] - 2026-01-01
 
-## v1.0.2 - Bugfixes
-
-Bug fixes for tray icon responsiveness and window title detection.
-
-**Fixed:**
+### Fixed
 
 - Tray icon stays responsive by pumping Windows messages in the event loop
 - Window title detection no longer requires `IsWindowEnabled` check
 - Dynamic buffer size for window titles via `GetWindowTextLengthW`
 - Skip windows with empty titles early
 
-<p align="right">(<a href="#changelog-top">back to top</a>)</p>
-
-## v1.0.1 - Rust rewrite
+## [1.0.1] - 2026-01-01
 
 Complete rewrite from Python to Rust. Same functionality, faster, smaller, no runtime dependencies.
 
-**New stuff:**
+### Added
 
 - Single standalone `.exe` - no Python or dependencies needed
 - Native Windows GUI using iced
@@ -175,28 +127,18 @@ Complete rewrite from Python to Rust. Same functionality, faster, smaller, no ru
 - Persistent settings via `confy` (stored in `%APPDATA%`)
 - Cross-compilation support from Linux
 
-**Removed:**
+### Removed
 
 - Python codebase, PyInstaller build system, all Python dependencies
 
-<p align="right">(<a href="#changelog-top">back to top</a>)</p>
+## [1.0.0] - 2025-09-22
 
-## v1.0.0 - Initial release
+Initial Python release. A rewrite of [Serena1432's DAWRPC](https://github.com/Serena1432/DAWRPC).
 
-Python version. A rewrite of [Serena1432's DAWRPC](https://github.com/Serena1432/DAWRPC).
-
-**Features:**
+### Added
 
 - Discord Rich Presence for FL Studio, Ableton Live, REAPER, Bitwig Studio, Studio One, LMMS, and Cubase
 - Automatic DAW detection via process monitoring
 - Project name extraction from window titles using regex
 - System tray icon with status indicator
 - Configurable refresh interval
-
-<p align="right">(<a href="#changelog-top">back to top</a>)</p>
-
----
-
-<div align="center">
-  <p>Back to <a href="README.md">README</a>?</p>
-</div>

@@ -1,5 +1,3 @@
-//! Message handlers for application state updates.
-
 use iced::Task;
 use iced::window;
 use tracing::debug;

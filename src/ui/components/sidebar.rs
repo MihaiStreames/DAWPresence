@@ -1,5 +1,3 @@
-//! Sidebar navigation panel.
-
 use iced::Length;
 use iced::widget::column;
 use iced::widget::container;

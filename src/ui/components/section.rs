@@ -1,5 +1,3 @@
-//! Section heading component for settings groups.
-
 use iced::widget::container;
 use iced::widget::text;
 

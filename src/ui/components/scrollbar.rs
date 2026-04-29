@@ -1,5 +1,3 @@
-//! Accent-colored scrollbar style.
-
 use iced::Background;
 use iced::Border;
 use iced::widget::scrollable;

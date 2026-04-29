@@ -1,5 +1,3 @@
-//! Discord connection status icon.
-
 use iced::Background;
 use iced::Border;
 use iced::Length;

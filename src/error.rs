@@ -1,5 +1,3 @@
-//! Application error types.
-
 use thiserror::Error;
 
 /// Configuration loading and validation errors.

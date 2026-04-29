@@ -1,5 +1,3 @@
-//! Tray menu creation and Windows message pump.
-
 use tray_icon::Icon;
 use tray_icon::TrayIcon;
 use tray_icon::TrayIconBuilder;
@@ -28,18 +26,21 @@ pub(super) struct TrayMenuIds {
 pub(super) fn create_tray_icon() -> Result<(TrayIcon, TrayMenuIds), crate::error::TrayError> {
     let settings = AppSettings::load();
     let menu = Menu::new();
+
     let hide_project = CheckMenuItem::new(
         strings::HIDE_PROJECT_NAME,
         true,
         settings.hide_project_name,
         None,
     );
+
     let hide_system = CheckMenuItem::new(
         strings::HIDE_SYSTEM_USAGE,
         true,
         settings.hide_system_usage,
         None,
     );
+
     let show = MenuItem::new(strings::TRAY_SHOW, true, None);
     let quit = MenuItem::new(strings::TRAY_QUIT, true, None);
 

@@ -1,9 +1,10 @@
-//! DAWPresence entry point, logging setup, and Iced wiring.
-
 #![cfg_attr(
     all(target_os = "windows", not(debug_assertions)),
     windows_subsystem = "windows"
 )]
+
+#[cfg(not(windows))]
+compile_error!("DAWPresence is Windows-only");
 
 mod daw;
 mod discord;
@@ -46,12 +47,6 @@ fn main() -> iced::Result {
         .run()
 }
 
-#[cfg(not(windows))]
-fn main() -> ! {
-    eprintln!("DAWPresence is Windows-only (for now)");
-    std::process::exit(1);
-}
-
 #[cfg(debug_assertions)]
 fn init_logging() {
     tracing_subscriber::fmt()
@@ -65,7 +60,6 @@ fn init_logging() {
 #[cfg(not(debug_assertions))]
 fn init_logging() {}
 
-/// Render the main window content.
 fn view(state: &state::AppState) -> iced::Element<'_, state::Message> {
     ui::view(state)
 }

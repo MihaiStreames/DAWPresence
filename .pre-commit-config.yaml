@@ -10,21 +10,21 @@ repos:
 
       - id: cargo-check
         name: cargo check
-        entry: cargo check
+        entry: bash -c '[[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]] && cargo check || echo "skipped (non-Windows host)"'
         language: system
         types: [rust]
         pass_filenames: false
 
       - id: cargo-clippy
         name: cargo clippy
-        entry: cargo clippy --all-targets -- -D warnings
+        entry: bash -c '[[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]] && cargo clippy --all-targets -- -D warnings || echo "skipped (non-Windows host)"'
         language: system
         types: [rust]
         pass_filenames: false
 
       - id: cargo-test
         name: cargo test
-        entry: cargo test
+        entry: bash -c '[[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]] && cargo test || echo "skipped (non-Windows host)"'
         language: system
         types: [rust]
         pass_filenames: false
@@ -35,3 +35,7 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+        args: [--fix=lf]

@@ -1,11 +1,11 @@
-//! User settings with confy persistence.
-
 use serde::Deserialize;
 use serde::Serialize;
 
 use crate::error::ConfigError;
 
 const DEFAULT_UPDATE_INTERVAL: u64 = 2500;
+const MIN_UPDATE_INTERVAL: u64 = 1000;
+const MAX_UPDATE_INTERVAL: u64 = 100_000_000;
 
 /// Controls when the Discord presence timer resets.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -16,8 +16,6 @@ pub(crate) enum TimerMode {
     /// Timer resets when project name changes.
     Project,
 }
-const MIN_UPDATE_INTERVAL: u64 = 1000;
-const MAX_UPDATE_INTERVAL: u64 = 100_000_000;
 
 /// User preferences persisted via confy.
 #[derive(Debug, Clone, Serialize, Deserialize)]

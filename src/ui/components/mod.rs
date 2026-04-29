@@ -1,5 +1,3 @@
-//! Reusable UI components with self-contained styles.
-
 mod button;
 mod card;
 mod input;

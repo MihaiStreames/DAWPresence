@@ -1,12 +1,5 @@
-//! DAW status data type and display formatting.
-
-/// Placeholder when version cannot be read from a PE resource.
 pub(crate) const UNKNOWN_VERSION: &str = "0.0.0";
-
-/// Sentinel when no project name can be extracted from a window title.
 pub(crate) const UNKNOWN_PROJECT: &str = "None";
-
-/// Placeholder for an empty/untitled project.
 pub(crate) const UNTITLED_PROJECT: &str = "Untitled";
 
 /// Current state of a detected DAW.

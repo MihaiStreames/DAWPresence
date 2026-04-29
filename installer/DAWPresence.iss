@@ -1,5 +1,3 @@
-; DAWPresence installer script.
-
 ; Version and ExeDir are passed via /D flags:
 ;   iscc /DAppVersion=3.0.0 /DExeDir=..\dist DAWPresence.iss
 

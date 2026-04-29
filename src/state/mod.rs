@@ -1,5 +1,3 @@
-//! Application state machine.
-
 mod handlers;
 
 use std::time::Duration;
@@ -78,8 +76,10 @@ pub(crate) fn boot() -> (AppState, Task<Message>) {
     };
 
     let auto_start_enabled = crate::win32::autostart::is_enabled();
+
     let settings = AppSettings::load();
     let update_interval_input = settings.update_interval.to_string();
+
     let daw_scanner = config_path.and_then(|path| {
         crate::daw::load_configs(&path)
             .map(DawScanner::new)

@@ -1,5 +1,3 @@
-//! Discord IPC connection lifecycle.
-
 mod presence;
 
 use std::sync::Mutex;

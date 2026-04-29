@@ -1,5 +1,3 @@
-//! Discord Rich Presence data formatting.
-
 use crate::daw::DawStatus;
 use crate::daw::UNKNOWN_PROJECT;
 use crate::daw::UNKNOWN_VERSION;

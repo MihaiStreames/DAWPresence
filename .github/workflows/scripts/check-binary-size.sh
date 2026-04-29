@@ -10,6 +10,6 @@ LIMIT=$((MAX_MB * 1024 * 1024))
 echo "Binary size: ${SIZE} bytes (limit: ${LIMIT} bytes)"
 
 if [[ "$SIZE" -gt "$LIMIT" ]]; then
-    echo "Binary too large: ${SIZE} bytes (limit: ${LIMIT} bytes)"
-    exit 1
+  echo "Binary too large: ${SIZE} bytes (limit: ${LIMIT} bytes)"
+  exit 1
 fi

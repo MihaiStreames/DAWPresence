@@ -1,5 +1,3 @@
-//! Home panel with stat cards and status icon.
-
 use iced::alignment;
 use iced::widget::column;
 use iced::widget::row;

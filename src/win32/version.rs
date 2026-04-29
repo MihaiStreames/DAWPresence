@@ -1,5 +1,3 @@
-//! Executable version extraction via GetFileVersionInfo.
-
 use std::os::windows::ffi::OsStrExt;
 use std::path::Path;
 
@@ -35,7 +33,6 @@ pub(crate) fn exe_version(path: &Path) -> String {
         .unwrap_or_else(|| UNKNOWN_VERSION.to_string())
 }
 
-/// Load the raw version info block from a PE file.
 fn load_version_info(path_wide: &[u16]) -> Option<Vec<u8>> {
     // SAFETY: path_wide is null-terminated, handle is out-param
     let mut handle: u32 = 0;
@@ -55,7 +52,6 @@ fn load_version_info(path_wide: &[u16]) -> Option<Vec<u8>> {
     Some(data)
 }
 
-/// Extract the language/codepage pair from the version info translation table.
 fn parse_translation(data: &[u8], data_range: &std::ops::Range<usize>) -> Option<(u16, u16)> {
     let query = to_wide_null("\\VarFileInfo\\Translation");
 
@@ -80,7 +76,6 @@ fn parse_translation(data: &[u8], data_range: &std::ops::Range<usize>) -> Option
     Some((translation[0], translation[1]))
 }
 
-/// Query the ProductVersion string using a specific language/codepage.
 fn query_version_string(
     data: &[u8],
     data_range: &std::ops::Range<usize>,

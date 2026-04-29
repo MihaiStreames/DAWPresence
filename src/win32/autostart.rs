@@ -1,5 +1,3 @@
-//! Windows auto-start via HKCU Run registry key.
-
 use tracing::trace;
 use tracing::warn;
 use windows_sys::Win32::Foundation::ERROR_SUCCESS;

@@ -15,12 +15,12 @@ jobs:
     steps:
       - uses: actions/first-interaction@v3
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          issue-message: |
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          issue_message: |
             Hey, thanks for opening your first issue!
 
             I'll take a look soon. Just make sure you've included the info in the template (OS, DAW, version, logs if you can).
-          pr-message: |
+          pr_message: |
             Hey, thanks for your first PR!
 
             I'll review it soon. Just make sure CI passes and you've run `cargo fmt` + `cargo clippy`.

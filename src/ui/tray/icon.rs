@@ -1,5 +1,3 @@
-//! Tray and window icon loading with LazyLock caching.
-
 use std::sync::LazyLock;
 
 use iced::window;
@@ -27,7 +25,7 @@ const ICON_FORMAT: image::ImageFormat = image::ImageFormat::Ico;
 #[cfg(not(target_os = "windows"))]
 const ICON_FORMAT: image::ImageFormat = image::ImageFormat::Png;
 
-/// Cached decoded RGBA pixels (decoded once, cloned on each use)
+// cached decoded RGBA pixels (decoded once, cloned on each use)
 static ICON_RED_RGBA: LazyLock<(Vec<u8>, u32, u32)> = LazyLock::new(|| decode_icon(ICON_RED_DATA));
 static ICON_BLUE_RGBA: LazyLock<(Vec<u8>, u32, u32)> =
     LazyLock::new(|| decode_icon(ICON_BLUE_DATA));
