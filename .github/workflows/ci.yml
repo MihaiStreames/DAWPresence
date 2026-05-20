@@ -4,16 +4,16 @@ on:
   push:
     branches: [master]
     paths:
-      - "**.rs"
-      - "Cargo.toml"
-      - "Cargo.lock"
-      - "daws.json"
+      - '**.rs'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'daws.json'
   pull_request:
     paths:
-      - "**.rs"
-      - "Cargo.toml"
-      - "Cargo.lock"
-      - "daws.json"
+      - '**.rs'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'daws.json'
 
 permissions: {}
 
