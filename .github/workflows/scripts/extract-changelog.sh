@@ -16,8 +16,7 @@ section="$(awk -v ver="$VERSION" '
     if (index($0, "[" ver "]")) { found=1; next }
   }
   found { print }
-' "$CHANGELOG" \
-	| sed -e :a -e '/^[[:space:]]*$/{ $d; N; ba; }')"
+' "$CHANGELOG" | sed -e :a -e '/^[[:space:]]*$/{ $d; N; ba; }')"
 
 if [[ -z "$section" ]]; then
   echo "Failed to extract release notes for '$VERSION' from $CHANGELOG" >&2

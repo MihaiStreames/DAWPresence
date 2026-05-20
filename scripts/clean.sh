@@ -1,13 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$ROOT_DIR"
+usage() {
+  echo "Usage: $(basename "$0") [-a|--all] [-h|--help]"
+  echo ""
+  echo "Options:"
+  echo "  -a, --all   remove target and installer output"
+  echo "  -h, --help  show this message"
+}
 
-echo "Cleaning build artifacts..."
-cargo clean
+ALL=false
+for arg in "$@"; do
+  case "$arg" in
+    -a|--all)  ALL=true ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "Error: unknown option '$arg'"; usage; exit 1 ;;
+  esac
+done
 
-if [[ -d dist ]]; then
-  rm -rf dist
-  echo "Removed dist/"
+cd "$(dirname "$0")/.."
+
+[[ -d dist ]] && echo "dist" && rm -rf dist
+
+if [[ "$ALL" == true ]]; then
+  [[ -d installer/Output ]] && echo "installer/Output" && rm -rf installer/Output
+  cargo clean
 fi
+
+echo "Clean complete"

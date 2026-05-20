@@ -1,4 +1,4 @@
-# DAWPresence
+# <img src="https://github.com/MihaiStreames/DAWPresence/raw/master/assets/app/icon.png?raw=true" alt="DAWPresence icon" height="28" width="28"> DAWPresence
 
 DAWPresence shows what you are creating on Discord. It monitors your running DAW, extracts the project name from the window title, and updates your Rich Presence automatically. Ships as a tiny Windows binary (under 5 MB, zero runtime deps) with an iced GUI and a system tray icon.
 

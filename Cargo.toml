@@ -20,41 +20,39 @@ confy = "2.0.0"
 crossbeam-channel = "0.5.15"
 discord-rich-presence = "1.1.0"
 fancy-regex = { version = "0.18.0", default-features = false, features = [
-    "std",
-    "unicode",
-    "variable-lookbehinds"
+  "std",
+  "unicode",
+  "variable-lookbehinds",
 ] }
 iced = { version = "0.14.0", default-features = false, features = [
-    "crisp",
-    "smol",
-    "tiny-skia",
+  "crisp",
+  "smol",
+  "tiny-skia",
 ] }
 image = { version = "0.25.10", default-features = false, features = [
-    "ico",
-    "png",
+  "ico",
+  "png",
 ] }
-serde = { version = "1.0.228", features = [
-    "derive"
-] }
+serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 thiserror = "2.0.18"
 tracing = { version = "0.1.44", features = ["release_max_level_off"] }
 tracing-subscriber = { version = "0.3.23", default-features = false, features = [
-    "fmt",
-    "env-filter",
-    "smallvec"
+  "fmt",
+  "env-filter",
+  "smallvec",
 ] }
 tray-icon = "0.24.0"
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.61.2", features = [
-    "Win32_Foundation",
-    "Win32_UI_WindowsAndMessaging",
-    "Win32_System_Threading",
-    "Win32_System_ProcessStatus",
-    "Win32_System_Diagnostics_ToolHelp",
-    "Win32_Storage_FileSystem",
-    "Win32_System_Registry",
+  "Win32_Foundation",
+  "Win32_UI_WindowsAndMessaging",
+  "Win32_System_Threading",
+  "Win32_System_ProcessStatus",
+  "Win32_System_Diagnostics_ToolHelp",
+  "Win32_Storage_FileSystem",
+  "Win32_System_Registry",
 ] }
 
 [build-dependencies]

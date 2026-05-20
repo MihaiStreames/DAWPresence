@@ -1,19 +1,45 @@
+fail_fast: true
+
 repos:
+  - repo: builtin
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: mixed-line-ending
+        args: [--fix=lf]
+        exclude: \.ps1$
+        priority: 0
+
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.25.2
+    hooks:
+      - id: zizmor
+        priority: 0
+
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.8.3
+    hooks:
+      - id: prettier
+        types_or: [json, markdown, yaml]
+        priority: 1
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+        priority: 1
+
   - repo: local
     hooks:
-      - id: cargo-fmt
-        name: cargo fmt
-        entry: cargo fmt --all -- --check
-        language: system
-        types: [rust]
-        pass_filenames: false
-
       - id: cargo-check
         name: cargo check
         entry: bash -c '[[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]] && cargo check || echo "skipped (non-Windows host)"'
         language: system
         types: [rust]
         pass_filenames: false
+        priority: 0
 
       - id: cargo-clippy
         name: cargo clippy
@@ -21,6 +47,7 @@ repos:
         language: system
         types: [rust]
         pass_filenames: false
+        priority: 0
 
       - id: cargo-test
         name: cargo test
@@ -28,14 +55,19 @@ repos:
         language: system
         types: [rust]
         pass_filenames: false
+        priority: 0
 
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
-    hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
-      - id: check-toml
-      - id: check-merge-conflict
-      - id: mixed-line-ending
-        args: [--fix=lf]
+      - id: taplo
+        name: taplo fmt
+        entry: uvx taplo fmt
+        language: system
+        types: [toml]
+        priority: 1
+
+      - id: cargo-fmt
+        name: cargo fmt
+        entry: cargo fmt --all -- --check
+        language: system
+        types: [rust]
+        pass_filenames: false
+        priority: 1
