@@ -35,7 +35,7 @@ Download `DAWPresence.exe` from the [latest release](https://github.com/MihaiStr
 
 ### From source
 
-**On Windows:**
+On Windows:
 
 ```pwsh
 git clone https://github.com/MihaiStreames/DAWPresence.git
@@ -43,7 +43,7 @@ cd DAWPresence
 cargo build --release
 ```
 
-**Cross-compile from Linux (requires `gcc-mingw-w64-x86-64`):**
+Cross-compile from Linux **(requires `gcc-mingw-w64-x86-64`)**:
 
 ```sh
 git clone https://github.com/MihaiStreames/DAWPresence.git
