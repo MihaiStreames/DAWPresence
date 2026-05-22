@@ -2,17 +2,22 @@
 set -euo pipefail
 
 VERSION="${1:-}"
-CHANGELOG="${2:-CHANGELOG.md}"
+CHANGELOG="${2:-}"
 
-[[ -z "$VERSION" ]] && exit 1
-[[ ! -f "$CHANGELOG" ]] && exit 1
+[[ -z "$VERSION" || -z "$CHANGELOG" ]] && {
+  echo "Usage: $(basename "$0") <version> <changelog>"
+  exit 1
+}
+[[ ! -f "$CHANGELOG" ]] && {
+  echo "Error: $CHANGELOG not found"
+  exit 1
+}
 
 VERSION="${VERSION#v}"
 
 section="$(awk -v ver="$VERSION" '
   /^## \[/ {
     if (found) exit
-    # match "## [VERSION]" (with optional " - date" suffix)
     if (index($0, "[" ver "]")) { found=1; next }
   }
   found { print }

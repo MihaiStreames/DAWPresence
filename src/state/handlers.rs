@@ -148,8 +148,7 @@ pub(super) fn tick(state: &mut AppState) -> Task<Message> {
 
         let changed = match (&state.last_project_name, current) {
             (Some(prev), Some(curr)) => prev != curr,
-            (None, Some(_)) => true,
-            (Some(_), None) => true,
+            (None, Some(_)) | (Some(_), None) => true,
             (None, None) => false,
         };
 

@@ -23,8 +23,15 @@ pub(crate) fn is_enabled() -> bool {
     let mut key = std::ptr::null_mut();
 
     // SAFETY: standard registry read, key closed on all paths
-    let result =
-        unsafe { RegOpenKeyExW(HKEY_CURRENT_USER, subkey.as_ptr(), 0, KEY_READ, &mut key) };
+    let result = unsafe {
+        RegOpenKeyExW(
+            HKEY_CURRENT_USER,
+            subkey.as_ptr(),
+            0,
+            KEY_READ,
+            &raw mut key,
+        )
+    };
 
     if result != ERROR_SUCCESS {
         return false;
@@ -70,8 +77,15 @@ fn write_run_value(exe_path: &str) {
     let mut key = std::ptr::null_mut();
 
     // SAFETY: standard registry write, key closed on all paths
-    let result =
-        unsafe { RegOpenKeyExW(HKEY_CURRENT_USER, subkey.as_ptr(), 0, KEY_WRITE, &mut key) };
+    let result = unsafe {
+        RegOpenKeyExW(
+            HKEY_CURRENT_USER,
+            subkey.as_ptr(),
+            0,
+            KEY_WRITE,
+            &raw mut key,
+        )
+    };
 
     if result != ERROR_SUCCESS {
         warn!("Couldn't open Run registry key: error {result}");
@@ -103,8 +117,15 @@ fn delete_run_value() {
     let mut key = std::ptr::null_mut();
 
     // SAFETY: standard registry write, key closed on all paths
-    let result =
-        unsafe { RegOpenKeyExW(HKEY_CURRENT_USER, subkey.as_ptr(), 0, KEY_WRITE, &mut key) };
+    let result = unsafe {
+        RegOpenKeyExW(
+            HKEY_CURRENT_USER,
+            subkey.as_ptr(),
+            0,
+            KEY_WRITE,
+            &raw mut key,
+        )
+    };
 
     if result != ERROR_SUCCESS {
         return;

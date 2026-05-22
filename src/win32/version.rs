@@ -9,7 +9,7 @@ use windows_sys::Win32::Storage::FileSystem::VerQueryValueW;
 use super::to_wide_null;
 use crate::daw::UNKNOWN_VERSION;
 
-/// Read the ProductVersion string from a PE file's version resource.
+/// Read the `ProductVersion` string from a PE file's version resource.
 ///
 /// Returns [`UNKNOWN_VERSION`] if the version cannot be read.
 pub(crate) fn exe_version(path: &Path) -> String {
@@ -36,7 +36,7 @@ pub(crate) fn exe_version(path: &Path) -> String {
 fn load_version_info(path_wide: &[u16]) -> Option<Vec<u8>> {
     // SAFETY: path_wide is null-terminated, handle is out-param
     let mut handle: u32 = 0;
-    let size = unsafe { GetFileVersionInfoSizeW(path_wide.as_ptr(), &mut handle) };
+    let size = unsafe { GetFileVersionInfoSizeW(path_wide.as_ptr(), &raw mut handle) };
     if size == 0 {
         return None;
     }
@@ -59,7 +59,14 @@ fn parse_translation(data: &[u8], data_range: &std::ops::Range<usize>) -> Option
     let mut len: u32 = 0;
 
     // SAFETY: data is valid version info buffer, query is null-terminated
-    let ok = unsafe { VerQueryValueW(data.as_ptr().cast(), query.as_ptr(), &mut ptr, &mut len) };
+    let ok = unsafe {
+        VerQueryValueW(
+            data.as_ptr().cast(),
+            query.as_ptr(),
+            &raw mut ptr,
+            &raw mut len,
+        )
+    };
 
     if ok == FALSE || ptr.is_null() || len < 4 {
         return None;
@@ -90,7 +97,14 @@ fn query_version_string(
     let mut len: u32 = 0;
 
     // SAFETY: same data buffer, query is null-terminated
-    let ok = unsafe { VerQueryValueW(data.as_ptr().cast(), query.as_ptr(), &mut ptr, &mut len) };
+    let ok = unsafe {
+        VerQueryValueW(
+            data.as_ptr().cast(),
+            query.as_ptr(),
+            &raw mut ptr,
+            &raw mut len,
+        )
+    };
 
     if ok == FALSE || ptr.is_null() {
         return None;

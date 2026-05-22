@@ -1,0 +1,43 @@
+include = ["**/*.toml"]
+exclude = ["target/**"]
+
+[formatting]
+align_entries  = true
+align_comments = true
+
+indent_string    = "  "
+column_width     = 100
+trailing_newline = true
+
+reorder_keys = false
+
+array_auto_expand = true
+compact_arrays    = true
+
+[[rule]]
+include = ["**/Cargo.toml"]
+
+[rule.schema]
+enabled = true
+url     = "https://json.schemastore.org/cargo.json"
+
+[[rule]]
+include = ["**/rustfmt.toml"]
+
+[rule.schema]
+enabled = true
+url     = "https://json.schemastore.org/rustfmt.json"
+
+[[rule]]
+include = ["**/Cargo.toml"]
+keys    = ["package"]
+
+[rule.formatting]
+align_entries = true
+
+[[rule]]
+include = ["**/Cargo.toml"]
+keys    = ["dependencies", "dev-dependencies", "build-dependencies", "lints"]
+
+[rule.formatting]
+reorder_keys = true

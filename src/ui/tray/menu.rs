@@ -84,9 +84,9 @@ pub(super) fn pump_windows_messages() {
     unsafe {
         let mut msg = zeroed();
 
-        while PeekMessageW(&mut msg, std::ptr::null_mut(), 0, 0, PM_REMOVE) != FALSE {
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
+        while PeekMessageW(&raw mut msg, std::ptr::null_mut(), 0, 0, PM_REMOVE) != FALSE {
+            TranslateMessage(&raw const msg);
+            DispatchMessageW(&raw const msg);
         }
     }
 }

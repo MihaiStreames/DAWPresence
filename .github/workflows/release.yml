@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 permissions: {}
 
@@ -17,7 +17,7 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
@@ -26,30 +26,32 @@ jobs:
           persist-credentials: false
 
       - name: Install Rust toolchain
-        run: rustup toolchain install stable --no-self-update
+        run: rustup toolchain install nightly --no-self-update
 
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
         with:
           lookup-only: true
 
+      - name: Install UPX
+        run: sudo apt-get install -y upx
+
       - name: Build release binary
-        shell: pwsh
-        run: ./scripts/build.ps1
+        run: |
+          mkdir -p dist
+          cargo build --release
+          upx --best target/x86_64-pc-windows-gnu/release/DAWPresence.exe
+          cp target/x86_64-pc-windows-gnu/release/DAWPresence.exe dist/DAWPresence.exe
 
-      - name: Build installer
-        shell: pwsh
-        run: ./scripts/build-installer.ps1 -Version ($env:VERSION -replace '^v', '')
-
-      - name: Upload build artifacts
+      - name: Upload binary
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: dawpresence-windows
-          path: dist/
+          name: dawpresence-exe
+          path: dist/DAWPresence.exe
 
-  size-check:
-    name: Size check
-    runs-on: ubuntu-latest
+  installer:
+    name: Installer
+    runs-on: windows-latest
     needs: build
     permissions:
       contents: read
@@ -58,14 +60,41 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Download build artifacts
+      - name: Download binary
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: dawpresence-exe
+          path: dist
+
+      - name: Build installer
+        shell: pwsh
+        run: ./scripts/build-installer.ps1 -Version ($env:VERSION -replace '^v', '')
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: dawpresence-windows
+          path: dist/
+
+  size-check:
+    name: Size check
+    runs-on: ubuntu-latest
+    needs: installer
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Download artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: dawpresence-windows
           path: dist
 
       - name: Check binary size
-        run: bash .github/workflows/scripts/check-binary-size.sh
+        run: bash .github/workflows/scripts/check-binary-size.sh dist/DAWPresence.exe 4
 
   release:
     name: Release
@@ -78,7 +107,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Download build artifacts
+      - name: Download artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: dawpresence-windows
@@ -88,12 +117,17 @@ jobs:
         run: bash .github/workflows/scripts/checksum.sh dist/DAWPresence.exe dist/DAWPresence-*-setup.exe
 
       - name: Extract release notes
-        run: bash .github/workflows/scripts/extract-changelog.sh "$VERSION" > release_notes.md
+        run: bash .github/workflows/scripts/extract-changelog.sh "$VERSION" CHANGELOG.md > release_notes.md
 
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "$VERSION" --notes-file release_notes.md dist/DAWPresence.exe dist/DAWPresence.exe.sha256 dist/DAWPresence-*-setup.exe dist/DAWPresence-*-setup.exe.sha256
+        run: |
+          gh release create "$VERSION" --notes-file release_notes.md \
+            dist/DAWPresence.exe \
+            dist/DAWPresence.exe.sha256 \
+            dist/DAWPresence-*-setup.exe \
+            dist/DAWPresence-*-setup.exe.sha256
 
   virustotal:
     name: VirusTotal
@@ -106,7 +140,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Download build artifacts
+      - name: Download artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: dawpresence-windows

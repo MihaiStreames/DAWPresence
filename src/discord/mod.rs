@@ -196,5 +196,6 @@ fn current_timestamp() -> i64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap_or(Duration::ZERO)
-        .as_secs() as i64
+        .as_secs()
+        .cast_signed()
 }

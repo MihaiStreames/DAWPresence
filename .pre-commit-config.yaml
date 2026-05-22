@@ -4,12 +4,11 @@ repos:
   - repo: builtin
     hooks:
       - id: trailing-whitespace
+        priority: 0
       - id: end-of-file-fixer
-      - id: check-yaml
-      - id: check-toml
+        priority: 0
       - id: mixed-line-ending
         args: [--fix=lf]
-        exclude: \.ps1$
         priority: 0
 
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
@@ -22,36 +21,35 @@ repos:
     rev: v3.8.3
     hooks:
       - id: prettier
-        types_or: [json, markdown, yaml]
-        priority: 1
+        types_or: [json, yaml]
+        priority: 2
+
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.13.1-1
+    hooks:
+      - id: shfmt
+        types: [shell]
+        priority: 2
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: check-added-large-files
-        priority: 1
+        priority: 2
 
   - repo: local
     hooks:
-      - id: cargo-check
-        name: cargo check
-        entry: bash -c '[[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]] && cargo check || echo "skipped (non-Windows host)"'
-        language: system
-        types: [rust]
-        pass_filenames: false
-        priority: 0
-
       - id: cargo-clippy
         name: cargo clippy
-        entry: bash -c '[[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]] && cargo clippy --all-targets -- -D warnings || echo "skipped (non-Windows host)"'
+        entry: cargo clippy --fix --allow-dirty --all-targets -- -D warnings
         language: system
         types: [rust]
         pass_filenames: false
-        priority: 0
+        priority: 1
 
       - id: cargo-test
         name: cargo test
-        entry: bash -c '[[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]] && cargo test || echo "skipped (non-Windows host)"'
+        entry: cargo test
         language: system
         types: [rust]
         pass_filenames: false
@@ -66,8 +64,8 @@ repos:
 
       - id: cargo-fmt
         name: cargo fmt
-        entry: cargo fmt --all -- --check
+        entry: cargo fmt
         language: system
         types: [rust]
         pass_filenames: false
-        priority: 1
+        priority: 0

@@ -72,8 +72,7 @@ fn input_style(theme: &iced::Theme, status: text_input::Status) -> text_input::S
 
     let border_color = match status {
         text_input::Status::Active => style::COLOR_TEXT_DIM,
-        text_input::Status::Hovered => style::COLOR_ACCENT,
-        text_input::Status::Focused { .. } => style::COLOR_ACCENT,
+        text_input::Status::Hovered | text_input::Status::Focused { .. } => style::COLOR_ACCENT,
         text_input::Status::Disabled => style::COLOR_SURFACE,
     };
 

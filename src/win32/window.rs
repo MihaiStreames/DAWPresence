@@ -24,7 +24,7 @@ pub(crate) fn window_title(pid: u32) -> String {
 
         let mut process_id: u32 = 0;
         // SAFETY: hwnd is from EnumWindows, process_id is stack-local
-        unsafe { GetWindowThreadProcessId(hwnd, &mut process_id) };
+        unsafe { GetWindowThreadProcessId(hwnd, &raw mut process_id) };
 
         if process_id != state.target_pid {
             return TRUE;
@@ -65,7 +65,7 @@ pub(crate) fn window_title(pid: u32) -> String {
 
     // SAFETY: state lives on stack for duration of enumeration, callback only borrows it
     unsafe {
-        EnumWindows(Some(callback), &mut state as *mut State as LPARAM);
+        EnumWindows(Some(callback), &raw mut state as LPARAM);
     }
 
     // main window typically has the longest title

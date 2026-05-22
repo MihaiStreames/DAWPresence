@@ -45,6 +45,7 @@ rustc-ice-*.txt
 #.idea/
 
 ### Build artifacts ###
+.xwin-cache/
 dist/
 installer/output/
 

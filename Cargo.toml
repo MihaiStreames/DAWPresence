@@ -1,19 +1,31 @@
 [package]
-name = "dawpresence"
-version = "3.0.1"
-description = "Show what you are creating on Discord."
-authors = ["MihaiStreames <72852703+MihaiStreames@users.noreply.github.com>"]
-license = "MIT"
-homepage = "https://github.com/MihaiStreames/DAWPresence"
-repository = "https://github.com/MihaiStreames/DAWPresence"
-keywords = ["discord", "rich-presence", "daw", "audio-production", "music"]
-categories = ["desktop-applications"]
-edition = "2024"
+name         = "dawpresence"
+version      = "3.0.1"
+edition      = "2024"
 rust-version = "1.92"
+authors      = ["MihaiStreames <72852703+MihaiStreames@users.noreply.github.com>"]
+description  = "Show what you are creating on Discord."
+repository   = "https://github.com/MihaiStreames/DAWPresence"
+homepage     = "https://github.com/MihaiStreames/DAWPresence"
+license      = "MIT"
+keywords     = ["discord", "rich-presence", "daw", "audio-production", "music"]
+categories   = ["desktop-applications"]
 
-[[bin]]
-name = "DAWPresence"
-path = "src/main.rs"
+[lints.rust]
+unsafe_code = "warn"
+
+[lints.clippy]
+cast_possible_truncation = "allow"
+cast_possible_wrap       = "allow"
+cast_precision_loss      = "allow"
+cast_sign_loss           = "allow"
+dbg_macro                = "warn"
+empty_drop               = "warn"
+exit                     = "warn"
+get_unwrap               = "warn"
+pedantic                 = { level = "warn", priority = -1 }
+rc_buffer                = "warn"
+rc_mutex                 = "warn"
 
 [dependencies]
 confy = "2.0.0"
@@ -24,15 +36,8 @@ fancy-regex = { version = "0.18.0", default-features = false, features = [
   "unicode",
   "variable-lookbehinds",
 ] }
-iced = { version = "0.14.0", default-features = false, features = [
-  "crisp",
-  "smol",
-  "tiny-skia",
-] }
-image = { version = "0.25.10", default-features = false, features = [
-  "ico",
-  "png",
-] }
+iced = { version = "0.14.0", default-features = false, features = ["crisp", "smol", "tiny-skia"] }
+image = { version = "0.25.10", default-features = false, features = ["ico", "png"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 thiserror = "2.0.18"
@@ -55,49 +60,19 @@ windows-sys = { version = "0.61.2", features = [
   "Win32_System_Registry",
 ] }
 
-[build-dependencies]
-winres = "0.1.12"
-
 [dev-dependencies]
 toml = "1.1.2+spec-1.1.0"
 
+[build-dependencies]
+winres = "0.1.12"
+
+[[bin]]
+name = "DAWPresence"
+path = "src/main.rs"
+
 [profile.release]
-opt-level = "z"
-lto = true
+opt-level     = "z"
+lto           = true
 codegen-units = 1
-strip = "symbols"
-panic = "abort"
-
-[lints.rust]
-unsafe_code = "warn"
-unreachable_pub = "warn"
-
-[lints.clippy]
-cloned_instead_of_copied = "warn"
-flat_map_option = "warn"
-inefficient_to_string = "warn"
-manual_let_else = "warn"
-manual_ok_or = "warn"
-manual_string_new = "warn"
-map_unwrap_or = "warn"
-semicolon_if_nothing_returned = "warn"
-uninlined_format_args = "warn"
-unnested_or_patterns = "warn"
-fn_params_excessive_bools = "warn"
-needless_pass_by_value = "warn"
-trivially_copy_pass_by_ref = "warn"
-unused_self = "warn"
-redundant_closure_for_method_calls = "warn"
-redundant_clone = "warn"
-too_many_arguments = "warn"
-too_many_lines = "warn"
-cognitive_complexity = "warn"
-enum_variant_names = "warn"
-type_complexity = "warn"
-dbg_macro = "warn"
-empty_drop = "warn"
-exit = "warn"
-get_unwrap = "warn"
-rc_buffer = "warn"
-rc_mutex = "warn"
-rest_pat_in_fully_bound_structs = "warn"
+strip         = "symbols"
+panic         = "abort"

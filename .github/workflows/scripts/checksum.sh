@@ -7,6 +7,6 @@ if [[ $# -eq 0 ]]; then
 fi
 
 for f in "$@"; do
-  sha256sum "$f" | awk '{print $1}' > "${f}.sha256"
+  sha256sum "$f" | awk '{print $1}' >"${f}.sha256"
   echo "${f}.sha256"
 done

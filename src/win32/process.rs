@@ -39,7 +39,7 @@ pub(crate) fn snapshot() -> Vec<ProcessEntry> {
     entry.dwSize = size_of::<PROCESSENTRY32W>() as u32;
 
     // SAFETY: entry is zeroed and correctly sized
-    if unsafe { Process32FirstW(raw, &mut entry) } == FALSE {
+    if unsafe { Process32FirstW(raw, &raw mut entry) } == FALSE {
         return Vec::new();
     }
 
@@ -58,7 +58,7 @@ pub(crate) fn snapshot() -> Vec<ProcessEntry> {
         });
 
         // SAFETY: entry is valid from previous call
-        if unsafe { Process32NextW(raw, &mut entry) } == FALSE {
+        if unsafe { Process32NextW(raw, &raw mut entry) } == FALSE {
             break;
         }
     }
@@ -86,7 +86,7 @@ pub(crate) fn memory_bytes(handle: HANDLE) -> Option<u64> {
     counters.cb = size_of::<PROCESS_MEMORY_COUNTERS>() as u32;
 
     // SAFETY: handle is valid, counters is zeroed with correct cb
-    let ok = unsafe { GetProcessMemoryInfo(handle, &mut counters, counters.cb) };
+    let ok = unsafe { GetProcessMemoryInfo(handle, &raw mut counters, counters.cb) };
     if ok == FALSE {
         return None;
     }
@@ -105,10 +105,10 @@ pub(crate) fn cpu_times(handle: HANDLE) -> Option<(u64, u64)> {
     let ok = unsafe {
         GetProcessTimes(
             handle,
-            &mut creation as *mut u64 as *mut _,
-            &mut exit as *mut u64 as *mut _,
-            &mut kernel as *mut u64 as *mut _,
-            &mut user as *mut u64 as *mut _,
+            (&raw mut creation).cast(),
+            (&raw mut exit).cast(),
+            (&raw mut kernel).cast(),
+            (&raw mut user).cast(),
         )
     };
 
@@ -125,7 +125,7 @@ pub(crate) fn exe_path(handle: HANDLE) -> Option<PathBuf> {
     let mut len = buf.len() as u32;
 
     // SAFETY: handle is valid, buf is correctly sized, len is in/out
-    let ok = unsafe { QueryFullProcessImageNameW(handle, 0, buf.as_mut_ptr(), &mut len) };
+    let ok = unsafe { QueryFullProcessImageNameW(handle, 0, buf.as_mut_ptr(), &raw mut len) };
     if ok == FALSE {
         return None;
     }
@@ -143,6 +143,8 @@ pub(crate) fn wall_ticks() -> u64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap_or_default()
-        .as_nanos() as u64
+        .as_nanos()
+        .try_into()
+        .unwrap_or(u64::MAX)
         / 100
 }

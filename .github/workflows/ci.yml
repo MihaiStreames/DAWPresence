@@ -4,16 +4,16 @@ on:
   push:
     branches: [master]
     paths:
-      - '**.rs'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'daws.json'
+      - "**.rs"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "daws.json"
   pull_request:
     paths:
-      - '**.rs'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'daws.json'
+      - "**.rs"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "daws.json"
 
 permissions: {}
 
@@ -29,7 +29,7 @@ env:
 jobs:
   check:
     name: Check
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
@@ -38,11 +38,11 @@ jobs:
           persist-credentials: false
 
       - name: Install Rust toolchain
-        run: rustup toolchain install stable --component rustfmt,clippy --no-self-update
+        run: rustup toolchain install nightly --target x86_64-pc-windows-gnu --component rustfmt,clippy --no-self-update
 
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
 
       - run: cargo fmt --all -- --check
       - run: cargo clippy --all-targets -- -D warnings
-      - run: cargo test
+      - run: cargo build --release

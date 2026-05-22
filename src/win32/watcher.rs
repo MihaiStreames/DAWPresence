@@ -36,7 +36,7 @@ impl ExitChannel {
         // SAFETY: process_handle is valid (from open()), ctx lives until callback frees it
         let ok = unsafe {
             RegisterWaitForSingleObject(
-                &mut wait_handle,
+                &raw mut wait_handle,
                 process_handle,
                 Some(exit_callback),
                 ctx.cast(),
