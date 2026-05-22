@@ -26,15 +26,15 @@ jobs:
           persist-credentials: false
 
       - name: Install Rust toolchain
-        run: rustup toolchain install nightly --no-self-update
+        run: rustup toolchain install nightly --target x86_64-pc-windows-gnu --no-self-update
 
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
         with:
           lookup-only: true
 
-      - name: Install UPX
-        run: sudo apt-get install -y upx
+      - name: Install dependencies
+        run: sudo apt-get install -y gcc-mingw-w64-x86-64 upx
 
       - name: Build release binary
         run: |
@@ -94,7 +94,7 @@ jobs:
           path: dist
 
       - name: Check binary size
-        run: bash .github/workflows/scripts/check-binary-size.sh dist/DAWPresence.exe 4
+        run: bash .github/workflows/scripts/check-binary-size.sh dist/DAWPresence.exe 2
 
   release:
     name: Release

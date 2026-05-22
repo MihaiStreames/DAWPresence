@@ -1,6 +1,6 @@
 # <img src="https://github.com/MihaiStreames/DAWPresence/raw/master/assets/app/main.png?raw=true" alt="DAWPresence icon" height="28" width="28"> DAWPresence
 
-DAWPresence shows what you are creating on Discord. It monitors your running DAW, extracts the project name from the window title, and updates your Rich Presence automatically. Ships as a tiny Windows binary (under 5 MB, zero runtime deps) with an iced GUI and a system tray icon.
+DAWPresence shows what you are creating on Discord. It monitors your running DAW, extracts the project name from the window title, and updates your Rich Presence automatically. Ships as a tiny Windows binary (under 2 MB, zero runtime deps) with an iced GUI and a system tray icon.
 
 [![Release](https://img.shields.io/github/v/release/MihaiStreames/DAWPresence?label=release)](https://github.com/MihaiStreames/DAWPresence/releases)
 [![Platform](https://img.shields.io/badge/platform-windows-0078D6)](https://github.com/MihaiStreames/DAWPresence/issues/1)
@@ -35,17 +35,20 @@ Download `DAWPresence.exe` from the [latest release](https://github.com/MihaiStr
 
 ### From source
 
+**On Windows:**
+
+```pwsh
+git clone https://github.com/MihaiStreames/DAWPresence.git
+cd DAWPresence
+cargo build --release
+```
+
+**Cross-compile from Linux (requires `gcc-mingw-w64-x86-64`):**
+
 ```sh
 git clone https://github.com/MihaiStreames/DAWPresence.git
 cd DAWPresence
 cargo build --release
-./target/release/DAWPresence.exe
-```
-
-Cross-compile from Linux:
-
-```sh
-cargo build --release --target x86_64-pc-windows-gnu
 ```
 
 ## Prerequisites
