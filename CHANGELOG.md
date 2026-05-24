@@ -11,7 +11,7 @@ All notable changes to DAWPresence.
 
 ### Changed
 
-- Binary compressed with UPX: ~3.5 MB -> ~1.6 MB
+- Binary compressed with UPX: ~3.5 MB -> ~1.5 MB
 
 ## [3.0.1] - 2026-04-12
 

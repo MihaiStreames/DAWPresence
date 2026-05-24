@@ -49,6 +49,7 @@ jobs:
           target: ${{ matrix.target }}
           components: rustfmt, clippy
           rustflags: ""
+          cache-shared-key: ci-${{ matrix.os }}
 
       - name: fmt
         if: matrix.os == 'windows-latest'
