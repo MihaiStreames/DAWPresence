@@ -33,7 +33,7 @@ Download the setup `.exe` from the [latest release](https://github.com/MihaiStre
 
 Download `DAWPresence.exe` from the [latest release](https://github.com/MihaiStreames/DAWPresence/releases/latest) and run it. Settings live in `%APPDATA%\dawpresence`.
 
-### From source
+## Building from source
 
 On Windows:
 
