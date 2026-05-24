@@ -1,6 +1,7 @@
 use iced::Length;
 use iced::widget::button;
 use iced::widget::container;
+use iced::widget::container::Style;
 use iced::widget::row;
 use iced::widget::text;
 
@@ -21,15 +22,14 @@ pub(in crate::ui) fn sidebar_item(
         .height(Length::Fill)
         .style(move |_theme: &iced::Theme| {
             if is_active {
-                iced::widget::container::Style::default()
-                    .background(iced::Background::Color(style::COLOR_ACCENT))
+                Style::default().background(iced::Background::Color(style::COLOR_ACCENT))
             } else {
-                iced::widget::container::Style::default()
+                Style::default()
             }
         });
 
     let item_style = if is_active {
-        item_active_style as fn(&iced::Theme) -> iced::widget::container::Style
+        item_active_style as fn(&iced::Theme) -> Style
     } else {
         item_inactive_style
     };
@@ -77,16 +77,16 @@ pub(in crate::ui) fn sidebar_item(
         .into()
 }
 
-fn item_active_style(theme: &iced::Theme) -> iced::widget::container::Style {
+fn item_active_style(theme: &iced::Theme) -> Style {
     let bg = theme.palette().background;
     let lighter = iced::Color::from_rgb(
         (bg.r * 1.3).min(1.0),
         (bg.g * 1.3).min(1.0),
         (bg.b * 1.3).min(1.0),
     );
-    iced::widget::container::Style::default().background(iced::Background::Color(lighter))
+    Style::default().background(iced::Background::Color(lighter))
 }
 
-fn item_inactive_style(_theme: &iced::Theme) -> iced::widget::container::Style {
-    iced::widget::container::Style::default()
+fn item_inactive_style(_theme: &iced::Theme) -> Style {
+    Style::default()
 }

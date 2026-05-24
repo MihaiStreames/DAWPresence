@@ -1,5 +1,6 @@
 use iced::Background;
 use iced::Border;
+use iced::widget::container::Style;
 use iced::widget::scrollable;
 
 use crate::ui::style;
@@ -28,7 +29,7 @@ pub(in crate::ui) fn scrollable_style(
     };
 
     scrollable::Style {
-        container: iced::widget::container::Style::default(),
+        container: Style::default(),
         vertical_rail: rail,
         horizontal_rail: rail,
         gap: None,

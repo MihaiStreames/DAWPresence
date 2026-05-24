@@ -32,6 +32,10 @@ fn main() -> iced::Result {
 
     info!("DAWPresence v{} starting up", version::APP_VERSION);
 
+    if !win32::single_instance::acquire() {
+        return Ok(());
+    }
+
     let window_icon = load_window_icon().ok();
 
     iced::application(state::boot, state::update, view)

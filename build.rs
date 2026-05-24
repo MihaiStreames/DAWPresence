@@ -1,18 +1,17 @@
 fn main() {
-    #[cfg(windows)]
-    {
-        let version = std::env::var("CARGO_PKG_VERSION").unwrap();
-        let description = std::env::var("CARGO_PKG_DESCRIPTION").unwrap();
-        let license = std::env::var("CARGO_PKG_LICENSE").unwrap();
+    if std::env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows" {
+        let mut res = winresource::WindowsResource::new();
 
-        let mut res = winres::WindowsResource::new();
+        if cfg!(target_os = "windows") {
+            res.set_toolkit_path(
+                "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64",
+            );
+        } else {
+            res.set_windres_path("x86_64-w64-mingw32-windres");
+            res.set_ar_path("x86_64-w64-mingw32-ar");
+        }
+
         res.set_icon("assets/app/main.ico");
-        res.set("ProductName", "DAWPresence");
-        res.set("ProductVersion", &version);
-        res.set("FileVersion", &version);
-        res.set("FileDescription", &description);
-        res.set("LegalCopyright", &license);
-        res.set("CompanyName", "MihaiStreames");
         res.compile().expect("couldn't compile windows resources");
     }
 }

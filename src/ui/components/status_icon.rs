@@ -2,6 +2,7 @@ use iced::Background;
 use iced::Border;
 use iced::Length;
 use iced::widget::container;
+use iced::widget::container::Style;
 use iced::widget::text;
 
 use crate::state::Message;
@@ -18,7 +19,7 @@ pub(in crate::ui) fn status_icon(connected: bool) -> iced::Element<'static, Mess
     let circle = container(text(""))
         .width(Length::Fixed(style::STATUS_ICON_SIZE))
         .height(Length::Fixed(style::STATUS_ICON_SIZE))
-        .style(move |_theme: &iced::Theme| iced::widget::container::Style {
+        .style(move |_theme: &iced::Theme| Style {
             background: Some(Background::Color(color)),
             border: Border {
                 radius: (style::STATUS_ICON_SIZE / 2.0).into(),

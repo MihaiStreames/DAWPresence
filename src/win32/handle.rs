@@ -20,6 +20,11 @@ impl OwnedHandle {
     }
 }
 
+// SAFETY: Win32 handles are valid to send across threads and share via OnceLock;
+// the underlying kernel object is reference-counted by the OS
+unsafe impl Send for OwnedHandle {}
+unsafe impl Sync for OwnedHandle {}
+
 impl Drop for OwnedHandle {
     fn drop(&mut self) {
         // SAFETY: self.0 is a valid, non-null handle (checked in new())

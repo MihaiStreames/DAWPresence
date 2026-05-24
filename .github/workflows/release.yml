@@ -17,7 +17,7 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       contents: read
     steps:
@@ -25,25 +25,40 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install Rust toolchain
-        run: rustup toolchain install nightly --target x86_64-pc-windows-gnu --no-self-update
-
-      - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+      - uses: actions-rust-lang/setup-rust-toolchain@46268bd060767258de96ed93c1251119784f2ab6 # v1.16.1
         with:
-          lookup-only: true
-
-      - name: Install dependencies
-        run: sudo apt-get install -y gcc-mingw-w64-x86-64 upx
+          rustflags: ""
+          cache: false
 
       - name: Build release binary
-        run: |
-          mkdir -p dist
-          cargo build --release
-          upx --best target/x86_64-pc-windows-gnu/release/DAWPresence.exe
-          cp target/x86_64-pc-windows-gnu/release/DAWPresence.exe dist/DAWPresence.exe
+        run: cargo build --release
 
       - name: Upload binary
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: dawpresence-exe-raw
+          path: target/release/DAWPresence.exe
+
+  pack:
+    name: Pack
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+    steps:
+      - name: Download binary
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: dawpresence-exe-raw
+          path: dist
+
+      - name: Install UPX
+        run: sudo apt-get install -y upx
+
+      - name: Pack binary
+        run: upx --best dist/DAWPresence.exe
+
+      - name: Upload packed binary
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: dawpresence-exe
@@ -52,7 +67,7 @@ jobs:
   installer:
     name: Installer
     runs-on: windows-latest
-    needs: build
+    needs: pack
     permissions:
       contents: read
     steps:
@@ -101,7 +116,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: size-check
     permissions:
-      contents: write # creates the GitHub release and uploads assets
+      contents: write
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -134,7 +149,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: release
     permissions:
-      contents: write # appends scan results to the GitHub release body
+      contents: write
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:

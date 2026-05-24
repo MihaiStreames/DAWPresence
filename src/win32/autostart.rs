@@ -61,7 +61,7 @@ pub(crate) fn set_enabled(enabled: bool) {
             return;
         };
 
-        let value = format!("\"{}\"", exe_path.display());
+        let value = format!("\"{}\" --minimized", exe_path.display());
         trace!("Writing auto-start registry key: {value}");
         write_run_value(&value);
     } else {

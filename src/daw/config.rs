@@ -61,7 +61,7 @@ pub(crate) fn ensure_daw_config() -> Result<PathBuf, ConfigError> {
         std::fs::write(&daws_path, bundled)?;
 
         debug!(
-            "Updated daws.json v{local_version} → v{bundled_version} at {}",
+            "Updated daws.json v{local_version} -> v{bundled_version} at {}",
             daws_path.display()
         );
     }

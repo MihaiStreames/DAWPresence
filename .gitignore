@@ -45,9 +45,12 @@ rustc-ice-*.txt
 #.idea/
 
 ### Build artifacts ###
-.xwin-cache/
 dist/
 installer/output/
+
+### Cargo ###
+#  since there's no clean way to use toolchain per OS, i'll just have that locally
+.cargo/
 
 ### LLMs ###
 .claude/

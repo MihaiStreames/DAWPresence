@@ -1,5 +1,6 @@
 use iced::Border;
 use iced::Length;
+use iced::alignment::Vertical;
 use iced::widget::button;
 use iced::widget::column;
 use iced::widget::container;
@@ -54,14 +55,14 @@ pub(in crate::ui) fn labeled_input<'a>(
             .into(),
     ])
     .spacing(style::SPACING_TIGHT)
-    .align_y(iced::alignment::Vertical::Center);
+    .align_y(Vertical::Center);
 
     container(
         row(vec![
             container(label_col).width(Length::Fill).into(),
             input_row.into(),
         ])
-        .align_y(iced::alignment::Vertical::Center),
+        .align_y(Vertical::Center),
     )
     .padding(style::SETTING_ROW_PADDING)
     .into()

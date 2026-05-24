@@ -37,18 +37,42 @@ Download `DAWPresence.exe` from the [latest release](https://github.com/MihaiStr
 
 On Windows:
 
+> [!NOTE]
+> Windows is very annoying, which means that you WILL need MSVC (MSVC Build Tools with Visual C++), which can be obtained in one command that silently gets them for you:
+>
+> ```pwsh
+> winget install Microsoft.VisualStudio.2022.BuildTools --override "--quiet --add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.Windows11SDK.22621 --includeRecommended"
+> ```
+>
+> On top of that, if you use `rust-analyzer`, cargo needs `LIB` and `PATH` set system-wide (aka running `vcvars64.bat` or set permanently). The upside is that you don't need `.cargo/config.toml` since MSVC is the default target.
+
 ```pwsh
 git clone https://github.com/MihaiStreames/DAWPresence.git
 cd DAWPresence
 cargo build --release
 ```
 
-Cross-compile from Linux **(requires `gcc-mingw-w64-x86-64`)**:
+On Linux:
+
+> [!NOTE]
+> Now on Linux, you need `gcc-mingw-w64-x86-64`:
+>
+> ```sh
+> pacman -S mingw-w64-gcc mingw-w64-binutils # arch
+> apt install gcc-mingw-w64-x86-64 # ubuntu
+> ```
+>
+> You then need to make `.cargo/config.toml` so that you don't have to always use `--target x86_64-pc-windows-gnu`:
+>
+> ```toml
+> [build]
+> target = "x86_64-pc-windows-gnu"
+> ```
 
 ```sh
 git clone https://github.com/MihaiStreames/DAWPresence.git
 cd DAWPresence
-cargo build --release
+cargo build --release # only if you follow the note above, else add --target x86_64-pc-windows-gnu
 ```
 
 ## Prerequisites

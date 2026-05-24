@@ -5,6 +5,8 @@ use std::time::Duration;
 use iced::Subscription;
 use iced::Task;
 use iced::event;
+use iced::futures::channel::mpsc::Sender;
+use iced::futures::future;
 use iced::time;
 use iced::window;
 use tracing::warn;
@@ -15,6 +17,8 @@ use crate::daw::ensure_daw_config;
 use crate::discord::DiscordManager;
 use crate::settings::AppSettings;
 use crate::ui::tray::tray_subscription;
+use crate::win32::autostart;
+use crate::win32::single_instance;
 
 /// Active page in the sidebar navigation.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -75,7 +79,7 @@ pub(crate) fn boot() -> (AppState, Task<Message>) {
         }
     };
 
-    let auto_start_enabled = crate::win32::autostart::is_enabled();
+    let auto_start_enabled = autostart::is_enabled();
 
     let settings = AppSettings::load();
     let update_interval_input = settings.update_interval.to_string();
@@ -129,7 +133,12 @@ pub(crate) fn update(state: &mut AppState, message: Message) -> Task<Message> {
 pub(crate) fn subscription(state: &AppState) -> Subscription<Message> {
     let tick =
         time::every(Duration::from_millis(state.settings.update_interval)).map(|_| Message::Tick);
-    Subscription::batch(vec![tray_subscription(), window_events(), tick])
+    Subscription::batch(vec![
+        tray_subscription(),
+        window_events(),
+        tick,
+        single_instance_subscription(),
+    ])
 }
 
 fn window_events() -> Subscription<Message> {
@@ -139,5 +148,30 @@ fn window_events() -> Subscription<Message> {
         }
         iced::Event::Window(window::Event::Opened { .. }) => Some(Message::WindowOpened(window_id)),
         _ => None,
+    })
+}
+
+fn single_instance_subscription() -> Subscription<Message> {
+    Subscription::run(|| {
+        iced::stream::channel(1, |mut output: Sender<Message>| async move {
+            let Some(receiver) = single_instance::take_receiver() else {
+                future::pending::<()>().await;
+                return;
+            };
+
+            std::thread::Builder::new()
+                .name("single-instance-show".into())
+                .stack_size(64 * 1024)
+                .spawn(move || {
+                    while receiver.recv().is_ok() {
+                        if output.try_send(Message::TrayShow).is_err() {
+                            break;
+                        }
+                    }
+                })
+                .expect("couldn't spawn single-instance show thread");
+
+            future::pending::<()>().await;
+        })
     })
 }

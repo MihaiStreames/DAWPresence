@@ -1,6 +1,7 @@
 pub(crate) mod autostart;
 pub(crate) mod handle;
 pub(crate) mod process;
+pub(crate) mod single_instance;
 pub(crate) mod version;
 pub(crate) mod watcher;
 pub(crate) mod window;

@@ -2,6 +2,7 @@ use iced::Border;
 use iced::Length;
 use iced::widget::column;
 use iced::widget::container;
+use iced::widget::container::Style;
 use iced::widget::text;
 
 use crate::state::Message;
@@ -26,8 +27,8 @@ pub(in crate::ui) fn stat_card(
         .into()
 }
 
-fn card_style(_theme: &iced::Theme) -> iced::widget::container::Style {
-    iced::widget::container::Style::default().border(Border {
+fn card_style(_theme: &iced::Theme) -> Style {
+    Style::default().border(Border {
         color: style::COLOR_TEXT_DIM,
         width: style::BORDER_WIDTH,
         radius: style::BORDER_RADIUS_CARD.into(),

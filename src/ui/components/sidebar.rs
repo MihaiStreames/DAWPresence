@@ -1,6 +1,7 @@
 use iced::Length;
 use iced::widget::column;
 use iced::widget::container;
+use iced::widget::container::Style;
 
 use super::sidebar_item;
 use crate::state::AppState;
@@ -30,12 +31,12 @@ pub(in crate::ui) fn sidebar(state: &AppState) -> iced::Element<'_, Message> {
         .into()
 }
 
-fn sidebar_bg(theme: &iced::Theme) -> iced::widget::container::Style {
+fn sidebar_bg(theme: &iced::Theme) -> Style {
     let bg = theme.palette().background;
     let darker = iced::Color::from_rgb(
         (bg.r * 0.85).max(0.0),
         (bg.g * 0.85).max(0.0),
         (bg.b * 0.85).max(0.0),
     );
-    iced::widget::container::Style::default().background(iced::Background::Color(darker))
+    Style::default().background(iced::Background::Color(darker))
 }

@@ -1,6 +1,6 @@
 [package]
 name         = "dawpresence"
-version      = "3.0.1"
+version      = "3.0.2"
 edition      = "2024"
 rust-version = "1.92"
 authors      = ["MihaiStreames <72852703+MihaiStreames@users.noreply.github.com>"]
@@ -10,6 +10,13 @@ homepage     = "https://github.com/MihaiStreames/DAWPresence"
 license      = "MIT"
 keywords     = ["discord", "rich-presence", "daw", "audio-production", "music"]
 categories   = ["desktop-applications"]
+
+[package.metadata.winresource]
+FileDescription  = "Show what you are creating on Discord."
+ProductName      = "DAWPresence"
+LegalCopyright   = "MIT"
+CompanyName      = "MihaiStreames"
+OriginalFilename = "DAWPresence.exe"
 
 [lints.rust]
 unsafe_code = "warn"
@@ -58,13 +65,14 @@ windows-sys = { version = "0.61.2", features = [
   "Win32_System_Diagnostics_ToolHelp",
   "Win32_Storage_FileSystem",
   "Win32_System_Registry",
+  "Win32_System_Pipes",
 ] }
 
 [dev-dependencies]
 toml = "1.1.2+spec-1.1.0"
 
 [build-dependencies]
-winres = "0.1.12"
+winresource = "0.1.31"
 
 [[bin]]
 name = "DAWPresence"

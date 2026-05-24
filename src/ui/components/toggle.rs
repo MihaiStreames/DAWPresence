@@ -1,6 +1,7 @@
 use iced::Background;
 use iced::Color;
 use iced::Length;
+use iced::alignment::Vertical;
 use iced::widget::column;
 use iced::widget::container;
 use iced::widget::row;
@@ -35,7 +36,7 @@ pub(in crate::ui) fn setting_toggle(
             container(label_col).width(Length::Fill).into(),
             toggle.into(),
         ])
-        .align_y(iced::alignment::Vertical::Center),
+        .align_y(Vertical::Center),
     )
     .padding(style::SETTING_ROW_PADDING)
     .into()

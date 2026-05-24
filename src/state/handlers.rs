@@ -9,7 +9,10 @@ use super::Page;
 use super::save_or_warn;
 use crate::daw::DawScanner;
 use crate::settings::AppSettings;
+use crate::settings::TimerMode;
 use crate::ui::tray::TrayUpdate;
+use crate::ui::tray::send_tray_update;
+use crate::win32::autostart;
 
 const INTERVAL_PARSE_ERROR: &str = "Interval must be a number";
 
@@ -23,6 +26,12 @@ pub(super) fn close_requested(settings: &AppSettings, window_id: window::Id) -> 
 
 pub(super) fn window_opened(state: &mut AppState, window_id: window::Id) -> Task<Message> {
     state.window_id = Some(window_id);
+
+    // autostart should make the window not open up
+    if std::env::args().any(|a| a == "--minimized") {
+        return window::set_mode(window_id, window::Mode::Hidden);
+    }
+
     Task::none()
 }
 
@@ -58,9 +67,9 @@ pub(super) fn navigate_to(state: &mut AppState, page: Page) -> Task<Message> {
 }
 
 pub(super) fn toggle_auto_start(state: &mut AppState, value: bool) -> Task<Message> {
-    crate::win32::autostart::set_enabled(value);
+    autostart::set_enabled(value);
     // re-read registry to confirm write succeeded
-    state.auto_start_enabled = crate::win32::autostart::is_enabled();
+    state.auto_start_enabled = autostart::is_enabled();
     debug!("Auto-start toggled: {}", state.auto_start_enabled);
     Task::none()
 }
@@ -76,7 +85,7 @@ pub(super) fn toggle_hide_project_name(state: &mut AppState, value: bool) -> Tas
     state.settings.hide_project_name = value;
     debug!("Hide project name toggled: {value}");
     save_or_warn(&state.settings);
-    crate::ui::tray::send_tray_update(TrayUpdate::HideProjectName(value));
+    send_tray_update(TrayUpdate::HideProjectName(value));
     Task::none()
 }
 
@@ -84,12 +93,11 @@ pub(super) fn toggle_hide_system_usage(state: &mut AppState, value: bool) -> Tas
     state.settings.hide_system_usage = value;
     debug!("Hide system usage toggled: {value}");
     save_or_warn(&state.settings);
-    crate::ui::tray::send_tray_update(TrayUpdate::HideSystemUsage(value));
+    send_tray_update(TrayUpdate::HideSystemUsage(value));
     Task::none()
 }
 
 pub(super) fn toggle_timer_mode(state: &mut AppState) -> Task<Message> {
-    use crate::settings::TimerMode;
     state.settings.timer_mode = match state.settings.timer_mode {
         TimerMode::Session => TimerMode::Project,
         TimerMode::Project => TimerMode::Session,
@@ -143,7 +151,7 @@ pub(super) fn tick(state: &mut AppState) -> Task<Message> {
     state.daw_status = status;
 
     // reset timer on project change in Project timer mode
-    if state.settings.timer_mode == crate::settings::TimerMode::Project {
+    if state.settings.timer_mode == TimerMode::Project {
         let current = state.daw_status.as_ref().map(|s| s.project_name.as_str());
 
         let changed = match (&state.last_project_name, current) {
@@ -172,7 +180,7 @@ pub(super) fn tick(state: &mut AppState) -> Task<Message> {
     if connected != state.discord_connected {
         debug!("Discord connection state: {connected}");
         state.discord_connected = connected;
-        crate::ui::tray::send_tray_update(TrayUpdate::DiscordConnected(connected));
+        send_tray_update(TrayUpdate::DiscordConnected(connected));
     }
 
     Task::none()

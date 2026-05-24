@@ -2,6 +2,17 @@
 
 All notable changes to DAWPresence.
 
+## [3.0.2] - 2026-05-24
+
+### Added
+
+- Launching a second instance now brings the existing window to the front instead of opening a duplicate
+- Autostart now launches minimized to tray instead of opening the window on login
+
+### Changed
+
+- Binary compressed with UPX: ~3.5 MB -> ~1.6 MB
+
 ## [3.0.1] - 2026-04-12
 
 ### Fixed
@@ -18,13 +29,11 @@ All notable changes to DAWPresence.
 - Auto-start with Windows toggle
 - Timer mode: session time (default) or project time (resets on project change)
 - App icon embedded in exe and shown in taskbar/titlebar
-- Dual renderer builds: tiny-skia (CPU, ~3.4 MB) and wgpu (GPU, ~4.6 MB)
 
 ### Changed
 
 - Blue accent color scheme throughout the app
-- Smaller binary (trimmed dependencies, switched async executor)
-- Cleaner debug logging (app-only by default, no framework noise)
+- Smaller binary
 
 ### Fixed
 
@@ -36,84 +45,52 @@ v2.2.0 was not released due to installer build issues. All changes are included 
 
 ### Added
 
-- Windows installer (Inno Setup) with start menu shortcut, desktop shortcut, auto-start option, and uninstaller
-- Direct Win32 process monitoring via `CreateToolhelp32Snapshot` (replaces `sysinfo` crate)
-- Event-driven process exit detection via `RegisterWaitForSingleObject` (NT kernel threadpool, zero CPU idle)
-- Typed error handling via `thiserror` (replaces string errors)
-- Compiled regex cache - patterns compiled once, reused every tick
-- Pre-normalized DAW configs - process names lowercased and stripped at startup
-- 28 unit tests covering config parsing, regex extraction, process matching, status formatting
+- Windows installer with start menu shortcut, desktop shortcut, auto-start option, and uninstaller
 
 ### Changed
 
-- Stable Rust toolchain (dropped nightly requirement)
-- Split monolithic modules into focused files (20+ files, all under 250 lines)
-- Discord IPC uses single mutex with poison recovery (was three separate mutexes)
-- Icon decoding cached (was re-decoded on every state change)
-- Tray and status icons are now circles with multi-size support for high-DPI displays
-- Interval modal shrinks when no validation error is shown
-- Click outside the interval modal to dismiss (warns if you have unsaved changes)
-- Faster DAW discovery when scanning running processes
-- Uninstaller removes settings and logs from `%APPDATA%`
+- Tray and status icons are now circles with high-DPI support
+- Interval editor shrinks when no validation error is shown
+- Click outside the interval editor to dismiss
+- Faster DAW discovery on startup
+- Uninstaller removes settings from `%APPDATA%`
 
 ### Fixed
 
 - "Minimize to tray" defaulting to off when upgrading from older config files
-- Process exit detection could race with cleanup in rare timing conditions
-- RAM display logic had an unreachable code path
-- Tray icon thread not cleaning up properly on shutdown
-- Settings load errors were silently ignored (now logs a warning)
-
-### Removed
-
-- `sysinfo` dependency (replaced by direct Win32 APIs)
-- Nightly Rust requirement (`generic_const_exprs`)
-- Platform stubs (`unsupported.rs`)
+- Process exit could race with cleanup in rare timing conditions
 
 ## [2.1.0] - 2026-04-11
 
 ### Added
 
-- `AdditionalProcessNames` config field for multi-process DAWs (prefix matching)
-- Versioned `daws.json` format - auto-updates local config when a new version ships
-- Window icon shows Discord connection state (red/green)
-
-### Changed
-
-- Extracted `app.rs` from `main.rs` for cleaner MVU separation
-- Stricter clippy linting (`pub` to `pub(crate)`, unsafe blocks in unsafe fns)
+- `AdditionalProcessNames` config field for multi-process DAWs
+- Versioned `daws.json` -- local config auto-updates when a new version ships
+- Window icon reflects Discord connection state (red/green)
 
 ### Fixed
 
-- Bitwig Studio now aggregates CPU/RAM across all processes (main UI, audio engine, plugin hosts)
+- Bitwig Studio now aggregates CPU/RAM across all its processes
 
 ## [2.0.1] - 2026-01-01
 
 ### Changed
 
-- Release builds strip logging and favor smaller binaries
-- Process monitoring refreshes only the data we use
-
-### Performance
-
-- Binary size: ~36 MB -> ~17 MB -> ~4 MB
-- RAM usage: ~70 MB+ -> ~7 MB
+- Smaller binary and lower memory usage
+- Binary size: ~36 MB -> ~4 MB
+- RAM usage: ~70 MB -> ~7 MB
 
 ## [2.0.0] - 2026-01-01
 
 ### Fixed
 
 - Project name detection now works on all Windows versions (fixes #2)
-- Switched from `regex` to `fancy-regex` crate (the old crate doesn't support lookaheads)
 
 ## [1.0.2] - 2026-01-01
 
 ### Fixed
 
-- Tray icon stays responsive by pumping Windows messages in the event loop
-- Window title detection no longer requires `IsWindowEnabled` check
-- Dynamic buffer size for window titles via `GetWindowTextLengthW`
-- Skip windows with empty titles early
+- Tray icon stays responsive while the app is running
 
 ## [1.0.1] - 2026-01-01
 
@@ -121,15 +98,14 @@ Complete rewrite from Python to Rust. Same functionality, faster, smaller, no ru
 
 ### Added
 
-- Single standalone `.exe` - no Python or dependencies needed
+- Single standalone `.exe` -- no Python or dependencies needed
 - Native Windows GUI using iced
 - System tray with status indicator
-- Persistent settings via `confy` (stored in `%APPDATA%`)
-- Cross-compilation support from Linux
+- Persistent settings stored in `%APPDATA%`
 
 ### Removed
 
-- Python codebase, PyInstaller build system, all Python dependencies
+- Python codebase and all Python dependencies
 
 ## [1.0.0] - 2025-09-22
 
