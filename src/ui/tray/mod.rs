@@ -104,7 +104,7 @@ fn run_tray_handling(mut output: Sender<Message>, shutdown: &AtomicBool) {
 fn handle_tray_event(
     menu_items: &TrayMenuIds,
     output: &mut Sender<Message>,
-    event: &tray_icon::menu::MenuEvent,
+    event: &MenuEvent,
 ) -> bool {
     if event.id() == &menu_items.show {
         debug!("Tray: show requested");

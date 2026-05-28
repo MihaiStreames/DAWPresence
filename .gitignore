@@ -54,3 +54,6 @@ installer/output/
 
 ### LLMs ###
 .claude/
+
+### Other ###
+__pycache__/

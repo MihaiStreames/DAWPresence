@@ -23,7 +23,7 @@ pub(super) struct TrayMenuIds {
     pub(super) hide_system: CheckMenuItem,
 }
 
-pub(super) fn create_tray_icon() -> Result<(TrayIcon, TrayMenuIds), crate::error::TrayError> {
+pub(super) fn create_tray_icon() -> Result<(TrayIcon, TrayMenuIds), TrayError> {
     let settings = AppSettings::load();
     let menu = Menu::new();
 
@@ -80,7 +80,6 @@ pub(super) fn pump_windows_messages() {
     use windows_sys::Win32::UI::WindowsAndMessaging::PeekMessageW;
     use windows_sys::Win32::UI::WindowsAndMessaging::TranslateMessage;
 
-    // SAFETY: msg is zeroed, PeekMessageW/TranslateMessage/DispatchMessageW are standard Win32
     unsafe {
         let mut msg = zeroed();
 

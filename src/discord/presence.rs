@@ -17,13 +17,13 @@ impl DiscordPresence {
     /// Build presence from current DAW status.
     pub(super) fn from_daw_status(daw_status: &DawStatus, settings: &AppSettings) -> Self {
         let project = if settings.hide_project_name {
-            "(hidden)".to_string()
+            "(hidden)".to_owned()
         } else {
             daw_status.project_name.clone()
         };
 
         let details = if project == UNKNOWN_PROJECT || project == UNTITLED_PROJECT {
-            "Opening an untitled project".to_string()
+            "Opening an untitled project".to_owned()
         } else {
             format!("Opening project: {project}")
         };
@@ -45,7 +45,7 @@ impl DiscordPresence {
         Self {
             details,
             state,
-            large_image: "icon".to_string(),
+            large_image: "icon".to_owned(),
             large_text: format!("DAWPresence v{APP_VERSION}"),
         }
     }

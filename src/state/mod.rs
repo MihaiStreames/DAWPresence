@@ -169,8 +169,9 @@ fn single_instance_subscription() -> Subscription<Message> {
                         }
                     }
                 })
-                .expect("couldn't spawn single-instance show thread");
+                .expect("Couldn't spawn single-instance show thread");
 
+            // no receiver means we're a second instance that already signaled and will exit shortly
             future::pending::<()>().await;
         })
     })

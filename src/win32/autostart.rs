@@ -22,7 +22,6 @@ pub(crate) fn is_enabled() -> bool {
     let name = to_wide_null(VALUE_NAME);
     let mut key = std::ptr::null_mut();
 
-    // SAFETY: standard registry read, key closed on all paths
     let result = unsafe {
         RegOpenKeyExW(
             HKEY_CURRENT_USER,
@@ -61,6 +60,7 @@ pub(crate) fn set_enabled(enabled: bool) {
             return;
         };
 
+        // --minimized starts the app to tray without showing the window
         let value = format!("\"{}\" --minimized", exe_path.display());
         trace!("Writing auto-start registry key: {value}");
         write_run_value(&value);
@@ -76,7 +76,6 @@ fn write_run_value(exe_path: &str) {
     let value = to_wide_null(exe_path);
     let mut key = std::ptr::null_mut();
 
-    // SAFETY: standard registry write, key closed on all paths
     let result = unsafe {
         RegOpenKeyExW(
             HKEY_CURRENT_USER,
@@ -116,7 +115,6 @@ fn delete_run_value() {
     let name = to_wide_null(VALUE_NAME);
     let mut key = std::ptr::null_mut();
 
-    // SAFETY: standard registry write, key closed on all paths
     let result = unsafe {
         RegOpenKeyExW(
             HKEY_CURRENT_USER,

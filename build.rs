@@ -1,5 +1,7 @@
 fn main() {
-    if std::env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows" {
+    if std::env::var("CARGO_CFG_TARGET_OS").expect("CARGO_CFG_TARGET_OS not set by Cargo")
+        == "windows"
+    {
         let mut res = winresource::WindowsResource::new();
 
         if cfg!(target_os = "windows") {
@@ -12,6 +14,6 @@ fn main() {
         }
 
         res.set_icon("assets/app/main.ico");
-        res.compile().expect("couldn't compile windows resources");
+        res.compile().expect("Couldn't compile windows resources");
     }
 }

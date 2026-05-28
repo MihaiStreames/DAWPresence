@@ -16,11 +16,11 @@ pub(in crate::ui) fn home_view(state: &AppState) -> iced::Element<'_, Message> {
         Some(status) if status.is_running => (
             status.display_name.clone(),
             if state.settings.hide_project_name {
-                strings::PROJECT_HIDDEN.to_string()
+                strings::PROJECT_HIDDEN.to_owned()
             } else if status.project_name.trim().is_empty()
                 || status.project_name.eq_ignore_ascii_case(UNKNOWN_PROJECT)
             {
-                strings::NO_PROJECT_OPEN.to_string()
+                strings::NO_PROJECT_OPEN.to_owned()
             } else {
                 status.project_name.clone()
             },
@@ -28,10 +28,10 @@ pub(in crate::ui) fn home_view(state: &AppState) -> iced::Element<'_, Message> {
             format!("{:.1}%", status.cpu_usage),
         ),
         _ => (
-            strings::NO_DAW_DETECTED.to_string(),
-            strings::NO_DAW_DETECTED.to_string(),
-            strings::NO_DAW_DETECTED.to_string(),
-            strings::NO_DAW_DETECTED.to_string(),
+            strings::NO_DAW_DETECTED.to_owned(),
+            strings::NO_DAW_DETECTED.to_owned(),
+            strings::NO_DAW_DETECTED.to_owned(),
+            strings::NO_DAW_DETECTED.to_owned(),
         ),
     };
 

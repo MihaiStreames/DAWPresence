@@ -33,7 +33,6 @@ impl ExitChannel {
         let ctx = Box::into_raw(Box::new((pid, self.tx.clone())));
         let mut wait_handle: HANDLE = std::ptr::null_mut();
 
-        // SAFETY: process_handle is valid (from open()), ctx lives until callback frees it
         let ok = unsafe {
             RegisterWaitForSingleObject(
                 &raw mut wait_handle,
@@ -46,7 +45,6 @@ impl ExitChannel {
         };
 
         if ok == FALSE {
-            // SAFETY: registration failed, we still own ctx
             let _ = unsafe { Box::from_raw(ctx) };
             tracing::warn!("RegisterWaitForSingleObject failed for PID {pid}");
             return std::ptr::null_mut();
@@ -60,9 +58,6 @@ impl ExitChannel {
 /// No-op if handle is null.
 pub(crate) fn unregister(wait_handle: HANDLE) {
     if !wait_handle.is_null() {
-        // SAFETY: wait_handle is from RegisterWaitForSingleObject;
-        // INVALID_HANDLE_VALUE makes UnregisterWaitEx block until the callback finishes,
-        // preventing use-after-free if the callback is mid-execution during drop
         unsafe {
             UnregisterWaitEx(wait_handle, INVALID_HANDLE_VALUE);
         }
@@ -73,7 +68,6 @@ unsafe extern "system" fn exit_callback(ctx: *mut c_void, _timed_out: bool) {
     if ctx.is_null() {
         return;
     }
-    // SAFETY: ctx was created by Box::into_raw in watch()
     let ctx = unsafe { Box::from_raw(ctx.cast::<(u32, Sender<u32>)>()) };
     let _ = ctx.1.send(ctx.0);
 }

@@ -1,6 +1,6 @@
 [package]
 name         = "dawpresence"
-version      = "3.0.2"
+version      = "3.0.3"
 edition      = "2024"
 rust-version = "1.92"
 authors      = ["MihaiStreames <72852703+MihaiStreames@users.noreply.github.com>"]
@@ -19,20 +19,37 @@ CompanyName      = "MihaiStreames"
 OriginalFilename = "DAWPresence.exe"
 
 [lints.rust]
-unsafe_code = "warn"
+future_incompatible       = { level = "warn", priority = -1 }
+nonstandard_style         = { level = "warn", priority = -1 }
+rust_2018_idioms          = { level = "warn", priority = -1 }
+trivial_numeric_casts     = "warn"
+unreachable_pub           = "warn"
+unsafe_code               = "warn"
+unsafe_op_in_unsafe_fn    = "warn"
+unused_crate_dependencies = "warn"
+unused_import_braces      = "warn"
+unused_lifetimes          = "warn"
+unused_macro_rules        = "warn"
+unused_qualifications     = "warn"
+
+[lints.rustdoc]
+broken_intra_doc_links = "warn"
 
 [lints.clippy]
+all      = { level = "warn", priority = -2 }
+pedantic = { level = "warn", priority = -1 }
+
+# picked from nursery: genuinely useful
+missing_const_for_fn = "warn"
+
+# cast lints: intentional, Win32 APIs require specific widths
 cast_possible_truncation = "allow"
 cast_possible_wrap       = "allow"
 cast_precision_loss      = "allow"
 cast_sign_loss           = "allow"
-dbg_macro                = "warn"
-empty_drop               = "warn"
-exit                     = "warn"
-get_unwrap               = "warn"
-pedantic                 = { level = "warn", priority = -1 }
-rc_buffer                = "warn"
-rc_mutex                 = "warn"
+
+# style preferences
+wildcard_imports = "allow"
 
 [dependencies]
 confy = "2.0.0"
@@ -65,11 +82,10 @@ windows-sys = { version = "0.61.2", features = [
   "Win32_System_Diagnostics_ToolHelp",
   "Win32_Storage_FileSystem",
   "Win32_System_Registry",
-  "Win32_System_Pipes",
 ] }
 
 [dev-dependencies]
-toml = "1.1.2+spec-1.1.0"
+toml = "1.1.2"
 
 [build-dependencies]
 winresource = "0.1.31"

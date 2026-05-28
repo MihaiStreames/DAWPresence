@@ -42,6 +42,7 @@ pub(in crate::ui) fn setting_toggle(
     .into()
 }
 
+#[allow(clippy::missing_const_for_fn)]
 fn toggler_style(_theme: &iced::Theme, status: toggler::Status) -> toggler::Style {
     let (bg, fg) = match status {
         toggler::Status::Active { is_toggled } => {
