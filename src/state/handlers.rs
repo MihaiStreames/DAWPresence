@@ -108,11 +108,11 @@ pub(super) fn toggle_timer_mode(state: &mut AppState) -> Task<Message> {
 }
 
 pub(super) fn update_interval_input(state: &mut AppState, value: &str) -> Task<Message> {
-    state.update_interval_input = value.to_string();
+    value.clone_into(&mut state.update_interval_input);
     state.interval_applied = false;
 
     if value.trim().is_empty() {
-        state.update_interval_error = Some(INTERVAL_PARSE_ERROR.to_string());
+        state.update_interval_error = Some(INTERVAL_PARSE_ERROR.to_owned());
     } else if let Ok(interval) = value.parse::<u64>() {
         match AppSettings::validate_update_interval(interval) {
             Ok(()) => state.update_interval_error = None,
@@ -120,7 +120,7 @@ pub(super) fn update_interval_input(state: &mut AppState, value: &str) -> Task<M
             Err(error) => state.update_interval_error = Some(error.to_string()),
         }
     } else {
-        state.update_interval_error = Some(INTERVAL_PARSE_ERROR.to_string());
+        state.update_interval_error = Some(INTERVAL_PARSE_ERROR.to_owned());
     }
 
     Task::none()
@@ -128,7 +128,7 @@ pub(super) fn update_interval_input(state: &mut AppState, value: &str) -> Task<M
 
 pub(super) fn apply_interval(state: &mut AppState) -> Task<Message> {
     let Ok(interval) = state.update_interval_input.parse::<u64>() else {
-        state.update_interval_error = Some(INTERVAL_PARSE_ERROR.to_string());
+        state.update_interval_error = Some(INTERVAL_PARSE_ERROR.to_owned());
         return Task::none();
     };
 

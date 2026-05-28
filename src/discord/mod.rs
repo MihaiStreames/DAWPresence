@@ -5,7 +5,7 @@ use std::time::Duration;
 use std::time::SystemTime;
 use std::time::UNIX_EPOCH;
 
-use discord_rich_presence::DiscordIpc;
+use discord_rich_presence::DiscordIpc as _;
 use discord_rich_presence::DiscordIpcClient;
 use discord_rich_presence::activity;
 use presence::DiscordPresence;
@@ -39,6 +39,7 @@ pub(crate) struct DiscordManager {
 }
 
 impl DiscordManager {
+    #[allow(clippy::missing_const_for_fn)]
     pub(crate) fn new() -> Self {
         Self {
             state: Mutex::new(DiscordState {
@@ -81,7 +82,7 @@ impl DiscordManager {
             .map_err(|e| DiscordError::Connect(e.to_string()))?;
 
         s.client = Some(new_client);
-        s.client_id = Some(client_id.to_string());
+        s.client_id = Some(client_id.to_owned());
         s.start_timestamp = Some(current_timestamp());
 
         info!("Connected to Discord RPC");
@@ -180,6 +181,7 @@ impl DiscordManager {
     }
 
     fn lock(&self) -> std::sync::MutexGuard<'_, DiscordState> {
+        // a panicking thread shouldn't break the whole app
         self.state
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner)

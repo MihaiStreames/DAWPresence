@@ -21,6 +21,8 @@ mod win32;
 use iced::Size;
 use iced::window;
 use tracing::info;
+#[cfg(not(debug_assertions))]
+use tracing_subscriber as _;
 #[cfg(debug_assertions)]
 use tracing_subscriber::EnvFilter;
 

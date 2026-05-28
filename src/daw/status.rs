@@ -20,7 +20,7 @@ impl DawStatus {
         if self.is_running {
             format!("{:.2}%", self.cpu_usage)
         } else {
-            "Undefined".to_string()
+            "Undefined".to_owned()
         }
     }
 
@@ -32,7 +32,7 @@ impl DawStatus {
                 format!("{}MB", self.memory_mb)
             }
         } else {
-            "Undefined".to_string()
+            "Undefined".to_owned()
         }
     }
 }

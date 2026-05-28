@@ -6,139 +6,94 @@ use std::sync::mpsc;
 use tracing::trace;
 use tracing::warn;
 use windows_sys::Win32::Foundation::CloseHandle;
-use windows_sys::Win32::Storage::FileSystem::PIPE_ACCESS_DUPLEX;
-use windows_sys::Win32::System::Pipes::CallNamedPipeW;
-use windows_sys::Win32::System::Pipes::ConnectNamedPipe;
-use windows_sys::Win32::System::Pipes::CreateNamedPipeW;
-use windows_sys::Win32::System::Pipes::DisconnectNamedPipe;
-use windows_sys::Win32::System::Pipes::PIPE_READMODE_BYTE;
-use windows_sys::Win32::System::Pipes::PIPE_TYPE_BYTE;
-use windows_sys::Win32::System::Pipes::PIPE_UNLIMITED_INSTANCES;
-use windows_sys::Win32::System::Pipes::PIPE_WAIT;
-use windows_sys::Win32::System::Threading::CreateMutexW;
-use windows_sys::Win32::System::Threading::MUTEX_ALL_ACCESS;
-use windows_sys::Win32::System::Threading::OpenMutexW;
+use windows_sys::Win32::Foundation::ERROR_ALREADY_EXISTS;
+use windows_sys::Win32::Foundation::GetLastError;
+use windows_sys::Win32::System::Threading::CreateEventW;
+use windows_sys::Win32::System::Threading::INFINITE;
+use windows_sys::Win32::System::Threading::ResetEvent;
+use windows_sys::Win32::System::Threading::SetEvent;
+use windows_sys::Win32::System::Threading::WaitForSingleObject;
 
 use super::handle::OwnedHandle;
 use super::to_wide_null;
 
+const EVENT_NAME: &str = "Local\\DAWPresence-SingleInstance";
+
 static SHOW_RECEIVER: LazyLock<Mutex<Option<mpsc::Receiver<()>>>> =
     LazyLock::new(|| Mutex::new(None));
 
-static MUTEX_HANDLE: OnceLock<OwnedHandle> = OnceLock::new();
+static EVENT_HANDLE: OnceLock<OwnedHandle> = OnceLock::new();
 
 pub(crate) fn take_receiver() -> Option<mpsc::Receiver<()>> {
     SHOW_RECEIVER.lock().ok()?.take()
 }
 
-const MUTEX_NAME: &str = "Local\\DAWPresence-SingleInstance";
-const PIPE_NAME: &str = "\\\\.\\pipe\\DAWPresence-SingleInstance";
-const PIPE_TIMEOUT_MS: u32 = 1000;
-
 /// Acquires the single-instance lock. If another instance is already running,
 /// signals it to show its window and returns `false`. Returns `true` otherwise.
 pub(crate) fn acquire() -> bool {
-    let mutex_name = to_wide_null(MUTEX_NAME);
+    let event_name = to_wide_null(EVENT_NAME);
 
-    // succeeds only if another instance created it
-    let existing = unsafe { OpenMutexW(MUTEX_ALL_ACCESS, 0, mutex_name.as_ptr()) };
-    if !existing.is_null() {
-        unsafe { CloseHandle(existing) };
+    // manual-reset: listener calls ResetEvent after waking, not the OS
+    let raw = unsafe { CreateEventW(std::ptr::null(), 1, 0, event_name.as_ptr()) };
+    if raw.is_null() {
+        warn!("CreateEventW failed");
+        return false;
+    }
+
+    if unsafe { GetLastError() } == ERROR_ALREADY_EXISTS {
+        unsafe { CloseHandle(raw) };
         trace!("Another instance detected, signaling it to show");
         signal_existing();
         return false;
     }
 
-    // we're first, create mutex and start pipe server
-    let raw = unsafe { CreateMutexW(std::ptr::null(), 0, mutex_name.as_ptr()) };
-    if raw.is_null() {
-        warn!("CreateMutexW failed");
-        return false;
-    }
-
-    let _ = MUTEX_HANDLE.set(OwnedHandle::new(raw).unwrap());
+    let _ = EVENT_HANDLE.set(OwnedHandle::new(raw).expect("CreateEventW returned invalid handle"));
 
     let (sender, receiver) = mpsc::channel::<()>();
-    *SHOW_RECEIVER.lock().unwrap() = Some(receiver);
-    start_pipe_listener(sender);
+    *SHOW_RECEIVER.lock().expect("SHOW_RECEIVER mutex poisoned") = Some(receiver);
+    start_event_listener(sender);
 
     true
 }
 
 fn signal_existing() {
-    let pipe = to_wide_null(PIPE_NAME);
-    let mut buf: u8 = 1;
-    let mut bytes_read: u32 = 0;
+    let event_name = to_wide_null(EVENT_NAME);
 
-    let ok = unsafe {
-        CallNamedPipeW(
-            pipe.as_ptr(),
-            std::ptr::addr_of_mut!(buf).cast(),
-            1,
-            std::ptr::addr_of_mut!(buf).cast(),
-            1,
-            std::ptr::addr_of_mut!(bytes_read),
-            PIPE_TIMEOUT_MS,
-        )
-    };
+    let raw = unsafe { CreateEventW(std::ptr::null(), 1, 0, event_name.as_ptr()) };
+    if raw.is_null() {
+        warn!("CreateEventW failed, existing instance may not show");
+        return;
+    }
 
-    if ok == 0 {
-        warn!("CallNamedPipeW failed, existing instance may not show");
+    unsafe {
+        SetEvent(raw);
+        CloseHandle(raw);
     }
 }
 
-fn create_pipe(pipe_name: &[u16]) -> Option<OwnedHandle> {
-    let raw = unsafe {
-        CreateNamedPipeW(
-            pipe_name.as_ptr(),
-            PIPE_ACCESS_DUPLEX,
-            PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
-            PIPE_UNLIMITED_INSTANCES,
-            0,
-            1,
-            PIPE_TIMEOUT_MS,
-            std::ptr::null(),
-        )
-    };
-    OwnedHandle::new(raw)
-}
-
-fn start_pipe_listener(sender: mpsc::Sender<()>) {
+fn start_event_listener(sender: mpsc::Sender<()>) {
     std::thread::Builder::new()
-        .name("single-instance-pipe".into())
+        .name("single-instance-event".into())
         .stack_size(64 * 1024)
-        .spawn(move || run_pipe_listener(sender))
-        .expect("Couldn't spawn pipe listener thread");
+        .spawn(move || run_event_listener(sender))
+        .expect("Couldn't spawn event listener thread");
 }
 
 #[allow(clippy::needless_pass_by_value)]
-fn run_pipe_listener(sender: mpsc::Sender<()>) {
-    let pipe_name = to_wide_null(PIPE_NAME);
-
-    let Some(mut pipe) = create_pipe(&pipe_name) else {
-        warn!("CreateNamedPipeW failed, single-instance pipe unavailable");
+fn run_event_listener(sender: mpsc::Sender<()>) {
+    let Some(handle) = EVENT_HANDLE.get() else {
+        warn!("Event handle not set, listener exiting");
         return;
     };
 
     loop {
-        // blocks until second instance connects
-        unsafe { ConnectNamedPipe(pipe.raw(), std::ptr::null_mut()) };
-        trace!("Second instance connected, sending show signal");
+        unsafe { WaitForSingleObject(handle.raw(), INFINITE) };
+        trace!("Second instance signaled, sending show signal");
 
-        let next = create_pipe(&pipe_name); // avoids teardown race
-
-        unsafe { DisconnectNamedPipe(pipe.raw()) };
-        drop(pipe);
+        unsafe { ResetEvent(handle.raw()) };
 
         if sender.send(()).is_err() {
             return;
         }
-
-        let Some(next_pipe) = next else {
-            warn!("CreateNamedPipeW failed, single-instance pipe unavailable");
-            return;
-        };
-
-        pipe = next_pipe;
     }
 }

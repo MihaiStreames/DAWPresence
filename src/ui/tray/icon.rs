@@ -32,7 +32,7 @@ static ICON_BLUE_RGBA: LazyLock<(Vec<u8>, u32, u32)> =
 
 fn decode_icon(data: &[u8]) -> (Vec<u8>, u32, u32) {
     let image = image::load_from_memory_with_format(data, ICON_FORMAT)
-        .expect("embedded icon data must be valid")
+        .expect("Embedded icon data must be valid")
         .into_rgba8();
     (image.to_vec(), image.width(), image.height())
 }

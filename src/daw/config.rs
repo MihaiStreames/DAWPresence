@@ -119,7 +119,7 @@ impl NormalizedConfig {
         &self.config.client_id
     }
 
-    pub(super) fn hide_version(&self) -> bool {
+    pub(super) const fn hide_version(&self) -> bool {
         self.config.hide_version
     }
 }
@@ -127,7 +127,7 @@ impl NormalizedConfig {
 /// Normalize a process name for comparison (lowercase, strip .exe).
 pub(super) fn normalize_process_name(name: &str) -> String {
     let lower = name.trim().to_lowercase();
-    lower.strip_suffix(".exe").unwrap_or(&lower).to_string()
+    lower.strip_suffix(".exe").unwrap_or(&lower).to_owned()
 }
 
 #[cfg(test)]
@@ -194,8 +194,8 @@ mod tests {
     #[test]
     fn match_fl_studio_prefix() {
         let configs = NormalizedConfig::from_configs(vec![DawConfig {
-            process_name: "FL".to_string(),
-            display_text: "FL Studio".to_string(),
+            process_name: "FL".to_owned(),
+            display_text: "FL Studio".to_owned(),
             title_regex: String::new(),
             client_id: String::new(),
             hide_version: false,
@@ -209,14 +209,14 @@ mod tests {
     #[test]
     fn match_bitwig_additional_prefixes() {
         let configs = NormalizedConfig::from_configs(vec![DawConfig {
-            process_name: "BitwigStudioApp".to_string(),
-            display_text: "Bitwig Studio".to_string(),
+            process_name: "BitwigStudioApp".to_owned(),
+            display_text: "Bitwig Studio".to_owned(),
             title_regex: String::new(),
             client_id: String::new(),
             hide_version: false,
             additional_process_names: vec![
-                "Bitwig Studio".to_string(),
-                "BitwigAudioEngine".to_string(),
+                "Bitwig Studio".to_owned(),
+                "BitwigAudioEngine".to_owned(),
             ],
         }]);
         assert!(configs[0].matches("bitwigstudioapp"));

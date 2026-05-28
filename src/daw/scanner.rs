@@ -132,6 +132,8 @@ impl DawScanner {
                 continue;
             };
 
+            // try each process until we get a real version
+            // some DAW processes don't embed version info
             if (cached_version.is_empty() || cached_version == UNKNOWN_VERSION)
                 && let Some(path) = process::exe_path(handle.raw())
             {
@@ -159,7 +161,7 @@ impl DawScanner {
         }
 
         if cached_version.is_empty() {
-            cached_version = UNKNOWN_VERSION.to_string();
+            UNKNOWN_VERSION.clone_into(&mut cached_version);
         }
 
         self.attached = Some(AttachedDaw {
@@ -171,6 +173,7 @@ impl DawScanner {
 
     fn read_metrics(&mut self) -> Option<DawStatus> {
         let daw = self.attached.as_mut()?;
+        #[allow(clippy::indexing_slicing)]
         let cfg = &self.configs[daw.config_index];
 
         let mut total_cpu: f32 = 0.0;
@@ -186,6 +189,7 @@ impl DawScanner {
 
             total_cpu += calculate_cpu_percent(p, self.cpu_count);
 
+            // longest title is most likely to contain the project name
             let title = window::window_title(p.pid);
             if title.len() > best_title.len() {
                 best_title = title;
@@ -198,12 +202,12 @@ impl DawScanner {
 
         Some(DawStatus {
             is_running: true,
-            display_name: cfg.display_text().to_string(),
+            display_name: cfg.display_text().to_owned(),
             project_name,
             cpu_usage: total_cpu,
             memory_mb: total_memory,
             version: daw.version.clone(),
-            client_id: cfg.client_id().to_string(),
+            client_id: cfg.client_id().to_owned(),
             hide_version: cfg.hide_version(),
         })
     }

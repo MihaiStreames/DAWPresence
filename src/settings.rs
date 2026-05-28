@@ -32,11 +32,11 @@ pub(crate) struct AppSettings {
     pub(crate) update_interval: u64,
 }
 
-fn default_close_to_tray() -> bool {
+const fn default_close_to_tray() -> bool {
     true
 }
 
-fn default_update_interval() -> u64 {
+const fn default_update_interval() -> u64 {
     DEFAULT_UPDATE_INTERVAL
 }
 
@@ -118,7 +118,7 @@ mod tests {
 
     #[test]
     fn validate_interval_valid() {
-        assert!(AppSettings::validate_update_interval(2500).is_ok());
+        AppSettings::validate_update_interval(2500).unwrap();
     }
 
     #[test]
