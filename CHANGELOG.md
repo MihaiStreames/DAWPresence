@@ -4,7 +4,7 @@ All notable changes to DAWPresence.
 
 ## [3.0.3] - 2026-05-28
 
-No user-facing changes. Internal code quality pass.
+No user-facing changes. Internal code quality pass, closes #38.
 
 ## [3.0.2] - 2026-05-24
 
