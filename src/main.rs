@@ -12,7 +12,6 @@ mod error;
 mod settings;
 mod state;
 mod ui;
-mod version;
 
 #[cfg(windows)]
 #[allow(unsafe_code)]
@@ -32,7 +31,7 @@ use crate::ui::tray::load_window_icon;
 fn main() -> iced::Result {
     init_logging();
 
-    info!("DAWPresence v{} starting up", version::APP_VERSION);
+    info!("DAWPresence v{} starting up", env!("CARGO_PKG_VERSION"));
 
     if !win32::single_instance::acquire() {
         return Ok(());
