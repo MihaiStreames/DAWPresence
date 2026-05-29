@@ -8,9 +8,9 @@ use tracing::warn;
 use windows_sys::Win32::Foundation::CloseHandle;
 use windows_sys::Win32::Foundation::ERROR_ALREADY_EXISTS;
 use windows_sys::Win32::Foundation::GetLastError;
+use windows_sys::Win32::Foundation::WAIT_FAILED;
 use windows_sys::Win32::System::Threading::CreateEventW;
 use windows_sys::Win32::System::Threading::INFINITE;
-use windows_sys::Win32::System::Threading::ResetEvent;
 use windows_sys::Win32::System::Threading::SetEvent;
 use windows_sys::Win32::System::Threading::WaitForSingleObject;
 
@@ -33,8 +33,8 @@ pub(crate) fn take_receiver() -> Option<mpsc::Receiver<()>> {
 pub(crate) fn acquire() -> bool {
     let event_name = to_wide_null(EVENT_NAME);
 
-    // manual-reset: listener calls ResetEvent after waking, not the OS
-    let raw = unsafe { CreateEventW(std::ptr::null(), 1, 0, event_name.as_ptr()) };
+    // auto-reset: OS atomically wakes one waiter and clears the event, no lost-wakeup race
+    let raw = unsafe { CreateEventW(std::ptr::null(), 0, 0, event_name.as_ptr()) };
     if raw.is_null() {
         warn!("CreateEventW failed");
         return false;
@@ -59,7 +59,7 @@ pub(crate) fn acquire() -> bool {
 fn signal_existing() {
     let event_name = to_wide_null(EVENT_NAME);
 
-    let raw = unsafe { CreateEventW(std::ptr::null(), 1, 0, event_name.as_ptr()) };
+    let raw = unsafe { CreateEventW(std::ptr::null(), 0, 0, event_name.as_ptr()) };
     if raw.is_null() {
         warn!("CreateEventW failed, existing instance may not show");
         return;
@@ -87,10 +87,14 @@ fn run_event_listener(sender: mpsc::Sender<()>) {
     };
 
     loop {
-        unsafe { WaitForSingleObject(handle.raw(), INFINITE) };
-        trace!("Second instance signaled, sending show signal");
+        let result = unsafe { WaitForSingleObject(handle.raw(), INFINITE) };
 
-        unsafe { ResetEvent(handle.raw()) };
+        if result == WAIT_FAILED {
+            warn!("WaitForSingleObject failed, single-instance listener exiting");
+            return;
+        }
+
+        trace!("Second instance signaled, sending show signal");
 
         if sender.send(()).is_err() {
             return;
