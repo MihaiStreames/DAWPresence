@@ -23,7 +23,6 @@ pub(in crate::ui) struct InputProps<'a> {
     pub on_submit: Option<Message>,
 }
 
-/// Input field with label on left, input+button on right, feedback below label.
 pub(in crate::ui) fn labeled_input<'a>(
     props: InputProps<'a>,
     on_input: impl Fn(String) -> Message + 'a,

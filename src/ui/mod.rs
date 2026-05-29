@@ -12,7 +12,7 @@ use crate::state::AppState;
 use crate::state::Message;
 use crate::state::Page;
 
-/// Render the app layout: sidebar + active page.
+/// Render the main app layout.
 pub(crate) fn view(state: &AppState) -> iced::Element<'_, Message> {
     let content = match state.active_page {
         Page::Home => pages::home_view(state),

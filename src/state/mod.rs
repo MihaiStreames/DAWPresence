@@ -20,7 +20,6 @@ use crate::ui::tray::tray_subscription;
 use crate::win32::autostart;
 use crate::win32::single_instance;
 
-/// Active page in the sidebar navigation.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub(crate) enum Page {
     #[default]
@@ -68,7 +67,10 @@ fn save_or_warn(settings: &AppSettings) {
     }
 }
 
-/// Initialize application state: load settings, ensure daws.json, create scanner.
+/// Initialize application state:
+/// 1. Load [`AppSettings`]
+/// 2. Ensure `daws.json`
+/// 3. Create [`DawScanner`]
 pub(crate) fn boot() -> (AppState, Task<Message>) {
     let config_path = match ensure_daw_config() {
         Ok(path) => Some(path),
@@ -110,7 +112,7 @@ pub(crate) fn boot() -> (AppState, Task<Message>) {
     )
 }
 
-/// Central message router: dispatches to handlers.
+/// Dispatch messages to handlers.
 pub(crate) fn update(state: &mut AppState, message: Message) -> Task<Message> {
     match message {
         Message::CloseRequested(id) => handlers::close_requested(&state.settings, id),
@@ -129,10 +131,13 @@ pub(crate) fn update(state: &mut AppState, message: Message) -> Task<Message> {
     }
 }
 
-/// Subscribe to tray events, window events, and periodic DAW polling.
+/// Subscribe to the main state changing subscriptions.
 pub(crate) fn subscription(state: &AppState) -> Subscription<Message> {
     let tick =
         time::every(Duration::from_millis(state.settings.update_interval)).map(|_| Message::Tick);
+
+    // TODO: maybe factor these out, move subscriptions in respective crates
+
     Subscription::batch(vec![
         tray_subscription(),
         window_events(),

@@ -5,7 +5,6 @@ use iced::widget::scrollable;
 
 use crate::ui::style;
 
-/// Scrollbar with accent color on hover/drag.
 pub(in crate::ui) fn scrollable_style(
     _theme: &iced::Theme,
     status: scrollable::Status,

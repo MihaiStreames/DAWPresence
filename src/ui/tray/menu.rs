@@ -11,7 +11,7 @@ use super::icon::load_tray_icon;
 use crate::error::TrayError;
 use crate::settings::AppSettings;
 
-/// Map any Display error into `TrayError::CreateFailed`.
+// map any Display error into TrayError::CreateFailed
 fn create_err(error: impl std::fmt::Display) -> TrayError {
     TrayError::CreateFailed(error.to_string())
 }

@@ -55,6 +55,7 @@ impl ExitChannel {
 }
 
 /// Cancel a registered wait, blocking until any in-flight callback completes.
+///
 /// No-op if handle is null.
 pub(crate) fn unregister(wait_handle: HANDLE) {
     if !wait_handle.is_null() {
@@ -68,6 +69,7 @@ unsafe extern "system" fn exit_callback(ctx: *mut c_void, _timed_out: bool) {
     if ctx.is_null() {
         return;
     }
+
     let ctx = unsafe { Box::from_raw(ctx.cast::<(u32, Sender<u32>)>()) };
     let _ = ctx.1.send(ctx.0);
 }

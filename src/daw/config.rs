@@ -7,14 +7,14 @@ use tracing::debug;
 
 use crate::error::ConfigError;
 
-/// Versioned wrapper for the daws.json config file.
+/// Versioned wrapper for `daws.json`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct DawConfigFile {
     version: u32,
     daws: Vec<DawConfig>,
 }
 
-/// DAW configuration loaded from daws.json.
+/// DAW configuration from `daws.json`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct DawConfig {
     #[serde(rename = "ProcessName")]
@@ -40,7 +40,8 @@ pub(crate) fn load_configs(path: &Path) -> Result<Vec<DawConfig>, ConfigError> {
     Ok(file.daws)
 }
 
-/// Ensure a bundled daws.json exists in the config directory.
+/// Ensure a bundled `daws.json` exists in the config directory.
+///
 /// Overwrites the local copy only when the bundled version is newer.
 pub(crate) fn ensure_daw_config() -> Result<PathBuf, ConfigError> {
     let config_path = confy::get_configuration_file_path("dawpresence", None)
@@ -69,7 +70,7 @@ pub(crate) fn ensure_daw_config() -> Result<PathBuf, ConfigError> {
     Ok(daws_path)
 }
 
-/// Pre-normalized DAW config for fast matching during scanning.
+/// Pre-normalized DAW config (for fast matching during scanning).
 pub(super) struct NormalizedConfig {
     config: DawConfig,
     normalized_name: String,

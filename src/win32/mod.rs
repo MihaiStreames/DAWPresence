@@ -1,6 +1,8 @@
+#![allow(clippy::indexing_slicing)]
 pub(crate) mod autostart;
 pub(crate) mod handle;
 pub(crate) mod process;
+pub(crate) mod registry;
 pub(crate) mod single_instance;
 pub(crate) mod version;
 pub(crate) mod watcher;

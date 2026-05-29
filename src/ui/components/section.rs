@@ -4,7 +4,6 @@ use iced::widget::text;
 use crate::state::Message;
 use crate::ui::style;
 
-/// Accent-colored section heading with top spacing.
 pub(in crate::ui) fn section_heading(label: &'static str) -> iced::Element<'static, Message> {
     container(
         text(label)

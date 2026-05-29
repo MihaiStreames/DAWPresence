@@ -90,7 +90,6 @@ impl DiscordManager {
         Ok(())
     }
 
-    /// Push presence to Discord, retrying once on connection failure.
     fn update_presence(&self, presence: &DiscordPresence) -> Result<(), DiscordError> {
         let mut s = self.lock();
 
@@ -112,6 +111,7 @@ impl DiscordManager {
                 .timestamps(activity::Timestamps::new().start(timestamp))
         };
 
+        // retry once on connection failure
         if let Err(e) = client.set_activity(build_activity()) {
             warn!("Couldn't set activity: {e}, trying to reconnect...");
 
@@ -128,6 +128,7 @@ impl DiscordManager {
                 });
             }
 
+            // push presence
             client
                 .set_activity(build_activity())
                 .map_err(|e| DiscordError::Activity(e.to_string()))?;
