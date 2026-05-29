@@ -114,7 +114,12 @@ def main() -> int:
 
     result = _run_stress(first.pid, baseline)
     first.terminate()
-    first.wait(timeout=5)
+
+    try:
+        first.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        first.kill()
+        first.wait()
 
     if result is None:
         print("Error: process died during handle poll")

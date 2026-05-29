@@ -1,3 +1,5 @@
+use std::mem::size_of;
+
 use windows_sys::Win32::Foundation::ERROR_SUCCESS;
 use windows_sys::Win32::System::Registry::HKEY;
 use windows_sys::Win32::System::Registry::KEY_READ;
