@@ -9,7 +9,6 @@ use crate::state::Message;
 use crate::state::Page;
 use crate::ui::style;
 
-/// Sidebar nav item with active accent bar.
 pub(in crate::ui) fn sidebar_item(
     label: &'static str,
     page: Page,

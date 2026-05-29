@@ -42,8 +42,8 @@ impl RegexCache {
             return UNKNOWN_PROJECT.to_owned();
         };
 
-        // prefer capture group 1 (named match) over group 0 (full match) for patterns without
-        // groups
+        // prefer capture group 1 (named match) over group 0 (full match)
+        // for patterns without groups
         captures
             .get(1)
             .or_else(|| captures.get(0))

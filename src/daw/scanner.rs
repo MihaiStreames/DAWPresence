@@ -39,7 +39,9 @@ struct AttachedDaw {
     version: String,
 }
 
-/// Two-phase DAW monitor: discovery via process snapshot, then per-PID metric polling.
+/// Two-phase DAW monitor:
+/// 1. Discovery via process snapshot
+/// 2. Per-PID metric polling
 pub(crate) struct DawScanner {
     configs: Vec<NormalizedConfig>,
     regex_cache: RegexCache,
@@ -63,6 +65,7 @@ impl DawScanner {
     }
 
     /// Returns current DAW status, or `None` if no DAW is running.
+    ///
     /// Transitions between discovery and monitoring automatically.
     pub(crate) fn poll(&mut self) -> Option<DawStatus> {
         self.handle_exits();
@@ -188,6 +191,9 @@ impl DawScanner {
             }
 
             total_cpu += calculate_cpu_percent(p, self.cpu_count);
+
+            // TODO: might need to look into this as other windows can
+            // take priority using the rule below (rare edge cases but still)
 
             // longest title is most likely to contain the project name
             let title = window::window_title(p.pid);

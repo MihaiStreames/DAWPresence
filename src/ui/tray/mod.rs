@@ -60,7 +60,6 @@ pub(crate) fn tray_subscription() -> Subscription<Message> {
     })
 }
 
-/// Sets the shutdown flag on drop so the tray thread exits cleanly.
 struct ShutdownGuard(Arc<AtomicBool>);
 
 impl Drop for ShutdownGuard {

@@ -78,7 +78,6 @@ fn parse_translation(data: &[u8], data_range: &std::ops::Range<usize>) -> Option
     }
 
     let translation = unsafe { std::slice::from_raw_parts(ptr as *const u16, 2) };
-    #[allow(clippy::indexing_slicing)]
     Some((translation[0], translation[1]))
 }
 
@@ -119,7 +118,6 @@ fn query_version_string(
 
     let wide = unsafe { std::slice::from_raw_parts(ptr as *const u16, len) };
     let null_pos = wide.iter().position(|c| *c == 0).unwrap_or(wide.len());
-    #[allow(clippy::indexing_slicing)]
     let version = String::from_utf16_lossy(&wide[..null_pos])
         .trim()
         .to_owned();

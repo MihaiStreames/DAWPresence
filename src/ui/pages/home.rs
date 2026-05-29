@@ -10,7 +10,7 @@ use crate::ui::components;
 use crate::ui::strings;
 use crate::ui::style;
 
-/// Render the default home panel.
+/// Render the home page.
 pub(in crate::ui) fn home_view(state: &AppState) -> iced::Element<'_, Message> {
     let (daw_name, project_name, memory_usage, cpu_usage) = match &state.daw_status {
         Some(status) if status.is_running => (

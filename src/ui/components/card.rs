@@ -8,7 +8,6 @@ use iced::widget::text;
 use crate::state::Message;
 use crate::ui::style;
 
-/// Bordered stat card with accent-colored title.
 pub(in crate::ui) fn stat_card(
     title: &'static str,
     value: String,

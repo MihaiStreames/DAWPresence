@@ -11,7 +11,6 @@ use iced::widget::toggler;
 use crate::state::Message;
 use crate::ui::style;
 
-/// Setting row with label, description, and toggler.
 pub(in crate::ui) fn setting_toggle(
     label: &'static str,
     description: &'static str,

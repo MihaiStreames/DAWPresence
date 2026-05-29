@@ -54,7 +54,6 @@ pub(crate) fn snapshot() -> Vec<ProcessEntry> {
 
         entries.push(ProcessEntry {
             pid: entry.th32ProcessID,
-            #[allow(clippy::indexing_slicing)]
             name: String::from_utf16_lossy(&entry.szExeFile[..name_len]),
         });
 
@@ -126,7 +125,6 @@ pub(crate) fn exe_path(handle: HANDLE) -> Option<PathBuf> {
         return None;
     }
 
-    #[allow(clippy::indexing_slicing)]
     Some(PathBuf::from(String::from_utf16_lossy(
         &buf[..len as usize],
     )))

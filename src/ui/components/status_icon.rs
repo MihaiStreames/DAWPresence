@@ -8,7 +8,6 @@ use iced::widget::text;
 use crate::state::Message;
 use crate::ui::style;
 
-/// Colored circle indicating Discord connection state.
 pub(in crate::ui) fn status_icon(connected: bool) -> iced::Element<'static, Message> {
     let color = if connected {
         style::COLOR_ACCENT
