@@ -57,7 +57,9 @@ jobs:
 
       - env:
           TARGET: ${{ matrix.target }}
+        shell: bash
         run: cargo clippy --all-targets --target "$TARGET" -- -D warnings
       - env:
           TARGET: ${{ matrix.target }}
+        shell: bash
         run: cargo build --release --target "$TARGET"
