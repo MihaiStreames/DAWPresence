@@ -45,7 +45,7 @@ Download `DAWPresence.exe` from the [latest release](https://github.com/MihaiStr
 On Windows:
 
 > [!NOTE]
-> Windows is very annoying. You WILL need MSVC (Build Tools with Visual C++). One command handles everything silently:
+> Windows is very annoying. You WILL need MSVC ([Build Tools with Visual C++](https://visualstudio.microsoft.com/visual-cpp-build-tools)). One command handles everything silently:
 >
 > ```pwsh
 > winget install Microsoft.VisualStudio.2022.BuildTools --override "--quiet --add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.Windows11SDK.22621 --includeRecommended"

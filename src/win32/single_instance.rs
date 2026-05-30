@@ -88,7 +88,6 @@ fn run_event_listener(sender: mpsc::Sender<()>) {
 
     loop {
         let result = unsafe { WaitForSingleObject(handle.raw(), INFINITE) };
-
         if result == WAIT_FAILED {
             warn!("WaitForSingleObject failed, single-instance listener exiting");
             return;
