@@ -94,14 +94,6 @@ cargo build --release # drop --target if you added config.toml above
 | LMMS          | All                         |
 | Cubase        | 14                          |
 
-## How it works
-
-On startup, a named Win32 event (`Local\DAWPresence-SingleInstance`) enforces single-instance behavior. If the event already exists, the new instance signals the running one to show its window and exits (no duplicate tray icons, no silent second process).
-
-The scanner polls running processes via `CreateToolhelp32Snapshot` and matches against `daws.json` entries by process name. On match, it opens the process with `PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_SYNCHRONIZE` and registers a `RegisterWaitForSingleObject` callback on the NT kernel threadpool (process exit detected instantly, no polling loop required).
-
-Each tick reads CPU time via `GetProcessTimes`, working set via `GetProcessMemoryInfo`, and window title via `EnumWindows`. The project name is extracted using a per-DAW regex (compiled patterns cached across ticks, not rebuilt every tick). DAW version comes from the PE version resource (`VerQueryValueW`). All of this feeds a Discord Rich Presence update over the IPC socket.
-
 ## Add a DAW
 
 1. Create a Discord application at the [Discord Developer Portal](https://discord.com/developers/applications).
