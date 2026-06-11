@@ -21,10 +21,6 @@ pub(super) const MINIMIZE_TO_TRAY_DESC: &str =
 pub(super) const AUTO_START: &str = "Start with Windows";
 pub(super) const AUTO_START_DESC: &str = "Launch DAWPresence automatically on login";
 
-pub(super) const TIMER_MODE: &str = "Timer mode";
-pub(super) const TIMER_MODE_SESSION: &str = "Session: resets when DAW opens";
-pub(super) const TIMER_MODE_PROJECT: &str = "Project: resets when project changes";
-
 // interval editor
 pub(super) const UPDATE_INTERVAL: &str = "Update interval (ms)";
 pub(super) const UPDATE_INTERVAL_DESC: &str = "How often DAW status is polled";

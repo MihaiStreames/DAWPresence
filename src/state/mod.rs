@@ -39,7 +39,6 @@ pub(crate) enum Message {
     ToggleCloseToTray(bool),
     ToggleHideProjectName(bool),
     ToggleHideSystemUsage(bool),
-    ToggleTimerMode,
     UpdateIntervalInput(String),
     ApplyInterval,
     Tick,
@@ -55,10 +54,10 @@ pub(crate) struct AppState {
     pub(crate) daw_status: Option<DawStatus>,
     pub(crate) discord_connected: bool,
     pub(crate) auto_start_enabled: bool,
+    pub(crate) start_minimized: bool,
     window_id: Option<window::Id>,
     daw_scanner: Option<DawScanner>,
     discord: DiscordManager,
-    last_project_name: Option<String>,
 }
 
 fn save_or_warn(settings: &AppSettings) {
@@ -82,6 +81,7 @@ pub(crate) fn boot() -> (AppState, Task<Message>) {
     };
 
     let auto_start_enabled = autostart::is_enabled();
+    let start_minimized = std::env::args().any(|a| a == "--minimized");
 
     let settings = AppSettings::load();
     let update_interval_input = settings.update_interval.to_string();
@@ -103,10 +103,10 @@ pub(crate) fn boot() -> (AppState, Task<Message>) {
             daw_status: None,
             discord_connected: false,
             auto_start_enabled,
+            start_minimized,
             window_id: None,
             daw_scanner,
             discord: DiscordManager::default(),
-            last_project_name: None,
         },
         Task::none(),
     )
@@ -124,7 +124,6 @@ pub(crate) fn update(state: &mut AppState, message: Message) -> Task<Message> {
         Message::ToggleCloseToTray(v) => handlers::toggle_close_to_tray(state, v),
         Message::ToggleHideProjectName(v) => handlers::toggle_hide_project_name(state, v),
         Message::ToggleHideSystemUsage(v) => handlers::toggle_hide_system_usage(state, v),
-        Message::ToggleTimerMode => handlers::toggle_timer_mode(state),
         Message::UpdateIntervalInput(v) => handlers::update_interval_input(state, &v),
         Message::ApplyInterval => handlers::apply_interval(state),
         Message::Tick => handlers::tick(state),
@@ -135,8 +134,6 @@ pub(crate) fn update(state: &mut AppState, message: Message) -> Task<Message> {
 pub(crate) fn subscription(state: &AppState) -> Subscription<Message> {
     let tick =
         time::every(Duration::from_millis(state.settings.update_interval)).map(|_| Message::Tick);
-
-    // TODO: maybe factor these out, move subscriptions in respective crates
 
     Subscription::batch(vec![
         tray_subscription(),

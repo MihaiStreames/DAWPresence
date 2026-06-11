@@ -192,11 +192,18 @@ impl DawScanner {
 
             total_cpu += calculate_cpu_percent(p, self.cpu_count);
 
-            // TODO: might need to look into this as other windows can
-            // take priority using the rule below (rare edge cases but still)
+            let titles = window::window_titles(p.pid);
 
-            // longest title is most likely to contain the project name
-            let title = window::window_title(p.pid);
+            // prefer title that matches the DAW's title regex
+            // else fall back to longest (#46)
+
+            let title = titles
+                .iter()
+                .find(|t| self.regex_cache.title_matches(t, cfg.title_regex()))
+                .or_else(|| titles.iter().max_by_key(|t| t.len()))
+                .cloned()
+                .unwrap_or_default();
+
             if title.len() > best_title.len() {
                 best_title = title;
             }
@@ -225,8 +232,9 @@ fn calculate_cpu_percent(process: &mut TrackedProcess, cpu_count: usize) -> f32 
     };
 
     let now = process::wall_ticks();
-    let cpu_delta = (kernel - process.prev_kernel) + (user - process.prev_user);
-    let wall_delta = now - process.prev_wall;
+    let cpu_delta =
+        kernel.saturating_sub(process.prev_kernel) + user.saturating_sub(process.prev_user);
+    let wall_delta = now.saturating_sub(process.prev_wall);
 
     process.prev_kernel = kernel;
     process.prev_user = user;

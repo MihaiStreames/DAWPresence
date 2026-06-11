@@ -48,6 +48,7 @@ mod tests {
             cpu_usage: 12.345,
             ..Default::default()
         };
+
         assert_eq!(status.cpu_usage_str(), "12.35%");
     }
 
@@ -64,6 +65,7 @@ mod tests {
             memory_mb: 512,
             ..Default::default()
         };
+
         assert_eq!(status.ram_usage_str(), "512MB");
     }
 
@@ -74,6 +76,7 @@ mod tests {
             memory_mb: 2048,
             ..Default::default()
         };
+
         assert_eq!(status.ram_usage_str(), "2.00GB");
     }
 

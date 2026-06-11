@@ -12,8 +12,8 @@ use windows_sys::Win32::UI::WindowsAndMessaging::GetWindowThreadProcessId;
 use windows_sys::Win32::UI::WindowsAndMessaging::IsWindowVisible;
 use windows_sys::core::BOOL;
 
-/// Find the longest visible window title for a PID.
-pub(crate) fn window_title(pid: u32) -> String {
+/// Collect all visible window titles for a PID.
+pub(crate) fn window_titles(pid: u32) -> Vec<String> {
     struct State {
         target_pid: u32,
         titles: Vec<String>,
@@ -64,10 +64,5 @@ pub(crate) fn window_title(pid: u32) -> String {
         EnumWindows(Some(callback), &raw mut state as LPARAM);
     }
 
-    // main window typically has the longest title
-    state
-        .titles
-        .into_iter()
-        .max_by_key(String::len)
-        .unwrap_or_default()
+    state.titles
 }

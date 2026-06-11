@@ -3,7 +3,6 @@ use iced::widget::container;
 use iced::widget::scrollable;
 use iced::widget::text;
 
-use crate::settings::TimerMode;
 use crate::state::AppState;
 use crate::state::Message;
 use crate::ui::components;
@@ -43,15 +42,6 @@ pub(in crate::ui) fn settings_view(state: &AppState) -> iced::Element<'_, Messag
             Message::ToggleAutoStart(!state.auto_start_enabled),
         ),
         components::section_heading(strings::SECTION_TIMING),
-        components::setting_toggle(
-            strings::TIMER_MODE,
-            match state.settings.timer_mode {
-                TimerMode::Session => strings::TIMER_MODE_SESSION,
-                TimerMode::Project => strings::TIMER_MODE_PROJECT,
-            },
-            state.settings.timer_mode == TimerMode::Project,
-            Message::ToggleTimerMode,
-        ),
         interval_editor(state),
     ])
     .spacing(style::SPACING_TIGHT);

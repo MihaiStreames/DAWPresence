@@ -101,7 +101,8 @@ impl NormalizedConfig {
 
     /// Check if a normalized process name matches this config.
     pub(super) fn matches(&self, process_name: &str) -> bool {
-        process_name.starts_with(&self.normalized_name)
+        // exact match instead of starts_with (#46)
+        process_name == self.normalized_name
             || self
                 .additional_prefixes
                 .iter()
@@ -168,9 +169,11 @@ mod tests {
             }]
         }"#;
         let config: DawConfigFile = serde_json::from_str(json).unwrap();
+
         assert_eq!(config.version, 1);
         assert_eq!(config.daws.len(), 1);
         assert_eq!(config.daws[0].process_name, "FL64");
+
         assert!(config.daws[0].hide_version);
         assert!(config.daws[0].additional_process_names.is_empty());
     }
@@ -189,11 +192,12 @@ mod tests {
             }]
         }"#;
         let config: DawConfigFile = serde_json::from_str(json).unwrap();
+
         assert_eq!(config.daws[0].additional_process_names.len(), 2);
     }
 
     #[test]
-    fn match_fl_studio_prefix() {
+    fn match_fl_studio_exact() {
         let configs = NormalizedConfig::from_configs(vec![DawConfig {
             process_name: "FL".to_owned(),
             display_text: "FL Studio".to_owned(),
@@ -202,8 +206,10 @@ mod tests {
             hide_version: false,
             additional_process_names: vec![],
         }]);
+
         assert!(configs[0].matches("fl"));
-        assert!(configs[0].matches("fl64"));
+        assert!(!configs[0].matches("fl64"));
+        assert!(!configs[0].matches("flux"));
         assert!(!configs[0].matches("firefox"));
     }
 
@@ -220,6 +226,7 @@ mod tests {
                 "BitwigAudioEngine".to_owned(),
             ],
         }]);
+
         assert!(configs[0].matches("bitwigstudioapp"));
         assert!(configs[0].matches("bitwigaudioengine-x64-avx2"));
         assert!(configs[0].matches("bitwig studio"));
@@ -230,8 +237,10 @@ mod tests {
     fn deserialize_bundled_daws_json() {
         let content = include_str!("../../daws.json");
         let config: DawConfigFile = serde_json::from_str(content).unwrap();
+
         assert!(config.version >= 1);
         assert!(!config.daws.is_empty());
+
         for daw in &config.daws {
             assert!(!daw.process_name.is_empty());
             assert!(!daw.display_text.is_empty());

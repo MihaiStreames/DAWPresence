@@ -7,16 +7,6 @@ const DEFAULT_UPDATE_INTERVAL: u64 = 2500;
 const MIN_UPDATE_INTERVAL: u64 = 1000;
 const MAX_UPDATE_INTERVAL: u64 = 100_000_000;
 
-/// Controls when the Discord presence timer resets.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
-pub(crate) enum TimerMode {
-    /// Timer resets when DAW opens/closes.
-    #[default]
-    Session,
-    /// Timer resets when project name changes.
-    Project,
-}
-
 /// User preferences persisted via confy.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct AppSettings {
@@ -26,8 +16,6 @@ pub(crate) struct AppSettings {
     pub(crate) hide_system_usage: bool,
     #[serde(default = "default_close_to_tray")]
     pub(crate) close_to_tray: bool,
-    #[serde(default)]
-    pub(crate) timer_mode: TimerMode,
     #[serde(default = "default_update_interval")]
     pub(crate) update_interval: u64,
 }
@@ -46,7 +34,6 @@ impl Default for AppSettings {
             hide_project_name: false,
             hide_system_usage: false,
             close_to_tray: true,
-            timer_mode: TimerMode::Session,
             update_interval: DEFAULT_UPDATE_INTERVAL,
         }
     }
@@ -93,22 +80,10 @@ mod tests {
     }
 
     #[test]
-    fn default_timer_mode_is_session() {
-        let settings = AppSettings::default();
-        assert_eq!(settings.timer_mode, TimerMode::Session);
-    }
-
-    #[test]
     fn close_to_tray_serde_default_is_true() {
         // missing field should default to true, not bool::default() (false)
         let settings: AppSettings = toml::from_str("hide_project_name = false\n").unwrap();
         assert!(settings.close_to_tray);
-    }
-
-    #[test]
-    fn timer_mode_roundtrip() {
-        let settings: AppSettings = toml::from_str("timer_mode = \"Project\"\n").unwrap();
-        assert_eq!(settings.timer_mode, TimerMode::Project);
     }
 
     #[test]

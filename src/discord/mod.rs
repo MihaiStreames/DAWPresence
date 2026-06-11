@@ -96,6 +96,7 @@ impl DiscordManager {
         let timestamp = s.start_timestamp.unwrap_or_else(current_timestamp);
 
         let Some(ref mut client) = s.client else {
+            debug_assert!(false, "update_presence called with no client");
             return Ok(());
         };
 

@@ -2,6 +2,18 @@
 
 All notable changes to DAWPresence.
 
+## [3.0.4] - 2026-06-11
+
+### Fixed
+
+- F.Lux (`flux.exe`) no longer falsely detected as FL Studio (#46)
+- Project name now extracted from the DAW's main window rather than whichever window has the longest title
+- Also tackled issues #41, #42 and #43 (check each for more details)
+
+### Removed
+
+- Per-project timer mode toggle _(the session timer remains)_; proper per-project tracking with persistence is tracked in #48
+
 ## [3.0.3] - 2026-05-28
 
 No user-facing changes. Internal code quality pass, closes #38.

@@ -9,7 +9,6 @@ use super::Page;
 use super::save_or_warn;
 use crate::daw::DawScanner;
 use crate::settings::AppSettings;
-use crate::settings::TimerMode;
 use crate::ui::tray::TrayUpdate;
 use crate::ui::tray::send_tray_update;
 use crate::win32::autostart;
@@ -27,8 +26,7 @@ pub(super) fn close_requested(settings: &AppSettings, window_id: window::Id) -> 
 pub(super) fn window_opened(state: &mut AppState, window_id: window::Id) -> Task<Message> {
     state.window_id = Some(window_id);
 
-    // autostart should make the window not open up
-    if std::env::args().any(|a| a == "--minimized") {
+    if state.start_minimized {
         return window::set_mode(window_id, window::Mode::Hidden);
     }
 
@@ -97,16 +95,6 @@ pub(super) fn toggle_hide_system_usage(state: &mut AppState, value: bool) -> Tas
     Task::none()
 }
 
-pub(super) fn toggle_timer_mode(state: &mut AppState) -> Task<Message> {
-    state.settings.timer_mode = match state.settings.timer_mode {
-        TimerMode::Session => TimerMode::Project,
-        TimerMode::Project => TimerMode::Session,
-    };
-    debug!("Timer mode changed to {:?}", state.settings.timer_mode);
-    save_or_warn(&state.settings);
-    Task::none()
-}
-
 pub(super) fn update_interval_input(state: &mut AppState, value: &str) -> Task<Message> {
     value.clone_into(&mut state.update_interval_input);
     state.interval_applied = false;
@@ -149,25 +137,6 @@ pub(super) fn tick(state: &mut AppState) -> Task<Message> {
 
     let status = state.daw_scanner.as_mut().and_then(DawScanner::poll);
     state.daw_status = status;
-
-    // reset timer on project change in Project timer mode
-    if state.settings.timer_mode == TimerMode::Project {
-        let current = state.daw_status.as_ref().map(|s| s.project_name.as_str());
-
-        let changed = match (&state.last_project_name, current) {
-            (Some(prev), Some(curr)) => prev != curr,
-            (None, Some(_)) | (Some(_), None) => true,
-            (None, None) => false,
-        };
-
-        if changed {
-            if current.is_some() {
-                debug!("Project changed to {:?}, resetting timer", current);
-                state.discord.reset_timestamp();
-            }
-            state.last_project_name = current.map(String::from);
-        }
-    }
 
     if let Err(error) = state
         .discord
