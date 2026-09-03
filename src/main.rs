@@ -37,12 +37,14 @@ fn main() -> iced::Result {
         return Ok(());
     }
 
+    let start_minimized = state::start_minimized();
     let window_icon = load_window_icon().ok();
 
     iced::application(state::boot, state::update, view)
         .title("DAWPresence")
         .subscription(state::subscription)
         .window(window::Settings {
+            visible: !start_minimized,
             resizable: false,
             icon: window_icon,
             size: Size::new(784.0, 340.0),

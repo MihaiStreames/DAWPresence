@@ -26,6 +26,7 @@ pub(super) fn close_requested(settings: &AppSettings, window_id: window::Id) -> 
 pub(super) fn window_opened(state: &mut AppState, window_id: window::Id) -> Task<Message> {
     state.window_id = Some(window_id);
 
+    // TODO: test new minimized logic first before deciding to remove this
     if state.start_minimized {
         return window::set_mode(window_id, window::Mode::Hidden);
     }

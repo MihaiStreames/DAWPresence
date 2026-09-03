@@ -55,7 +55,7 @@ wildcard_imports = "allow"
 confy = "2.0.0"
 crossbeam-channel = "0.5.15"
 discord-rich-presence = "1.1.0"
-fancy-regex = { version = "0.18.0", default-features = false, features = [
+fancy-regex = { version = "0.19.0", default-features = false, features = [
   "std",
   "unicode",
   "variable-lookbehinds",

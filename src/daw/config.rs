@@ -175,7 +175,7 @@ mod tests {
         assert_eq!(config.daws[0].process_name, "FL64");
 
         assert!(config.daws[0].hide_version);
-        assert!(config.daws[0].additional_process_names.is_empty());
+        assert_eq!(config.daws[0].additional_process_names, [] as [String; 0]);
     }
 
     #[test]
@@ -242,10 +242,10 @@ mod tests {
         assert!(!config.daws.is_empty());
 
         for daw in &config.daws {
-            assert!(!daw.process_name.is_empty());
-            assert!(!daw.display_text.is_empty());
-            assert!(!daw.title_regex.is_empty());
-            assert!(!daw.client_id.is_empty());
+            assert_ne!(daw.process_name, "");
+            assert_ne!(daw.display_text, "");
+            assert_ne!(daw.title_regex, "");
+            assert_ne!(daw.client_id, "");
         }
     }
 }

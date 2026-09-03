@@ -140,11 +140,12 @@ impl DiscordManager {
         Ok(())
     }
 
+    /// !!TEMPORARILY DISABLED FOR NOW!!
     /// Reset the presence timer to now (for project-based timer mode).
-    pub(crate) fn reset_timestamp(&self) {
-        let mut s = self.lock();
-        s.start_timestamp = Some(current_timestamp());
-    }
+    // pub(crate) fn reset_timestamp(&self) {
+    //     let mut s = self.lock();
+    //     s.start_timestamp = Some(current_timestamp());
+    // }
 
     pub(crate) fn disconnect(&self) {
         let mut s = self.lock();

@@ -66,6 +66,11 @@ fn save_or_warn(settings: &AppSettings) {
     }
 }
 
+/// Helper for checking if app starts minimized.
+pub(crate) fn start_minimized() -> bool {
+    std::env::args().any(|a| a == "--minimized")
+}
+
 /// Initialize application state:
 /// 1. Load [`AppSettings`]
 /// 2. Ensure `daws.json`
@@ -81,7 +86,7 @@ pub(crate) fn boot() -> (AppState, Task<Message>) {
     };
 
     let auto_start_enabled = autostart::is_enabled();
-    let start_minimized = std::env::args().any(|a| a == "--minimized");
+    let start_minimized = start_minimized();
 
     let settings = AppSettings::load();
     let update_interval_input = settings.update_interval.to_string();
