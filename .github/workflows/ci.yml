@@ -46,7 +46,7 @@ jobs:
         run: sudo apt-get install -y gcc-mingw-w64-x86-64
 
       - name: Setup Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@46268bd060767258de96ed93c1251119784f2ab6 # v1.16.1
+        uses: actions-rust-lang/setup-rust-toolchain@ecabd13d1c56bd1345c230e542e9144811ad706f # v2.0.0
         with:
           target: ${{ matrix.target }}
           components: rustfmt, clippy
