@@ -22,7 +22,7 @@ env:
 
 jobs:
   check:
-    name: Check (${{ matrix.os }})
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
@@ -30,9 +30,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
+          # verifies the readme's linux build path (mingw cross-compile)
+          - name: Cross-build (windows-gnu)
+            os: ubuntu-latest
             target: x86_64-pc-windows-gnu
-          - os: windows-latest
+          - name: Build and test (windows-msvc)
+            os: windows-latest
             target: x86_64-pc-windows-msvc
 
     steps:
@@ -46,7 +49,7 @@ jobs:
         run: sudo apt-get install -y gcc-mingw-w64-x86-64
 
       - name: Setup Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
+        uses: actions-rust-lang/setup-rust-toolchain@ecabd13d1c56bd1345c230e542e9144811ad706f # v2.0.0
         with:
           target: ${{ matrix.target }}
           components: rustfmt, clippy
@@ -69,5 +72,7 @@ jobs:
         shell: bash
         run: cargo build --release --target "$TARGET"
 
+      # cross-compiled windows-gnu test binaries can't run on the linux runner
       - name: Test
+        if: matrix.os == 'windows-latest'
         run: cargo test

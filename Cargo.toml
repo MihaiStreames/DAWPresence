@@ -70,7 +70,7 @@ windows-sys = { version = "0.61.2", features = [
 ] }
 
 [dev-dependencies]
-toml = "1.1.6+spec-1.1.0"
+toml = "1.1.6"
 
 [build-dependencies]
 winresource = "0.1.31"
