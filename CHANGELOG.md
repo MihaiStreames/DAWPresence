@@ -2,6 +2,18 @@
 
 All notable changes to DAWPresence.
 
+## [3.0.6] - 2026-10-05
+
+### Fixed
+
+- The app no longer freezes when Discord is slow, hung or restarting; Discord updates now run in the background (#39)
+- When Discord recovers it gets your current status right away instead of replaying missed updates
+
+### Changed
+
+- Autostart entries from before 3.0.5 now update themselves on the next login, no need to toggle autostart off and on anymore
+- Internal cleanup of the Discord connection handling (#40)
+
 ## [3.0.5] - 2026-10-02
 
 ### Added

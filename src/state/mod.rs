@@ -14,7 +14,8 @@ use tracing::warn;
 use crate::daw::DawScanner;
 use crate::daw::DawStatus;
 use crate::daw::ensure_daw_config;
-use crate::discord::DiscordManager;
+use crate::discord::DiscordSender;
+use crate::discord::discord_subscription;
 use crate::settings::AppSettings;
 use crate::ui::tray::tray_subscription;
 use crate::win32::autostart;
@@ -42,6 +43,8 @@ pub(crate) enum Message {
     UpdateIntervalInput(String),
     ApplyInterval,
     Tick,
+    DiscordReady(DiscordSender),
+    DiscordConnected(bool),
 }
 
 /// Root application state for the Iced MVU loop
@@ -58,7 +61,7 @@ pub(crate) struct AppState {
     pub(crate) start_hidden: bool,
     window_id: Option<window::Id>,
     daw_scanner: Option<DawScanner>,
-    discord: DiscordManager,
+    discord: Option<DiscordSender>,
 }
 
 fn save_or_warn(settings: &AppSettings) {
@@ -103,7 +106,7 @@ pub(crate) fn boot(settings: AppSettings, start_hidden: bool) -> (AppState, Task
             start_hidden,
             window_id: None,
             daw_scanner,
-            discord: DiscordManager::default(),
+            discord: None,
         },
         Task::none(),
     )
@@ -124,6 +127,8 @@ pub(crate) fn update(state: &mut AppState, message: Message) -> Task<Message> {
         Message::UpdateIntervalInput(value) => handlers::update_interval_input(state, &value),
         Message::ApplyInterval => handlers::apply_interval(state),
         Message::Tick => handlers::tick(state),
+        Message::DiscordReady(sender) => handlers::discord_ready(state, sender),
+        Message::DiscordConnected(connected) => handlers::discord_connected(state, connected),
     }
 }
 
@@ -133,6 +138,7 @@ pub(crate) fn subscription(state: &AppState) -> Subscription<Message> {
 
     Subscription::batch(vec![
         tray_subscription(),
+        discord_subscription(),
         window_events(),
         tick,
         single_instance_subscription(),

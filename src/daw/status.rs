@@ -38,51 +38,5 @@ impl DawStatus {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn cpu_usage_str_running() {
-        let status = DawStatus {
-            is_running: true,
-            cpu_usage: 12.345,
-            ..Default::default()
-        };
-
-        assert_eq!(status.cpu_usage_str(), "12.35%");
-    }
-
-    #[test]
-    fn cpu_usage_str_not_running() {
-        let status = DawStatus::default();
-        assert_eq!(status.cpu_usage_str(), "Undefined");
-    }
-
-    #[test]
-    fn ram_usage_str_mb() {
-        let status = DawStatus {
-            is_running: true,
-            memory_mb: 512,
-            ..Default::default()
-        };
-
-        assert_eq!(status.ram_usage_str(), "512MB");
-    }
-
-    #[test]
-    fn ram_usage_str_gb() {
-        let status = DawStatus {
-            is_running: true,
-            memory_mb: 2048,
-            ..Default::default()
-        };
-
-        assert_eq!(status.ram_usage_str(), "2.00GB");
-    }
-
-    #[test]
-    fn ram_usage_str_not_running() {
-        let status = DawStatus::default();
-        assert_eq!(status.ram_usage_str(), "Undefined");
-    }
-}
+#[path = "tests/status.rs"]
+mod tests;

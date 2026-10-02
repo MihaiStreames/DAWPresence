@@ -25,6 +25,7 @@ use tracing_subscriber::EnvFilter;
 use crate::settings::AppSettings;
 use crate::ui::tray::load_window_icon;
 use crate::win32::autostart::is_autostart_launch;
+use crate::win32::autostart::migrate_legacy_run_key;
 
 #[cfg(windows)]
 fn main() -> iced::Result {
@@ -35,6 +36,9 @@ fn main() -> iced::Result {
     if !win32::single_instance::acquire() {
         return Ok(());
     }
+
+    // TODO: remove after v3.0.6
+    migrate_legacy_run_key();
 
     let settings = AppSettings::load();
     let start_hidden = settings.should_start_hidden(is_autostart_launch());

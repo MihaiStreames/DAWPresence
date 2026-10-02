@@ -1,3 +1,4 @@
+use tracing::debug;
 use tracing::trace;
 use tracing::warn;
 use windows_sys::Win32::System::Registry::HKEY_CURRENT_USER;
@@ -9,15 +10,28 @@ const VALUE_NAME: &str = "DAWPresence";
 const AUTOSTART_FLAG: &str = "--autostart";
 const LEGACY_AUTOSTART_FLAG: &str = "--minimized"; // versions before 3.0.5
 
-// TODO: migrate legacy Run keys on boot
-// if argv has LEGACY_AUTOSTART_FLAG the key is stale
-// -> call set_enabled(true) to rewrite it with AUTOSTART_FLAG
-// -> drop LEGACY_AUTOSTART_FLAG a few releases later
-// --> users skipping would only see the window open on boot
+// TODO: drop LEGACY_AUTOSTART_FLAG a few releases after 3.0.6
+// users skipping straight past would only see the window open on boot
 
 /// Check if the app was launched by the Run key rather than by the user
 pub(crate) fn is_autostart_launch() -> bool {
     std::env::args().any(|argument| argument == AUTOSTART_FLAG || argument == LEGACY_AUTOSTART_FLAG)
+}
+
+/// Rewrite a Run key that still launches with the pre-3.0.5 flag
+///
+/// Only acts when the key still exists, so a manual `--minimized` launch never enables autostart
+pub(crate) fn migrate_legacy_run_key() {
+    if !std::env::args().any(|argument| argument == LEGACY_AUTOSTART_FLAG) {
+        return;
+    }
+
+    if !is_enabled() {
+        return;
+    }
+
+    debug!("Migrating legacy auto-start registry key to {AUTOSTART_FLAG}");
+    set_enabled(true);
 }
 
 /// Check if auto-start is enabled by reading the HKCU Run key

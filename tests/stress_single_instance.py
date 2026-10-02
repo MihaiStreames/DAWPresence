@@ -31,6 +31,7 @@ def _get_handle_count(pid: int) -> int | None:
         ],
         capture_output=True,
         text=True,
+        check=False,
     )
 
     try:

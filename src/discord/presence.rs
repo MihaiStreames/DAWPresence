@@ -4,7 +4,25 @@ use crate::daw::UNKNOWN_VERSION;
 use crate::daw::UNTITLED_PROJECT;
 use crate::settings::AppSettings;
 
+/// Presence update for the Discord worker, with privacy settings already applied
+#[derive(Debug)]
+pub(crate) struct PresenceRequest {
+    pub(super) client_id: String,
+    pub(super) presence: DiscordPresence,
+}
+
+impl PresenceRequest {
+    /// Build a request from current DAW status
+    pub(crate) fn from_daw_status(daw_status: &DawStatus, settings: &AppSettings) -> Self {
+        Self {
+            client_id: daw_status.client_id.clone(),
+            presence: DiscordPresence::from_daw_status(daw_status, settings),
+        }
+    }
+}
+
 /// Rich Presence data to display on Discord
+#[derive(Debug)]
 pub(super) struct DiscordPresence {
     pub(super) details: String,
     pub(super) state: String,
@@ -49,3 +67,7 @@ impl DiscordPresence {
         }
     }
 }
+
+#[cfg(test)]
+#[path = "tests/presence.rs"]
+mod tests;

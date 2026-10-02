@@ -1,13 +1,14 @@
 use iced::Task;
 use iced::window;
 use tracing::debug;
-use tracing::warn;
 
 use super::AppState;
 use super::Message;
 use super::Page;
 use super::save_or_warn;
 use crate::daw::DawScanner;
+use crate::discord::DiscordSender;
+use crate::discord::PresenceRequest;
 use crate::settings::AppSettings;
 use crate::ui::tray::TrayUpdate;
 use crate::ui::tray::send_tray_update;
@@ -150,19 +151,31 @@ pub(super) fn tick(state: &mut AppState) -> Task<Message> {
     let status = state.daw_scanner.as_mut().and_then(DawScanner::poll);
     state.daw_status = status;
 
-    if let Err(error) = state
-        .discord
-        .update_from_daw_status(state.daw_status.as_ref(), &state.settings)
-    {
-        warn!("Couldn't update Discord presence: {error}");
+    let Some(discord) = &state.discord else {
+        return Task::none();
+    };
+
+    let request = state
+        .daw_status
+        .as_ref()
+        .map(|status| PresenceRequest::from_daw_status(status, &state.settings));
+
+    if !discord.send(request) {
+        state.discord = None;
     }
 
-    let connected = state.discord.is_connected();
-    if connected != state.discord_connected {
-        debug!("Discord connection state: {connected}");
-        state.discord_connected = connected;
-        send_tray_update(TrayUpdate::DiscordConnected(connected));
-    }
+    Task::none()
+}
 
+pub(super) fn discord_ready(state: &mut AppState, sender: DiscordSender) -> Task<Message> {
+    state.discord = Some(sender);
+    debug!("Discord worker ready");
+    Task::none()
+}
+
+pub(super) fn discord_connected(state: &mut AppState, connected: bool) -> Task<Message> {
+    state.discord_connected = connected;
+    debug!("Discord connection state: {connected}");
+    send_tray_update(TrayUpdate::DiscordConnected(connected));
     Task::none()
 }
