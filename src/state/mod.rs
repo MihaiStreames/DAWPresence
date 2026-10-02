@@ -27,7 +27,7 @@ pub(crate) enum Page {
     Settings,
 }
 
-/// Events flowing through the Iced update loop.
+/// Events flowing through the Iced update loop
 #[derive(Debug, Clone)]
 pub(crate) enum Message {
     CloseRequested(window::Id),
@@ -44,7 +44,8 @@ pub(crate) enum Message {
     Tick,
 }
 
-/// Root application state for the Iced MVU loop.
+/// Root application state for the Iced MVU loop
+#[allow(clippy::struct_excessive_bools)]
 pub(crate) struct AppState {
     pub(crate) settings: AppSettings,
     pub(crate) active_page: Page,
@@ -54,7 +55,7 @@ pub(crate) struct AppState {
     pub(crate) daw_status: Option<DawStatus>,
     pub(crate) discord_connected: bool,
     pub(crate) auto_start_enabled: bool,
-    pub(crate) start_minimized: bool,
+    pub(crate) start_hidden: bool,
     window_id: Option<window::Id>,
     daw_scanner: Option<DawScanner>,
     discord: DiscordManager,
@@ -66,16 +67,10 @@ fn save_or_warn(settings: &AppSettings) {
     }
 }
 
-/// Helper for checking if app starts minimized.
-pub(crate) fn start_minimized() -> bool {
-    std::env::args().any(|a| a == "--minimized")
-}
-
 /// Initialize application state:
-/// 1. Load [`AppSettings`]
-/// 2. Ensure `daws.json`
-/// 3. Create [`DawScanner`]
-pub(crate) fn boot() -> (AppState, Task<Message>) {
+/// 1. Ensure `daws.json`
+/// 2. Create [`DawScanner`]
+pub(crate) fn boot(settings: AppSettings, start_hidden: bool) -> (AppState, Task<Message>) {
     let config_path = match ensure_daw_config() {
         Ok(path) => Some(path),
 
@@ -86,9 +81,6 @@ pub(crate) fn boot() -> (AppState, Task<Message>) {
     };
 
     let auto_start_enabled = autostart::is_enabled();
-    let start_minimized = start_minimized();
-
-    let settings = AppSettings::load();
     let update_interval_input = settings.update_interval.to_string();
 
     let daw_scanner = config_path.and_then(|path| {
@@ -108,7 +100,7 @@ pub(crate) fn boot() -> (AppState, Task<Message>) {
             daw_status: None,
             discord_connected: false,
             auto_start_enabled,
-            start_minimized,
+            start_hidden,
             window_id: None,
             daw_scanner,
             discord: DiscordManager::default(),
@@ -117,28 +109,27 @@ pub(crate) fn boot() -> (AppState, Task<Message>) {
     )
 }
 
-/// Dispatch messages to handlers.
+/// Dispatch messages to handlers
 pub(crate) fn update(state: &mut AppState, message: Message) -> Task<Message> {
     match message {
-        Message::CloseRequested(id) => handlers::close_requested(&state.settings, id),
+        Message::CloseRequested(id) => handlers::close_requested(state, id),
         Message::WindowOpened(id) => handlers::window_opened(state, id),
-        Message::TrayShow => handlers::tray_show(state.window_id),
+        Message::TrayShow => handlers::tray_show(state),
         Message::TrayQuit => handlers::tray_quit(state.window_id),
         Message::NavigateTo(page) => handlers::navigate_to(state, page),
-        Message::ToggleAutoStart(v) => handlers::toggle_auto_start(state, v),
-        Message::ToggleCloseToTray(v) => handlers::toggle_close_to_tray(state, v),
-        Message::ToggleHideProjectName(v) => handlers::toggle_hide_project_name(state, v),
-        Message::ToggleHideSystemUsage(v) => handlers::toggle_hide_system_usage(state, v),
-        Message::UpdateIntervalInput(v) => handlers::update_interval_input(state, &v),
+        Message::ToggleAutoStart(value) => handlers::toggle_auto_start(state, value),
+        Message::ToggleCloseToTray(value) => handlers::toggle_close_to_tray(state, value),
+        Message::ToggleHideProjectName(value) => handlers::toggle_hide_project_name(state, value),
+        Message::ToggleHideSystemUsage(value) => handlers::toggle_hide_system_usage(state, value),
+        Message::UpdateIntervalInput(value) => handlers::update_interval_input(state, &value),
         Message::ApplyInterval => handlers::apply_interval(state),
         Message::Tick => handlers::tick(state),
     }
 }
 
-/// Subscribe to the main state changing subscriptions.
+/// Subscribe to the main state changing subscriptions
 pub(crate) fn subscription(state: &AppState) -> Subscription<Message> {
-    let tick =
-        time::every(Duration::from_millis(state.settings.update_interval)).map(|_| Message::Tick);
+    let tick = time::every(Duration::from_millis(state.settings.update_interval)).map(|_| Message::Tick);
 
     Subscription::batch(vec![
         tray_subscription(),
@@ -150,9 +141,7 @@ pub(crate) fn subscription(state: &AppState) -> Subscription<Message> {
 
 fn window_events() -> Subscription<Message> {
     event::listen_with(|event, _status, window_id| match event {
-        iced::Event::Window(window::Event::CloseRequested) => {
-            Some(Message::CloseRequested(window_id))
-        }
+        iced::Event::Window(window::Event::CloseRequested) => Some(Message::CloseRequested(window_id)),
         iced::Event::Window(window::Event::Opened { .. }) => Some(Message::WindowOpened(window_id)),
         _ => None,
     })

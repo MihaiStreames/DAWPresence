@@ -2,6 +2,22 @@
 
 All notable changes to DAWPresence.
 
+## [3.0.5] - 2026-10-02
+
+### Added
+
+- Autostart now remembers how you left the app: if the window was open at shutdown it reopens on login, if it was in the tray it stays there
+- Manually launching the app always shows the window, only autostart launches can start in the tray
+
+### Fixed
+
+- Autostart enabled from the installer now starts in the tray like the in-app toggle does, instead of always opening the window
+
+### Changed
+
+- Autostart flag renamed from `--minimized` to `--autostart`. Existing entries keep working, toggle autostart off and on to update yours
+- Dependency updates and internal formatting/tooling cleanup
+
 ## [3.0.4] - 2026-06-11
 
 ### Fixed

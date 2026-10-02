@@ -6,7 +6,7 @@ align_entries  = true
 align_comments = true
 
 indent_string    = "  "
-column_width     = 100
+column_width     = 120
 trailing_newline = true
 
 reorder_keys = false

@@ -12,7 +12,7 @@ use super::accent_button;
 use crate::state::Message;
 use crate::ui::style;
 
-/// Props for a labeled input field with action button.
+/// Props for a labeled input field with action button
 pub(in crate::ui) struct InputProps<'a> {
     pub label: &'static str,
     pub description: &'a str,
@@ -56,15 +56,9 @@ pub(in crate::ui) fn labeled_input<'a>(
     .spacing(style::SPACING_TIGHT)
     .align_y(Vertical::Center);
 
-    container(
-        row(vec![
-            container(label_col).width(Length::Fill).into(),
-            input_row.into(),
-        ])
-        .align_y(Vertical::Center),
-    )
-    .padding(style::SETTING_ROW_PADDING)
-    .into()
+    container(row(vec![container(label_col).width(Length::Fill).into(), input_row.into()]).align_y(Vertical::Center))
+        .padding(style::SETTING_ROW_PADDING)
+        .into()
 }
 
 fn input_style(theme: &iced::Theme, status: text_input::Status) -> text_input::Style {

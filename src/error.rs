@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-/// Configuration loading and validation errors.
+/// Configuration loading and validation errors
 #[derive(Error, Debug)]
 pub(crate) enum ConfigError {
     #[error("Couldn't read daws.json: {0}")]
@@ -22,7 +22,7 @@ pub(crate) enum ConfigError {
     SaveFailed(String),
 }
 
-/// Discord IPC connection errors.
+/// Discord IPC connection errors
 #[derive(Error, Debug)]
 pub(crate) enum DiscordError {
     #[error("Couldn't connect to Discord: {0}")]
@@ -35,7 +35,7 @@ pub(crate) enum DiscordError {
     Reconnect { activity: String, reconnect: String },
 }
 
-/// Tray icon errors.
+/// Tray icon errors
 #[derive(Error, Debug)]
 pub(crate) enum TrayError {
     #[error("Couldn't create tray icon: {0}")]

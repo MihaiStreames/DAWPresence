@@ -24,13 +24,12 @@ use self::menu::create_tray_icon;
 use self::menu::pump_windows_messages;
 use crate::state::Message;
 
-static TRAY_UPDATES: LazyLock<(mpsc::Sender<TrayUpdate>, Mutex<mpsc::Receiver<TrayUpdate>>)> =
-    LazyLock::new(|| {
-        let (sender, receiver) = mpsc::channel();
-        (sender, Mutex::new(receiver))
-    });
+static TRAY_UPDATES: LazyLock<(mpsc::Sender<TrayUpdate>, Mutex<mpsc::Receiver<TrayUpdate>>)> = LazyLock::new(|| {
+    let (sender, receiver) = mpsc::channel();
+    (sender, Mutex::new(receiver))
+});
 
-/// State changes pushed from the app thread to the tray thread.
+/// State changes pushed from the app thread to the tray thread
 pub(crate) enum TrayUpdate {
     HideProjectName(bool),
     HideSystemUsage(bool),
@@ -42,7 +41,7 @@ pub(crate) fn send_tray_update(update: TrayUpdate) {
     let _ = TRAY_UPDATES.0.send(update);
 }
 
-/// Bridge tray menu events into the app.
+/// Bridge tray menu events into the app
 pub(crate) fn tray_subscription() -> Subscription<Message> {
     Subscription::run(|| {
         iced::stream::channel::<Message>(100, |output: Sender<Message>| async move {
@@ -100,11 +99,7 @@ fn run_tray_handling(mut output: Sender<Message>, shutdown: &AtomicBool) {
     drop(tray_icon);
 }
 
-fn handle_tray_event(
-    menu_items: &TrayMenuIds,
-    output: &mut Sender<Message>,
-    event: &MenuEvent,
-) -> bool {
+fn handle_tray_event(menu_items: &TrayMenuIds, output: &mut Sender<Message>, event: &MenuEvent) -> bool {
     if event.id() == &menu_items.show {
         debug!("Tray: show requested");
 

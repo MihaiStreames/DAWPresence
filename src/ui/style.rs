@@ -40,10 +40,7 @@ pub(super) const STATUS_ICON_TOP_OFFSET: f32 = 4.0;
 pub(super) const COLOR_ERROR: Color = Color::from_rgb(200.0 / 255.0, 80.0 / 255.0, 80.0 / 255.0);
 pub(super) const COLOR_ACCENT: Color = Color::from_rgb(88.0 / 255.0, 166.0 / 255.0, 1.0);
 pub(super) const COLOR_ACCENT_HOVER: Color = Color::from_rgb(108.0 / 255.0, 180.0 / 255.0, 1.0);
-pub(super) const COLOR_ACCENT_DIM: Color =
-    Color::from_rgb(60.0 / 255.0, 120.0 / 255.0, 200.0 / 255.0);
-pub(super) const COLOR_TEXT_DIM: Color =
-    Color::from_rgb(140.0 / 255.0, 140.0 / 255.0, 140.0 / 255.0);
+pub(super) const COLOR_ACCENT_DIM: Color = Color::from_rgb(60.0 / 255.0, 120.0 / 255.0, 200.0 / 255.0);
+pub(super) const COLOR_TEXT_DIM: Color = Color::from_rgb(140.0 / 255.0, 140.0 / 255.0, 140.0 / 255.0);
 pub(super) const COLOR_SURFACE: Color = Color::from_rgb(50.0 / 255.0, 50.0 / 255.0, 50.0 / 255.0);
-pub(super) const COLOR_SURFACE_HOVER: Color =
-    Color::from_rgb(65.0 / 255.0, 65.0 / 255.0, 65.0 / 255.0);
+pub(super) const COLOR_SURFACE_HOVER: Color = Color::from_rgb(65.0 / 255.0, 65.0 / 255.0, 65.0 / 255.0);

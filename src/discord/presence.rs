@@ -4,7 +4,7 @@ use crate::daw::UNKNOWN_VERSION;
 use crate::daw::UNTITLED_PROJECT;
 use crate::settings::AppSettings;
 
-/// Rich Presence data to display on Discord.
+/// Rich Presence data to display on Discord
 pub(super) struct DiscordPresence {
     pub(super) details: String,
     pub(super) state: String,
@@ -13,7 +13,7 @@ pub(super) struct DiscordPresence {
 }
 
 impl DiscordPresence {
-    /// Build presence from current DAW status.
+    /// Build presence from current DAW status
     pub(super) fn from_daw_status(daw_status: &DawStatus, settings: &AppSettings) -> Self {
         let project = if settings.hide_project_name {
             "(hidden)".to_owned()

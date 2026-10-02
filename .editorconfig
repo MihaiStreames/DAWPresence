@@ -9,7 +9,7 @@ trim_trailing_whitespace = true
 [*.rs]
 indent_style = space
 indent_size = 4
-max_line_length = 100
+max_line_length = 120
 
 [*.toml]
 indent_style = space
@@ -26,12 +26,12 @@ indent_size = 2
 [*.sh]
 indent_style = space
 indent_size = 2
-max_line_length = 100
+max_line_length = 120
 
 [*.ps1]
 indent_style = space
 indent_size = 2
-max_line_length = 100
+max_line_length = 120
 
 [*.md]
 indent_style = space

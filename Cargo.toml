@@ -1,6 +1,6 @@
 [package]
 name         = "dawpresence"
-version      = "3.0.4"
+version      = "3.0.5"
 edition      = "2024"
 rust-version = "1.92"
 authors      = ["MihaiStreames <72852703+MihaiStreames@users.noreply.github.com>"]
@@ -36,42 +36,28 @@ unused_qualifications     = "warn"
 broken_intra_doc_links = "warn"
 
 [lints.clippy]
-all      = { level = "warn", priority = -2 }
-pedantic = { level = "warn", priority = -1 }
-
-# picked from nursery: genuinely useful
-missing_const_for_fn = "warn"
-
-# cast lints: intentional, Win32 APIs require specific widths
+all                      = { level = "warn", priority = -2 }
 cast_possible_truncation = "allow"
 cast_possible_wrap       = "allow"
 cast_precision_loss      = "allow"
 cast_sign_loss           = "allow"
-
-# style preferences
-wildcard_imports = "allow"
+missing_const_for_fn     = "warn"
+pedantic                 = { level = "warn", priority = -1 }
+wildcard_imports         = "allow"
 
 [dependencies]
-confy = "2.0.0"
-crossbeam-channel = "0.5.15"
+confy                 = "2.0.0"
+crossbeam-channel     = "0.5.17"
 discord-rich-presence = "1.1.0"
-fancy-regex = { version = "0.19.0", default-features = false, features = [
-  "std",
-  "unicode",
-  "variable-lookbehinds",
-] }
-iced = { version = "0.14.0", default-features = false, features = ["crisp", "smol", "tiny-skia"] }
-image = { version = "0.25.10", default-features = false, features = ["ico", "png"] }
-serde = { version = "1.0.228", features = ["derive"] }
-serde_json = "1.0.149"
-thiserror = "2.0.18"
-tracing = { version = "0.1.44", features = ["release_max_level_off"] }
-tracing-subscriber = { version = "0.3.23", default-features = false, features = [
-  "fmt",
-  "env-filter",
-  "smallvec",
-] }
-tray-icon = "0.24.0"
+fancy-regex           = { version = "0.19.2", default-features = false, features = ["std", "unicode", "variable-lookbehinds"] }
+iced                  = { version = "0.14.0", default-features = false, features = ["crisp", "smol", "tiny-skia"] }
+image                 = { version = "0.25.10", default-features = false, features = ["ico", "png"] }
+serde                 = { version = "1.0.229", features = ["derive"] }
+serde_json            = "1.0.151"
+thiserror             = "2.0.21"
+tracing               = { version = "0.1.44", features = ["release_max_level_off"] }
+tracing-subscriber    = { version = "0.3.23", default-features = false, features = ["fmt", "env-filter", "smallvec"] }
+tray-icon             = "0.25.0"
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.61.2", features = [
@@ -85,7 +71,7 @@ windows-sys = { version = "0.61.2", features = [
 ] }
 
 [dev-dependencies]
-toml = "1.1.2"
+toml = "1.1.6+spec-1.1.0"
 
 [build-dependencies]
 winresource = "0.1.31"

@@ -9,12 +9,10 @@ use crate::ui::components;
 use crate::ui::strings;
 use crate::ui::style;
 
-/// Render the settings page.
+/// Render the settings page
 pub(in crate::ui) fn settings_view(state: &AppState) -> iced::Element<'_, Message> {
     let content = column(vec![
-        text(strings::SETTINGS_TITLE)
-            .size(style::TEXT_HEADING)
-            .into(),
+        text(strings::SETTINGS_TITLE).size(style::TEXT_HEADING).into(),
         components::section_heading(strings::SECTION_PRIVACY),
         components::setting_toggle(
             strings::HIDE_PROJECT_NAME,

@@ -7,14 +7,14 @@ use tracing::debug;
 
 use crate::error::ConfigError;
 
-/// Versioned wrapper for `daws.json`.
+/// Versioned wrapper for `daws.json`
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct DawConfigFile {
     version: u32,
     daws: Vec<DawConfig>,
 }
 
-/// DAW configuration from `daws.json`.
+/// DAW configuration from `daws.json`
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct DawConfig {
     #[serde(rename = "ProcessName")]
@@ -33,19 +33,18 @@ pub(crate) struct DawConfig {
     additional_process_names: Vec<String>,
 }
 
-/// Load DAW configs from a JSON file.
+/// Load DAW configs from a JSON file
 pub(crate) fn load_configs(path: &Path) -> Result<Vec<DawConfig>, ConfigError> {
     let content = std::fs::read_to_string(path)?;
     let file: DawConfigFile = serde_json::from_str(&content)?;
     Ok(file.daws)
 }
 
-/// Ensure a bundled `daws.json` exists in the config directory.
-///
-/// Overwrites the local copy only when the bundled version is newer.
+/// Ensure a bundled `daws.json` exists in the config directory or
+/// overwrite the local copy only when the bundled version is newer
 pub(crate) fn ensure_daw_config() -> Result<PathBuf, ConfigError> {
-    let config_path = confy::get_configuration_file_path("dawpresence", None)
-        .map_err(|e| ConfigError::InitFailed(e.to_string()))?;
+    let config_path =
+        confy::get_configuration_file_path("dawpresence", None).map_err(|e| ConfigError::InitFailed(e.to_string()))?;
     let config_dir = config_path.parent().ok_or(ConfigError::NoConfigDir)?;
     let daws_path = config_dir.join("daws.json");
 
@@ -70,7 +69,7 @@ pub(crate) fn ensure_daw_config() -> Result<PathBuf, ConfigError> {
     Ok(daws_path)
 }
 
-/// Pre-normalized DAW config (for fast matching during scanning).
+/// Pre-normalized DAW config (for fast matching during scanning)
 pub(super) struct NormalizedConfig {
     config: DawConfig,
     normalized_name: String,
@@ -99,7 +98,7 @@ impl NormalizedConfig {
             .collect()
     }
 
-    /// Check if a normalized process name matches this config.
+    /// Check if a normalized process name matches this config
     pub(super) fn matches(&self, process_name: &str) -> bool {
         // exact match instead of starts_with (#46)
         process_name == self.normalized_name
@@ -126,7 +125,7 @@ impl NormalizedConfig {
     }
 }
 
-/// Normalize a process name for comparison (lowercase, strip .exe).
+/// Normalize a process name for comparison (lowercase, strip .exe)
 pub(super) fn normalize_process_name(name: &str) -> String {
     let lower = name.trim().to_lowercase();
     lower.strip_suffix(".exe").unwrap_or(&lower).to_owned()
@@ -221,10 +220,7 @@ mod tests {
             title_regex: String::new(),
             client_id: String::new(),
             hide_version: false,
-            additional_process_names: vec![
-                "Bitwig Studio".to_owned(),
-                "BitwigAudioEngine".to_owned(),
-            ],
+            additional_process_names: vec!["Bitwig Studio".to_owned(), "BitwigAudioEngine".to_owned()],
         }]);
 
         assert!(configs[0].matches("bitwigstudioapp"));

@@ -22,14 +22,14 @@ use windows_sys::Win32::System::Threading::QueryFullProcessImageNameW;
 
 use super::handle::OwnedHandle;
 
-/// A process from the system snapshot.
+/// A process from the system snapshot
 #[derive(Debug, Clone)]
 pub(crate) struct ProcessEntry {
     pub(crate) pid: u32,
     pub(crate) name: String,
 }
 
-/// Enumerate all running processes.
+/// Enumerate all running processes
 pub(crate) fn snapshot() -> Vec<ProcessEntry> {
     let raw = unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) };
     let Some(_guard) = OwnedHandle::new(raw) else {
@@ -65,7 +65,7 @@ pub(crate) fn snapshot() -> Vec<ProcessEntry> {
     entries
 }
 
-/// Open a process handle for monitoring and synchronization.
+/// Open a process handle for monitoring and synchronization
 pub(crate) fn open(pid: u32) -> Option<OwnedHandle> {
     let raw = unsafe {
         OpenProcess(
@@ -78,7 +78,7 @@ pub(crate) fn open(pid: u32) -> Option<OwnedHandle> {
     OwnedHandle::new(raw)
 }
 
-/// Working set memory in bytes.
+/// Working set memory in bytes
 pub(crate) fn memory_bytes(handle: HANDLE) -> Option<u64> {
     let mut counters: PROCESS_MEMORY_COUNTERS = unsafe { zeroed() };
     counters.cb = size_of::<PROCESS_MEMORY_COUNTERS>() as u32;
@@ -91,7 +91,7 @@ pub(crate) fn memory_bytes(handle: HANDLE) -> Option<u64> {
     Some(counters.WorkingSetSize as u64)
 }
 
-/// Kernel + user time in 100ns ticks.
+/// Kernel + user time in 100ns ticks
 pub(crate) fn cpu_times(handle: HANDLE) -> Option<(u64, u64)> {
     let mut creation = 0u64;
     let mut exit = 0u64;
@@ -115,7 +115,7 @@ pub(crate) fn cpu_times(handle: HANDLE) -> Option<(u64, u64)> {
     Some((kernel, user))
 }
 
-/// Full executable path for a process.
+/// Full executable path for a process
 pub(crate) fn exe_path(handle: HANDLE) -> Option<PathBuf> {
     let mut buf = [0u16; MAX_PATH as usize];
     let mut len = buf.len() as u32;
@@ -125,12 +125,10 @@ pub(crate) fn exe_path(handle: HANDLE) -> Option<PathBuf> {
         return None;
     }
 
-    Some(PathBuf::from(String::from_utf16_lossy(
-        &buf[..len as usize],
-    )))
+    Some(PathBuf::from(String::from_utf16_lossy(&buf[..len as usize])))
 }
 
-/// Wall-clock time in 100ns ticks.
+/// Wall-clock time in 100ns ticks
 pub(crate) fn wall_ticks() -> u64 {
     // epoch offset cancels in delta calculations
     SystemTime::now()

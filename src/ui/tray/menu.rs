@@ -27,19 +27,8 @@ pub(super) fn create_tray_icon() -> Result<(TrayIcon, TrayMenuIds), TrayError> {
     let settings = AppSettings::load();
     let menu = Menu::new();
 
-    let hide_project = CheckMenuItem::new(
-        strings::HIDE_PROJECT_NAME,
-        true,
-        settings.hide_project_name,
-        None,
-    );
-
-    let hide_system = CheckMenuItem::new(
-        strings::HIDE_SYSTEM_USAGE,
-        true,
-        settings.hide_system_usage,
-        None,
-    );
+    let hide_project = CheckMenuItem::new(strings::HIDE_PROJECT_NAME, true, settings.hide_project_name, None);
+    let hide_system = CheckMenuItem::new(strings::HIDE_SYSTEM_USAGE, true, settings.hide_system_usage, None);
 
     let show = MenuItem::new(strings::TRAY_SHOW, true, None);
     let quit = MenuItem::new(strings::TRAY_QUIT, true, None);
@@ -68,7 +57,7 @@ pub(super) fn create_tray_icon() -> Result<(TrayIcon, TrayMenuIds), TrayError> {
     ))
 }
 
-/// Pump Windows messages to keep the tray icon responsive.
+/// Pump Windows messages to keep the tray icon responsive
 #[cfg(windows)]
 #[allow(unsafe_code)]
 pub(super) fn pump_windows_messages() {

@@ -30,15 +30,9 @@ pub(in crate::ui) fn setting_toggle(
         .on_toggle(move |_| message.clone())
         .style(toggler_style);
 
-    container(
-        row(vec![
-            container(label_col).width(Length::Fill).into(),
-            toggle.into(),
-        ])
-        .align_y(Vertical::Center),
-    )
-    .padding(style::SETTING_ROW_PADDING)
-    .into()
+    container(row(vec![container(label_col).width(Length::Fill).into(), toggle.into()]).align_y(Vertical::Center))
+        .padding(style::SETTING_ROW_PADDING)
+        .into()
 }
 
 #[allow(clippy::missing_const_for_fn)]

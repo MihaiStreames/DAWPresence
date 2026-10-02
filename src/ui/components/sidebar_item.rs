@@ -9,11 +9,7 @@ use crate::state::Message;
 use crate::state::Page;
 use crate::ui::style;
 
-pub(in crate::ui) fn sidebar_item(
-    label: &'static str,
-    page: Page,
-    active: Page,
-) -> iced::Element<'static, Message> {
+pub(in crate::ui) fn sidebar_item(label: &'static str, page: Page, active: Page) -> iced::Element<'static, Message> {
     let is_active = page == active;
 
     let accent = container(text(""))
@@ -78,11 +74,7 @@ pub(in crate::ui) fn sidebar_item(
 
 fn item_active_style(theme: &iced::Theme) -> Style {
     let bg = theme.palette().background;
-    let lighter = iced::Color::from_rgb(
-        (bg.r * 1.3).min(1.0),
-        (bg.g * 1.3).min(1.0),
-        (bg.b * 1.3).min(1.0),
-    );
+    let lighter = iced::Color::from_rgb((bg.r * 1.3).min(1.0), (bg.g * 1.3).min(1.0), (bg.b * 1.3).min(1.0));
     Style::default().background(iced::Background::Color(lighter))
 }
 
