@@ -117,7 +117,6 @@ pub(super) fn update_interval_input(state: &mut AppState, value: &str) -> Task<M
     } else if let Ok(interval) = value.parse::<u64>() {
         match AppSettings::validate_update_interval(interval) {
             Ok(()) => state.update_interval_error = None,
-
             Err(error) => state.update_interval_error = Some(error.to_string()),
         }
     } else {

@@ -4,6 +4,7 @@ use iced::Subscription;
 use iced::futures::channel::mpsc::Sender;
 use iced::futures::future;
 use tracing::debug;
+use tracing::trace;
 use tracing::warn;
 
 use super::DiscordManager;
@@ -52,13 +53,19 @@ pub(crate) fn discord_subscription() -> Subscription<Message> {
 fn run_worker(receiver: &mpsc::Receiver<Option<PresenceRequest>>, mut output: Sender<Message>) {
     let mut discord = DiscordManager::new();
     let mut was_connected = false;
+    let mut is_failing = false;
 
     while let Ok(request) = receiver.recv() {
         // a hung discord shouldn't replay a backlog of stale ticks once it recovers
         let request = receiver.try_iter().last().unwrap_or(request);
 
-        if let Err(error) = discord.apply_request(request.as_ref()) {
-            warn!("Couldn't update Discord presence: {error}");
+        match discord.apply_request(request.as_ref()) {
+            Ok(()) => is_failing = false,
+            Err(error) if is_failing => trace!("Still couldn't update Discord presence: {error}"),
+            Err(error) => {
+                warn!("Couldn't update Discord presence: {error}");
+                is_failing = true;
+            }
         }
 
         let is_connected = discord.is_connected();

@@ -70,7 +70,6 @@ impl Drop for ShutdownGuard {
 fn run_tray_handling(mut output: Sender<Message>, shutdown: &AtomicBool) {
     let (tray_icon, menu_items) = match create_tray_icon() {
         Ok(tray) => tray,
-
         Err(error) => {
             warn!("Couldn't create tray icon: {error}");
             return;
@@ -89,9 +88,7 @@ fn run_tray_handling(mut output: Sender<Message>, shutdown: &AtomicBool) {
                     break;
                 }
             }
-
             Err(RecvTimeoutError::Timeout) => {}
-
             Err(RecvTimeoutError::Disconnected) => break,
         }
     }
@@ -101,7 +98,7 @@ fn run_tray_handling(mut output: Sender<Message>, shutdown: &AtomicBool) {
 
 fn handle_tray_event(menu_items: &TrayMenuIds, output: &mut Sender<Message>, event: &MenuEvent) -> bool {
     if event.id() == &menu_items.show {
-        debug!("Tray: show requested");
+        debug!("Show requested");
 
         if output.try_send(Message::TrayShow).is_err() {
             warn!("Tray channel closed, exiting tray loop");
@@ -112,7 +109,7 @@ fn handle_tray_event(menu_items: &TrayMenuIds, output: &mut Sender<Message>, eve
     }
 
     if event.id() == &menu_items.quit {
-        debug!("Tray: quit requested");
+        debug!("Quit requested");
         let _ = output.try_send(Message::TrayQuit);
         return true;
     }
@@ -142,16 +139,13 @@ fn drain_tray_updates(menu_items: &TrayMenuIds, tray_icon: &tray_icon::TrayIcon)
             TrayUpdate::HideProjectName(checked) => {
                 menu_items.hide_project.set_checked(checked);
             }
-
             TrayUpdate::HideSystemUsage(checked) => {
                 menu_items.hide_system.set_checked(checked);
             }
-
             TrayUpdate::DiscordConnected(connected) => {
-                debug!("Tray: discord connected = {connected}");
+                debug!("Discord connected: {connected}");
                 let icon = match load_tray_icon(connected) {
                     Ok(icon) => icon,
-
                     Err(error) => {
                         warn!("Couldn't update tray icon: {error}");
                         continue;

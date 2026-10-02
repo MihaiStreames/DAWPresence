@@ -76,7 +76,6 @@ fn save_or_warn(settings: &AppSettings) {
 pub(crate) fn boot(settings: AppSettings, start_hidden: bool) -> (AppState, Task<Message>) {
     let config_path = match ensure_daw_config() {
         Ok(path) => Some(path),
-
         Err(error) => {
             warn!("Couldn't initialize daws.json: {error}");
             None
