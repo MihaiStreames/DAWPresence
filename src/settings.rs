@@ -108,13 +108,20 @@ mod tests {
     }
 
     #[test]
-    fn autostart_restores_last_state() {
-        let mut settings = AppSettings::default();
-
-        settings.was_hidden = true;
+    fn autostart_stays_in_tray_when_left_hidden() {
+        let settings = AppSettings {
+            was_hidden: true,
+            ..AppSettings::default()
+        };
         assert!(settings.should_start_hidden(true));
+    }
 
-        settings.was_hidden = false;
+    #[test]
+    fn autostart_shows_window_when_left_open() {
+        let settings = AppSettings {
+            was_hidden: false,
+            ..AppSettings::default()
+        };
         assert!(!settings.should_start_hidden(true));
     }
 
