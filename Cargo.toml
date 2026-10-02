@@ -6,7 +6,6 @@ rust-version = "1.92"
 authors      = ["MihaiStreames <72852703+MihaiStreames@users.noreply.github.com>"]
 description  = "Show what you are creating on Discord."
 repository   = "https://github.com/MihaiStreames/DAWPresence"
-homepage     = "https://github.com/MihaiStreames/DAWPresence"
 license      = "MIT"
 keywords     = ["discord", "rich-presence", "daw", "audio-production", "music"]
 categories   = ["desktop-applications"]
