@@ -33,7 +33,7 @@ impl DiscordState {
     }
 }
 
-/// Manages Discord IPC connection, reconnection, and presence updates.
+/// Manages Discord IPC connection, reconnection, and presence updates
 pub(crate) struct DiscordManager {
     state: Mutex<DiscordState>,
 }
@@ -54,7 +54,7 @@ impl DiscordManager {
         self.lock().client.is_some()
     }
 
-    /// Connect (or reconnect if client ID changed) to Discord IPC.
+    /// Connect (or reconnect if client ID changed) to Discord IPC
     pub(crate) fn connect(&self, client_id: &str) -> Result<(), DiscordError> {
         let mut s = self.lock();
 
@@ -77,9 +77,7 @@ impl DiscordManager {
         }
 
         let mut new_client = DiscordIpcClient::new(client_id);
-        new_client
-            .connect()
-            .map_err(|e| DiscordError::Connect(e.to_string()))?;
+        new_client.connect().map_err(|e| DiscordError::Connect(e.to_string()))?;
 
         s.client = Some(new_client);
         s.client_id = Some(client_id.to_owned());
@@ -140,12 +138,6 @@ impl DiscordManager {
         Ok(())
     }
 
-    /// Reset the presence timer to now (for project-based timer mode).
-    pub(crate) fn reset_timestamp(&self) {
-        let mut s = self.lock();
-        s.start_timestamp = Some(current_timestamp());
-    }
-
     pub(crate) fn disconnect(&self) {
         let mut s = self.lock();
 
@@ -159,7 +151,7 @@ impl DiscordManager {
         debug!("Disconnected from Discord RPC");
     }
 
-    /// Update presence from DAW status, or disconnect if no DAW running.
+    /// Update presence from DAW status, or disconnect if no DAW running
     pub(crate) fn update_from_daw_status(
         &self,
         daw_status: Option<&DawStatus>,
@@ -184,9 +176,7 @@ impl DiscordManager {
 
     fn lock(&self) -> std::sync::MutexGuard<'_, DiscordState> {
         // a panicking thread shouldn't break the whole app
-        self.state
-            .lock()
-            .unwrap_or_else(std::sync::PoisonError::into_inner)
+        self.state.lock().unwrap_or_else(std::sync::PoisonError::into_inner)
     }
 }
 

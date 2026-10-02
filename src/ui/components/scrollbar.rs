@@ -5,10 +5,7 @@ use iced::widget::scrollable;
 
 use crate::ui::style;
 
-pub(in crate::ui) fn scrollable_style(
-    _theme: &iced::Theme,
-    status: scrollable::Status,
-) -> scrollable::Style {
+pub(in crate::ui) fn scrollable_style(_theme: &iced::Theme, status: scrollable::Status) -> scrollable::Style {
     let scroller_color = match status {
         scrollable::Status::Active { .. } => style::COLOR_SURFACE,
         scrollable::Status::Hovered { .. } => style::COLOR_ACCENT_DIM,

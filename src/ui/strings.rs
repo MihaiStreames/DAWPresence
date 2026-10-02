@@ -8,15 +8,13 @@ pub(super) const SECTION_TIMING: &str = "Timing";
 
 // toggle labels
 pub(super) const HIDE_PROJECT_NAME: &str = "Hide project name";
-pub(super) const HIDE_PROJECT_NAME_DESC: &str =
-    "Prevents your project name from appearing on Discord";
+pub(super) const HIDE_PROJECT_NAME_DESC: &str = "Prevents your project name from appearing on Discord";
 
 pub(super) const HIDE_SYSTEM_USAGE: &str = "Hide system usage";
 pub(super) const HIDE_SYSTEM_USAGE_DESC: &str = "Hides memory and CPU stats from Discord presence";
 
 pub(super) const MINIMIZE_TO_TRAY: &str = "Minimize to tray";
-pub(super) const MINIMIZE_TO_TRAY_DESC: &str =
-    "Close button minimizes to system tray instead of quitting";
+pub(super) const MINIMIZE_TO_TRAY_DESC: &str = "Close button minimizes to system tray instead of quitting";
 
 pub(super) const AUTO_START: &str = "Start with Windows";
 pub(super) const AUTO_START_DESC: &str = "Launch DAWPresence automatically on login";

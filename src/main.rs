@@ -1,7 +1,4 @@
-#![cfg_attr(
-    all(target_os = "windows", not(debug_assertions)),
-    windows_subsystem = "windows"
-)]
+#![cfg_attr(all(target_os = "windows", not(debug_assertions)), windows_subsystem = "windows")]
 
 #[cfg(not(windows))]
 compile_error!("DAWPresence is Windows-only");
@@ -25,7 +22,9 @@ use tracing_subscriber as _;
 #[cfg(debug_assertions)]
 use tracing_subscriber::EnvFilter;
 
+use crate::settings::AppSettings;
 use crate::ui::tray::load_window_icon;
+use crate::win32::autostart::is_autostart_launch;
 
 #[cfg(windows)]
 fn main() -> iced::Result {
@@ -37,12 +36,15 @@ fn main() -> iced::Result {
         return Ok(());
     }
 
+    let settings = AppSettings::load();
+    let start_hidden = settings.should_start_hidden(is_autostart_launch());
     let window_icon = load_window_icon().ok();
 
-    iced::application(state::boot, state::update, view)
+    iced::application(move || state::boot(settings.clone(), start_hidden), state::update, view)
         .title("DAWPresence")
         .subscription(state::subscription)
         .window(window::Settings {
+            visible: !start_hidden,
             resizable: false,
             icon: window_icon,
             size: Size::new(784.0, 340.0),
@@ -56,8 +58,7 @@ fn main() -> iced::Result {
 fn init_logging() {
     tracing_subscriber::fmt()
         .with_env_filter(
-            EnvFilter::try_from_env("DAWPRESENCE_LOG")
-                .unwrap_or_else(|_| EnvFilter::new("DAWPresence=debug,warn")),
+            EnvFilter::try_from_env("DAWPRESENCE_LOG").unwrap_or_else(|_| EnvFilter::new("DAWPresence=debug,warn")),
         )
         .init();
 }

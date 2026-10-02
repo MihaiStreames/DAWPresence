@@ -9,7 +9,7 @@ use windows_sys::Win32::System::Threading::RegisterWaitForSingleObject;
 use windows_sys::Win32::System::Threading::UnregisterWaitEx;
 use windows_sys::Win32::System::Threading::WT_EXECUTEONLYONCE;
 
-/// Channel pair for receiving process exit notifications.
+/// Channel pair for receiving process exit notifications
 pub(crate) struct ExitChannel {
     tx: Sender<u32>,
     rx: Receiver<u32>,
@@ -21,14 +21,12 @@ impl ExitChannel {
         Self { tx, rx }
     }
 
-    /// Drain all pending exit PIDs without blocking.
+    /// Drain all pending exit PIDs without blocking
     pub(crate) fn drain(&self) -> Vec<u32> {
         self.rx.try_iter().collect()
     }
 
-    /// Register an NT threadpool wait on a process handle.
-    ///
-    /// Returns the wait handle for cleanup, or null on failure.
+    /// Register an NT threadpool wait on a process handle, returning the wait handle for cleanup, or null on failure
     pub(crate) fn watch(&self, pid: u32, process_handle: HANDLE) -> HANDLE {
         let ctx = Box::into_raw(Box::new((pid, self.tx.clone())));
         let mut wait_handle: HANDLE = std::ptr::null_mut();
@@ -54,9 +52,7 @@ impl ExitChannel {
     }
 }
 
-/// Cancel a registered wait, blocking until any in-flight callback completes.
-///
-/// No-op if handle is null.
+/// Cancel a registered wait, blocking until any in-flight callback completes or no-op if handle is null
 pub(crate) fn unregister(wait_handle: HANDLE) {
     if !wait_handle.is_null() {
         unsafe {

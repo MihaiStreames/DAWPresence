@@ -10,15 +10,14 @@ use crate::ui::components;
 use crate::ui::strings;
 use crate::ui::style;
 
-/// Render the home page.
+/// Render the home page
 pub(in crate::ui) fn home_view(state: &AppState) -> iced::Element<'_, Message> {
     let (daw_name, project_name, memory_usage, cpu_usage) = match &state.daw_status {
         Some(status) if status.is_running => (
             status.display_name.clone(),
             if state.settings.hide_project_name {
                 strings::PROJECT_HIDDEN.to_owned()
-            } else if status.project_name.trim().is_empty()
-                || status.project_name.eq_ignore_ascii_case(UNKNOWN_PROJECT)
+            } else if status.project_name.trim().is_empty() || status.project_name.eq_ignore_ascii_case(UNKNOWN_PROJECT)
             {
                 strings::NO_PROJECT_OPEN.to_owned()
             } else {

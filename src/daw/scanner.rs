@@ -64,9 +64,8 @@ impl DawScanner {
         }
     }
 
-    /// Returns current DAW status, or `None` if no DAW is running.
-    ///
-    /// Transitions between discovery and monitoring automatically.
+    /// Returns current DAW status, or `None` if no DAW is running
+    /// (transitions between discovery and monitoring automatically)
     pub(crate) fn poll(&mut self) -> Option<DawStatus> {
         self.handle_exits();
 
@@ -209,9 +208,7 @@ impl DawScanner {
             }
         }
 
-        let project_name = self
-            .regex_cache
-            .extract_project_name(&best_title, cfg.title_regex());
+        let project_name = self.regex_cache.extract_project_name(&best_title, cfg.title_regex());
 
         Some(DawStatus {
             is_running: true,
@@ -232,8 +229,7 @@ fn calculate_cpu_percent(process: &mut TrackedProcess, cpu_count: usize) -> f32 
     };
 
     let now = process::wall_ticks();
-    let cpu_delta =
-        kernel.saturating_sub(process.prev_kernel) + user.saturating_sub(process.prev_user);
+    let cpu_delta = kernel.saturating_sub(process.prev_kernel) + user.saturating_sub(process.prev_user);
     let wall_delta = now.saturating_sub(process.prev_wall);
 
     process.prev_kernel = kernel;

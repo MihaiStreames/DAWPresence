@@ -21,7 +21,7 @@ fn open_key(hive: HKEY, subkey: &str, access: u32) -> Option<OwnedKey> {
     (result == ERROR_SUCCESS).then_some(OwnedKey(key))
 }
 
-/// Check if a named value exists under the given key.
+/// Check if a named value exists under the given key
 pub(crate) fn value_exists(hive: HKEY, subkey: &str, name: &str) -> bool {
     let Some(key) = open_key(hive, subkey, KEY_READ) else {
         return false;
@@ -42,7 +42,7 @@ pub(crate) fn value_exists(hive: HKEY, subkey: &str, name: &str) -> bool {
     result == ERROR_SUCCESS
 }
 
-/// Read a [`REG_DWORD`] value. Returns `None` if the key/value is missing or the type is wrong.
+/// Read a [`REG_DWORD`] value. Returns `None` if the key/value is missing or the type is wrong
 #[expect(dead_code)]
 pub(crate) fn read_dword(hive: HKEY, subkey: &str, name: &str) -> Option<u32> {
     let key = open_key(hive, subkey, KEY_READ)?;
@@ -65,7 +65,7 @@ pub(crate) fn read_dword(hive: HKEY, subkey: &str, name: &str) -> Option<u32> {
     (result == ERROR_SUCCESS && kind == REG_DWORD).then_some(value)
 }
 
-/// Write a [`REG_SZ`] (string) value. Returns `false` if the key cannot be opened or write fails.
+/// Write a [`REG_SZ`] (string) value. Returns `false` if the key cannot be opened or write fails
 pub(crate) fn set_sz(hive: HKEY, subkey: &str, name: &str, value: &str) -> bool {
     let Some(key) = open_key(hive, subkey, KEY_WRITE) else {
         return false;
@@ -75,20 +75,11 @@ pub(crate) fn set_sz(hive: HKEY, subkey: &str, name: &str, value: &str) -> bool 
     let value = to_wide_null(value);
     let byte_len = (value.len() * 2) as u32;
 
-    let result = unsafe {
-        RegSetValueExW(
-            key.0,
-            name.as_ptr(),
-            0,
-            REG_SZ,
-            value.as_ptr().cast(),
-            byte_len,
-        )
-    };
+    let result = unsafe { RegSetValueExW(key.0, name.as_ptr(), 0, REG_SZ, value.as_ptr().cast(), byte_len) };
     result == ERROR_SUCCESS
 }
 
-/// Delete a named value. No-op if the key or value does not exist.
+/// Delete a named value. No-op if the key or value does not exist
 pub(crate) fn delete_value(hive: HKEY, subkey: &str, name: &str) {
     let Some(key) = open_key(hive, subkey, KEY_WRITE) else {
         return;

@@ -15,29 +15,41 @@ use crate::win32::autostart;
 
 const INTERVAL_PARSE_ERROR: &str = "Interval must be a number";
 
-pub(super) fn close_requested(settings: &AppSettings, window_id: window::Id) -> Task<Message> {
-    if settings.close_to_tray {
-        window::set_mode(window_id, window::Mode::Hidden)
-    } else {
-        window::close(window_id)
+fn remember_hidden(state: &mut AppState, is_hidden: bool) {
+    if state.settings.was_hidden == is_hidden {
+        return;
     }
+
+    state.settings.was_hidden = is_hidden;
+    save_or_warn(&state.settings);
+}
+
+pub(super) fn close_requested(state: &mut AppState, window_id: window::Id) -> Task<Message> {
+    if !state.settings.close_to_tray {
+        return window::close(window_id);
+    }
+
+    remember_hidden(state, true);
+    window::set_mode(window_id, window::Mode::Hidden)
 }
 
 pub(super) fn window_opened(state: &mut AppState, window_id: window::Id) -> Task<Message> {
     state.window_id = Some(window_id);
 
-    if state.start_minimized {
+    if state.start_hidden {
+        remember_hidden(state, true);
         return window::set_mode(window_id, window::Mode::Hidden);
     }
 
     Task::none()
 }
 
-pub(super) fn tray_show(window_id: Option<window::Id>) -> Task<Message> {
-    let Some(id) = window_id else {
+pub(super) fn tray_show(state: &mut AppState) -> Task<Message> {
+    let Some(id) = state.window_id else {
         return Task::none();
     };
 
+    remember_hidden(state, false);
     Task::batch(vec![
         window::set_mode(id, window::Mode::Windowed),
         window::gain_focus(id),

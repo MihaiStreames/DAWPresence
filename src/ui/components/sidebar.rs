@@ -10,7 +10,7 @@ use crate::state::Page;
 use crate::ui::strings;
 use crate::ui::style;
 
-/// Render the sidebar with page navigation.
+/// Render the sidebar with page navigation
 pub(in crate::ui) fn sidebar(state: &AppState) -> iced::Element<'_, Message> {
     let items = column(vec![
         sidebar_item(strings::NAV_HOME, Page::Home, state.active_page),
@@ -33,10 +33,6 @@ pub(in crate::ui) fn sidebar(state: &AppState) -> iced::Element<'_, Message> {
 
 fn sidebar_bg(theme: &iced::Theme) -> Style {
     let bg = theme.palette().background;
-    let darker = iced::Color::from_rgb(
-        (bg.r * 0.85).max(0.0),
-        (bg.g * 0.85).max(0.0),
-        (bg.b * 0.85).max(0.0),
-    );
+    let darker = iced::Color::from_rgb((bg.r * 0.85).max(0.0), (bg.g * 0.85).max(0.0), (bg.b * 0.85).max(0.0));
     Style::default().background(iced::Background::Color(darker))
 }

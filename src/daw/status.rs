@@ -2,7 +2,7 @@ pub(crate) const UNKNOWN_VERSION: &str = "0.0.0";
 pub(crate) const UNKNOWN_PROJECT: &str = "None";
 pub(crate) const UNTITLED_PROJECT: &str = "Untitled";
 
-/// Current state of a detected DAW.
+/// Current state of a detected DAW
 #[derive(Debug, Clone, Default)]
 pub(crate) struct DawStatus {
     pub(crate) is_running: bool,
